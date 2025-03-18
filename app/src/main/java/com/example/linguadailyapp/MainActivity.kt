@@ -1,8 +1,10 @@
 package com.example.linguadailyapp
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -10,32 +12,60 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.ui.screens.HomeScreen
 import com.example.linguadailyapp.ui.screens.SettingsScreen
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
-import android.Manifest
 
 class MainActivity : ComponentActivity() {
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if ( !isGranted ) {
+                Toast.makeText(this, "Notification Permission Denied", Toast.LENGTH_SHORT).show()
+            }
+            showApp()
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Create notif channel
-        enableEdgeToEdge()
+
+        createNotificationChannel()
+
+        checkNotificationPermission()
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "LinguaDailyChannel",
+                "Lingua Daily Notifications",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun checkNotificationPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            showApp()
+        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
+            showApp()
+        } else {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private fun showApp() {
         setContent {
             LinguaDailyAppTheme {
                 AppNavigation()
-
-
             }
         }
     }
@@ -51,26 +81,4 @@ fun AppNavigation() {
         composable("home") { HomeScreen(navController) }
         composable("settings") { SettingsScreen(navController) }
     }
-}
-
-@Composable
-fun RequestNotificationPermission(onPermissionGranted: () -> Unit) {
-    val context = LocalContext.current
-
-    // Register the permission request
-    val requestPermissionLauncher =
-        (context as ComponentActivity).registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted ->
-            if (isGranted) {
-                // If permission is granted, navigate to the HomeScreen
-                onPermissionGranted()
-            } else {
-                // Show a toast or handle the case where permission is denied
-                Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-    // Request the permission for sending notifications
-    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
 }
