@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.ui.components.ButtonBanner
 import com.example.linguadailyapp.ui.components.TopBar
+import com.example.linguadailyapp.navigation.NavigationDestinations
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +40,7 @@ fun HomeScreen(
                 },
                 onSettingsIconClick = {
                     // Navigate to the settings screen
-                    navController.navigate("settings")
+                    navController.navigate(NavigationDestinations.Settings.route)
                 }
             )
         },

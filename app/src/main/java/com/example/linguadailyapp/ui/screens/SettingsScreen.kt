@@ -34,6 +34,7 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.R
+import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.components.SwitchSetting
 import com.example.linguadailyapp.utils.sendNotification
 
@@ -54,7 +55,7 @@ fun SettingsScreen(navController: NavController) {
                         if (navController.previousBackStackEntry != null) {
                             navController.popBackStack()
                         } else {
-                            navController.navigate("home") // Fallback if no previous screen
+                            navController.navigate(NavigationDestinations.Home.route) // Fallback if no previous screen
                         }
                     }) {
                         Icon(imageVector = Icons.Filled.ArrowBackIosNew, contentDescription = "Back", tint = Color.Black)
