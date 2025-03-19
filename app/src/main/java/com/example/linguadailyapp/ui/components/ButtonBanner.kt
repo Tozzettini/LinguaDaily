@@ -53,7 +53,7 @@ fun ButtonBanner(navController: NavController) {
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Circle(Icons.Default.Lightbulb, Color(0xFFBBDEFB), "Words") { navController.navigate(NavigationDestinations.Settings.route) }
+            Circle(Icons.Default.Lightbulb, Color(0xFFBBDEFB), "Words") { navController.navigate(NavigationDestinations.WordsList.route) }
             Circle(Icons.Default.Bookmarks, Color(0xFFFFAB91), "Bookmarks") { println("Green Circle Clicked!") }
             Circle(Icons.Default.Shuffle, Color(0xFFA5D6A7), "Random") { println("Blue Circle Clicked!") }
         }
