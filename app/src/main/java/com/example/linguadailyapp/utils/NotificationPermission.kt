@@ -52,6 +52,8 @@ class NotificationPermission(
         fun handlePermissionResult(context: Context, isGranted: Boolean) {
             if ( !isGranted ) {
                 Toast.makeText(context, "Notification Permission Denied", Toast.LENGTH_SHORT).show()
+            } else {
+                sendNotification("You enabled notifications!", "we are just checking they actually work ;)", context)
             }
         }
     }
