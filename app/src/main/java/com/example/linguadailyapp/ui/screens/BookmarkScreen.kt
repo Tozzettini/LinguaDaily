@@ -97,7 +97,7 @@ fun BookmarkBoxContainer() {
             modifier = Modifier
                 .border(2.dp, Color.Black, shape = RoundedCornerShape(8.dp)) // Black border outline
                 .background(
-                    MaterialTheme.colorScheme.background,
+                    MaterialTheme.colorScheme.surfaceVariant,
                     shape = RoundedCornerShape(8.dp)
                 ) // Background color & rounded corners
                 .clip(RoundedCornerShape(8.dp)) // Ensures content inside respects the rounded shape
