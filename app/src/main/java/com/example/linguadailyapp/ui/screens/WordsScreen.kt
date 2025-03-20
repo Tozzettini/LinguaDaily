@@ -1,5 +1,6 @@
 package com.example.linguadailyapp.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -78,7 +79,7 @@ fun WordsList(modifier: Modifier) {
         LazyColumn (
             verticalArrangement = Arrangement.spacedBy(4.dp),
             contentPadding = PaddingValues(vertical = 4.dp),
-            modifier = Modifier.background(Color.LightGray)
+            modifier = Modifier.background(MaterialTheme.colorScheme.background)
         )
         {
             items(itemsList) {
@@ -94,7 +95,7 @@ fun WordCard() {
     Row (modifier = Modifier
         .fillMaxWidth()
         .height(66.dp)
-        .background(Color.White),
+        .background(MaterialTheme.colorScheme.primaryContainer),
         verticalAlignment = Alignment.CenterVertically
     ) {
         DateCircle(
@@ -102,7 +103,7 @@ fun WordCard() {
             modifier = Modifier.padding(8.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        WordInformation("ciao tutti", "buongiorno")
+        WordInformation("ciao a tutti", "buongiorno")
         Spacer(modifier = Modifier.weight(1f))
         Icon(
             imageVector = Icons.Outlined.BookmarkBorder,
@@ -136,7 +137,7 @@ fun WordInformation(word: String, definition: String) {
 @Composable
 fun DateCircle(monthDay: MonthDay, modifier: Modifier = Modifier) {
     Surface(
-        color = Color.Cyan,
+        color = MaterialTheme.colorScheme.onSecondary,
         shape = CircleShape,
         modifier = modifier.size(50.dp),
     ) {
@@ -161,6 +162,7 @@ fun DateCircle(monthDay: MonthDay, modifier: Modifier = Modifier) {
         }
     }
 }
+//TODO: Using offset isn't a Great Idea in theory
 
 @Preview(showBackground = true)
 @Composable
@@ -202,5 +204,40 @@ fun previewWordsScreen() {
         WordsScreen(
             navController = navController
         )
+    }
+}
+
+
+//---
+@Composable
+fun TestDateCircle(monthDay: MonthDay, modifier: Modifier = Modifier) {
+    Surface(
+        color = MaterialTheme.colorScheme.onSecondary,
+        shape = CircleShape,
+        modifier = modifier.size(50.dp),
+        border = BorderStroke(1.dp, Color.Black)
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Text(
+                //wrote with $ cause its supposed to be a variable, its called String Interpolation
+                // Bomboclaat
+                text = "${monthDay.month.name.take(3)}\n${monthDay.dayOfMonth}",
+                color = Color.Blue,
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center,
+                lineHeight = 12.sp // Adjust spacing between lines
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun previewTestDateCircle() {
+    MaterialTheme {
+        TestDateCircle(monthDay = MonthDay.now(), Modifier.padding(8.dp))
     }
 }

@@ -56,6 +56,10 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                         ButtonBanner(navController = navController)
                         // Add your home screen content here
+                        // MainWordContainer
+                        // SteakCounter
+                        // Spacer with weight 1 to push the ad/design always at the bottom
+                        // Ad/Design
                         Text(
                             text = "Welcome to the Daily Word App!",
                             modifier = Modifier
