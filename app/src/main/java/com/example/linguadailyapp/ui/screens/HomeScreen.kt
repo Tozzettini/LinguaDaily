@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.ui.components.ButtonBanner
 import com.example.linguadailyapp.ui.components.TopBar
 import com.example.linguadailyapp.navigation.NavigationDestinations
+import com.example.linguadailyapp.ui.components.MainWordDisplayContainer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,8 +58,11 @@ fun HomeScreen(
                         ButtonBanner(navController = navController)
                         // Add your home screen content here
                         // MainWordContainer
+                        MainWordDisplayContainer()
                         // SteakCounter
                         // Spacer with weight 1 to push the ad/design always at the bottom
+                        Spacer(modifier = Modifier.weight(1f)) // This will take up all available space
+
                         // Ad/Design
                         Text(
                             text = "Welcome to the Daily Word App!",
