@@ -69,7 +69,7 @@ fun HomeScreen(
         }
     )
 }
-
+// TODO: Might have to redo everything with cards
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
