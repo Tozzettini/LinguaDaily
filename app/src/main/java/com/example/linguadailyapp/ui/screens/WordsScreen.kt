@@ -88,7 +88,7 @@ fun WordsScreen(navController: NavController) {
 @Composable
 fun WordsList(modifier: Modifier, words: List<Word>) {
 
-    Surface (Modifier.background(Color.LightGray)) {
+    Surface (modifier = modifier.background(Color.LightGray)) {
         LazyColumn (
             verticalArrangement = Arrangement.spacedBy(4.dp),
             contentPadding = PaddingValues(vertical = 4.dp),
