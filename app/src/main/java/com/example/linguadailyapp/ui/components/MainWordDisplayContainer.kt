@@ -1,13 +1,11 @@
 package com.example.linguadailyapp.ui.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -22,9 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.linguadailyapp.database.word.Word
+import java.time.LocalDate
 
 @Composable
-fun MainWordDisplayContainer() {
+fun MainWordDisplayContainer(word: Word) {
 
     val mainWord = "Bomboclaat"
     val definition = "An exclamation used to express shock or frustration."
@@ -47,11 +47,11 @@ fun MainWordDisplayContainer() {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                mainWord,
+                word.word,
                 fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
             )
-            Text(": $definition", fontSize = 18.sp)
+            Text(": ${word.description}", fontSize = 18.sp)
             Spacer(modifier = Modifier.height(8.dp))
             Text( "How to use $mainWord", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Text(usageExample, fontSize = 18.sp)
@@ -68,6 +68,6 @@ fun MainWordDisplayContainer() {
 @Composable
 fun PreviewMainWordDisplayContainer(){
 MaterialTheme {
-    MainWordDisplayContainer()
+    MainWordDisplayContainer(Word(word = "Ciao", description = "Hello", language = "Italian", date = LocalDate.now()))
 }
 }
