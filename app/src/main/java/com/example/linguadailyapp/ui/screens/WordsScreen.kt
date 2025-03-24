@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,18 +33,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.linguadailyapp.database.Word
+import com.example.linguadailyapp.database.WordDatabase
 import com.example.linguadailyapp.navigation.NavigationDestinations
+import kotlinx.coroutines.runBlocking
 import java.time.MonthDay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WordsScreen(navController: NavController) {
+
+    val context = LocalContext.current
+    val words: List<Word>
+
+    runBlocking {
+        WordDatabase.getInstance(context).wordDao().insert(Word(word = "Ciao a tutti", description =  "Bounjourno", language =  "Italian"))
+        WordDatabase.getInstance(context).wordDao().insert(Word(word = "This is getting inserted", description =  "into the local database", language =  "Italian"))
+        WordDatabase.getInstance(context).wordDao().insert(Word(word = "And then read from", description =  "the database again", language =  "Italian"))
+
+        words = WordDatabase.getInstance(context).wordDao().getAllWords()
+    }
 
     Scaffold (
         topBar = {
@@ -65,15 +79,14 @@ fun WordsScreen(navController: NavController) {
             )
         },
         content = { paddingValues ->
-            WordsList(Modifier.padding(paddingValues))
+            WordsList(Modifier.padding(paddingValues), words)
         }
     )
 
 }
 
 @Composable
-fun WordsList(modifier: Modifier) {
-    val itemsList = List(100) { "Item #$it" }
+fun WordsList(modifier: Modifier, words: List<Word>) {
 
     Surface (Modifier.background(Color.LightGray)) {
         LazyColumn (
@@ -82,15 +95,15 @@ fun WordsList(modifier: Modifier) {
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         )
         {
-            items(itemsList) {
-                    item -> WordCard()
+            items(words) {
+                    item -> WordCard(item)
             }
         }
     }
 }
 
 @Composable
-fun WordCard() {
+fun WordCard(word: Word) {
 
     Row (modifier = Modifier
         .fillMaxWidth()
@@ -103,7 +116,7 @@ fun WordCard() {
             modifier = Modifier.padding(8.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        WordInformation("ciao a tutti", "buongiorno")
+        WordInformation(word.word, word.description)
         Spacer(modifier = Modifier.weight(1f))
         Icon(
             imageVector = Icons.Outlined.BookmarkBorder,
@@ -164,13 +177,13 @@ fun DateCircle(monthDay: MonthDay, modifier: Modifier = Modifier) {
 }
 //TODO: Using offset isn't a Great Idea in theory
 
-@Preview(showBackground = true)
-@Composable
-fun previewWordsList() {
-    MaterialTheme {
-        WordsList(Modifier)
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun previewWordsList() {
+//    MaterialTheme {
+//        WordsList(Modifier)
+//    }
+//}
 
 @Preview(showBackground = true)
 @Composable
@@ -188,13 +201,13 @@ fun previewWordInformation() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun previewWordCard() {
-    MaterialTheme {
-        WordCard()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun previewWordCard() {
+//    MaterialTheme {
+//        WordCard()
+//    }
+//}
 
 @Preview(showBackground = true)
 @Composable
