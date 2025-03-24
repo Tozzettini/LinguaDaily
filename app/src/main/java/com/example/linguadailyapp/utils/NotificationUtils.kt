@@ -6,10 +6,11 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.linguadailyapp.R
 
 fun sendNotification(title: String, message: String, context: Context) {
     val notificationBuilder = NotificationCompat.Builder(context, "LinguaDailyChannel")
-        .setSmallIcon(android.R.drawable.ic_dialog_info)
+        .setSmallIcon(R.drawable.ic_icon_v1)
         .setContentTitle(title)
         .setContentText(message)
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)

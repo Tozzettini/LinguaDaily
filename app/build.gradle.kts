@@ -40,6 +40,8 @@ android {
 }
 
 dependencies {
+
+    // or if using Kotlin KAPT
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.material.icons.extended)
 
