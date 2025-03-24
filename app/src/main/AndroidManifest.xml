@@ -16,7 +16,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="LinguaDaily"
+            android:label="Lingua Daily"
             android:icon="@mipmap/icon"
             android:roundIcon="@mipmap/icon"
             android:theme="@style/Theme.LinguaDailyApp">
