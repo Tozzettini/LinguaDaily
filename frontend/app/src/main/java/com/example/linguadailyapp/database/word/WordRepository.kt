@@ -22,7 +22,7 @@ class WordRepository(val context : Context) {
 
     suspend fun getAllWords(): List<Word> {
         return wordDao.getAllWords().filter { word ->
-            word.date >= LocalDate.now()
+            word.date <= LocalDate.now()
         }
     }
 
