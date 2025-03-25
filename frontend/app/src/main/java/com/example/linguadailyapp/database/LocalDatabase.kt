@@ -6,13 +6,14 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.example.linguadailyapp.database.settings.Settings
 import com.example.linguadailyapp.database.settings.SettingsDao
 import com.example.linguadailyapp.database.word.Word
 import com.example.linguadailyapp.database.word.WordDao
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-private class Converters {
+class Converters {
     private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
 
     @TypeConverter
@@ -27,7 +28,7 @@ private class Converters {
 
 }
 
-@Database(entities = [Word::class], version = 1, exportSchema = false)
+@Database(entities = [Word::class, Settings::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class LocalDatabase : RoomDatabase() {
 
