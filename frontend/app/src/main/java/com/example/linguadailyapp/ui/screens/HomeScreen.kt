@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,9 +45,11 @@ fun HomeScreen(
 ) {
 
     val context = LocalContext.current
-    val todaysWord: Word
-    runBlocking {
-        todaysWord = WordRepository(context).getTodaysWord()!!
+    var todaysWord by remember { mutableStateOf<Word?>(null) }
+
+    // Use LaunchedEffect to handle asynchronous data fetching
+    LaunchedEffect(context) {
+        todaysWord = WordRepository(context).getTodaysWord() // Suspend function to fetch data
     }
 
     Scaffold(
@@ -75,8 +78,12 @@ fun HomeScreen(
                         ButtonBanner(navController = navController)
                         // Add your home screen content here
                         // MainWordContainer
-                        MainWordDisplayContainer(todaysWord)
-                        // SteakCounter
+                        if (todaysWord != null) {
+                            MainWordDisplayContainer(todaysWord!!)
+                        } else {
+                            val sampleWord = Word(word = "Ciao", description = "Hello", language = "Italian", date = LocalDate.now())
+                            todaysWord = sampleWord
+                        }                        // SteakCounter
                         // Spacer with weight 1 to push the ad/design always at the bottom
                         Spacer(modifier = Modifier.weight(1f)) // This will take up all available space
 
@@ -93,7 +100,9 @@ fun HomeScreenPreview() {
     val navController = rememberNavController() // ✅ Correct way to provide a NavController in preview
     MaterialTheme {
         HomeScreen(
-            navController = navController
+
+            navController = navController,
+
         )
     }
 }
