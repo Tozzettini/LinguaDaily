@@ -28,7 +28,7 @@ class Converters {
 
 }
 
-@Database(entities = [Word::class, Settings::class], version = 1, exportSchema = false)
+@Database(entities = [Word::class, Settings::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class LocalDatabase : RoomDatabase() {
 
