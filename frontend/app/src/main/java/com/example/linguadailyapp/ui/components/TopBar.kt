@@ -1,5 +1,6 @@
 package com.example.linguadailyapp.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -11,11 +12,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.linguadailyapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,13 +34,14 @@ fun TopBar(
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
         title = {
-            Text(
-                text = "Lingua Daily",
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.SansSerif
+            Image(
+                painter = painterResource(id = R.drawable.logo_linguadaily), // your logo image
+                contentDescription = null, // provide a description if needed
+                modifier = Modifier
+                    .fillMaxWidth() // Take full width
+                    .padding(horizontal = 16.dp) // Optional padding
             )
+
         },
         navigationIcon = {
 
