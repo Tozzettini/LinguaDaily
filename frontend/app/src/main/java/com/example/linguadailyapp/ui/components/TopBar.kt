@@ -146,6 +146,8 @@ fun LanguageDropdownMenu(
     var language by rememberSaveable  { mutableStateOf("EN") }
     var expanded by remember { mutableStateOf(false) }
 
+    // var EN,IT,NL multableStateOf(false), we want to be able to select multiple at a time
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
