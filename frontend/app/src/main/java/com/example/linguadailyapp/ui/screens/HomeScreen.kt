@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.R
@@ -33,6 +35,8 @@ import com.example.linguadailyapp.ui.components.ButtonBanner
 import com.example.linguadailyapp.ui.components.TopBar
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.components.MainWordDisplayContainer
+import com.example.linguadailyapp.viewmodel.WordViewModel
+import com.example.linguadailyapp.viewmodel.WordViewModelFactory
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 
@@ -41,16 +45,11 @@ import java.time.LocalDate
 fun HomeScreen(
     navController: NavController,
     onLanguageIconClick: () -> Unit = {},
-    onSettingsIconClick: () -> Unit = { }
+    onSettingsIconClick: () -> Unit = { },
+    viewModel: WordViewModel = viewModel(factory = WordViewModelFactory(LocalContext.current))
 ) {
 
-    val context = LocalContext.current
-    var todaysWord by remember { mutableStateOf<Word?>(null) }
-
-    // Use LaunchedEffect to handle asynchronous data fetching
-    LaunchedEffect(context) {
-        todaysWord = WordRepository(context).getTodaysWord() // Suspend function to fetch data
-    }
+    val todaysWord by viewModel.todaysWord.collectAsState()
 
     Scaffold(
         topBar = {
@@ -78,12 +77,8 @@ fun HomeScreen(
                         ButtonBanner(navController = navController)
                         // Add your home screen content here
                         // MainWordContainer
-                        if (todaysWord != null) {
-                            MainWordDisplayContainer(todaysWord!!)
-                        } else {
-                            val sampleWord = Word(word = "Ciao", description = "Hello", language = "Italian", date = LocalDate.now())
-                            todaysWord = sampleWord
-                        }                        // SteakCounter
+                        MainWordDisplayContainer(todaysWord)
+                        // SteakCounter
                         // Spacer with weight 1 to push the ad/design always at the bottom
                         Spacer(modifier = Modifier.weight(1f)) // This will take up all available space
 
