@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import java.time.LocalDate;
 
 
 // Represents the Word Table in the database
@@ -18,6 +19,7 @@ public class Word {
     private String word;
     private String description;
     private String language;
+    private LocalDate date;
 
     // Getters and setters
     public Long getId() {
@@ -50,5 +52,13 @@ public class Word {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 }

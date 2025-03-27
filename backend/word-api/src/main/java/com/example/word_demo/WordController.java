@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,8 +24,27 @@ public class WordController {
 
     // Get all words
     @GetMapping
-    public List<Word> getAllWords() {
-        return wordService.getAllWords();
+    public ResponseEntity<?> getAllWords(@RequestParam(required = false) String since) {
+        System.out.println(since);
+
+        if (since != null) {
+            try {
+                LocalDate sinceDate = LocalDate.parse(since);
+
+                var words = this.wordService.getAllWords();
+
+                words = words.stream().filter(w -> !w.getDate().isBefore(sinceDate)).toList();
+
+                return ResponseEntity.ok(words);
+
+            } catch (DateTimeParseException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Invalid date format for 'since'. Please use the format 'yyyy-MM-dd'.");
+            }
+        } else {
+            // If no 'since' parameter, return all words
+            return ResponseEntity.ok(wordService.getAllWords());
+        }
     }
 
     // Get a single word by id
