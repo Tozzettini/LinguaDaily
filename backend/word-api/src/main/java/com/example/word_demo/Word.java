@@ -1,11 +1,13 @@
 package com.example.word_demo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 // Represents the Word Table in the database
@@ -21,7 +23,10 @@ public class Word {
     private String language;
     private LocalDate date;
 
-    // Getters and setters
+    @JsonIgnore
+    private LocalDateTime created = LocalDateTime.now();
+
+    // Getters and setters.
     public Long getId() {
         return id;
     }
@@ -60,5 +65,13 @@ public class Word {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public LocalDateTime getCreated() {
+        return created;
+    }
+
+    public void setCreated(LocalDateTime created) {
+        this.created = created;
     }
 }

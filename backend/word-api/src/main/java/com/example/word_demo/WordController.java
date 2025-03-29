@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +30,12 @@ public class WordController {
 
         if (since != null) {
             try {
-                LocalDate sinceDate = LocalDate.parse(since);
+                since = since.replace(" ", "T");
+                LocalDateTime sinceDate = LocalDateTime.parse(since);
 
                 var words = this.wordService.getAllWords();
 
-                words = words.stream().filter(w -> !w.getDate().isBefore(sinceDate)).toList();
+                words = words.stream().filter(w -> !w.getCreated().isBefore(sinceDate)).toList();
 
                 return ResponseEntity.ok(words);
 
