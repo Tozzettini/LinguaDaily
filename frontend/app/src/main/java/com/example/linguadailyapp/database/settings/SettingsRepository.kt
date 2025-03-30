@@ -2,7 +2,8 @@ package com.example.linguadailyapp.database.settings
 
 import android.content.Context
 import com.example.linguadailyapp.database.LocalDatabase
-import java.time.LocalDate
+import java.time.Instant
+import java.time.LocalDateTime
 
 class SettingsRepository(val context : Context) {
 
@@ -41,16 +42,16 @@ class SettingsRepository(val context : Context) {
         settingsDao.saveSettings(updatedSettings)
     }
 
-    suspend fun getLastSynced() : LocalDate {
-        return settingsDao.getSettings()?.lastSynced ?: LocalDate.MIN
+    suspend fun getLastSynced() : Instant {
+        return settingsDao.getSettings()?.lastSynced ?: Instant.MIN
     }
 
-    suspend fun setLastSynced(date: LocalDate) {
+    suspend fun setLastSynced(datetime: Instant) {
 
         val current = currentSettings() ?: Settings()
 
         val updatedSettings = current.copy(
-            lastSynced = date
+            lastSynced = datetime
         )
 
         settingsDao.saveSettings(updatedSettings)

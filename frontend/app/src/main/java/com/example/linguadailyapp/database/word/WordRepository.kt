@@ -2,6 +2,8 @@ package com.example.linguadailyapp.database.word
 
 import android.content.Context
 import com.example.linguadailyapp.database.LocalDatabase
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
 class WordRepository(val context : Context) {
@@ -12,19 +14,21 @@ class WordRepository(val context : Context) {
         wordDao.insert(word)
     }
 
-    suspend fun wipeWordsTable() {
-        wordDao.wipeWordsTable()
+    suspend fun insertAll(words: List<Word>) {
+        for(word in words) {
+            this.insert(word)
+        }
     }
 
     suspend fun getTodaysWord(): Word? {
         return wordDao.getWordForDay(LocalDate.now())
     }
 
-    suspend fun getAllWords(): List<Word> {
-        return wordDao.getAllWords().filter { word ->
-            word.date <= LocalDate.now()
-        }
+    fun getAllWordsFlow(): Flow<List<Word>> {
+        return wordDao.getAllWordsFlow()
+            .map { words -> words.filter { it.date <= LocalDate.now() } }
     }
+
 
 }
 

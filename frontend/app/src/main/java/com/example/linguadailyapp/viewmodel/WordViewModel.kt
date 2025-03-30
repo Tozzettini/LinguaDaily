@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.linguadailyapp.database.word.Word
 import com.example.linguadailyapp.database.word.WordRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -20,11 +19,11 @@ class WordViewModel(private val repository: WordRepository) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            val allWords = repository.getAllWords()
-            _words.value = allWords
-
-            val today = LocalDate.now()
-            _todaysWord.value = allWords.firstOrNull { it.date == today }!!
+            repository.getAllWordsFlow().collect { allWords ->
+                _words.value = allWords
+                val today = LocalDate.now()
+                _todaysWord.value = allWords.firstOrNull { it.date == today } ?: Word(word = "Ciao", description = "Hello", language = "Italian", date = LocalDate.now())
+            }
         }
     }
 }
