@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -24,7 +25,7 @@ public class Word {
     private LocalDate date;
 
     @JsonIgnore
-    private LocalDateTime created = LocalDateTime.now();
+    private Instant created = Instant.now();
 
     // Getters and setters.
     public Long getId() {
@@ -67,11 +68,11 @@ public class Word {
         this.date = date;
     }
 
-    public LocalDateTime getCreated() {
+    public Instant getCreated() {
         return created;
     }
 
-    public void setCreated(LocalDateTime created) {
+    public void setCreated(Instant created) {
         this.created = created;
     }
 }

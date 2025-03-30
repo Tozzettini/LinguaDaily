@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
@@ -30,8 +31,8 @@ public class WordController {
 
         if (since != null) {
             try {
-                since = since.replace(" ", "T");
-                LocalDateTime sinceDate = LocalDateTime.parse(since);
+                since = since.replace(" ", "T") + "Z";
+                Instant sinceDate = Instant.parse(since);
 
                 var words = this.wordService.getAllWords();
 
@@ -40,8 +41,9 @@ public class WordController {
                 return ResponseEntity.ok(words);
 
             } catch (DateTimeParseException e) {
+                System.out.println(e);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Invalid date format for 'since'. Please use the format 'yyyy-MM-dd'.");
+                        .body("Invalid date format for 'since'.");
             }
         } else {
             // If no 'since' parameter, return all words
