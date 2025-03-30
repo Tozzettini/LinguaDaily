@@ -29,25 +29,20 @@ public class WordController {
     public ResponseEntity<?> getAllWords(@RequestParam(required = false) String since) {
         System.out.println(since);
 
-        if (since != null) {
+        if (since != null && !since.equals(Instant.MIN.toString())) {
+            try {
+                Instant sinceDate = Instant.parse(since);
 
-            since = since.replace(" ", "T") + "Z";
+                var words = this.wordService.getAllWords();
 
-            if(!since.equals(Instant.MIN)) {
-                try {
-                    Instant sinceDate = Instant.parse(since);
+                words = words.stream().filter(w -> !w.getCreated().isBefore(sinceDate)).toList();
 
-                    var words = this.wordService.getAllWords();
+                return ResponseEntity.ok(words);
 
-                    words = words.stream().filter(w -> !w.getCreated().isBefore(sinceDate)).toList();
-
-                    return ResponseEntity.ok(words);
-
-                } catch (DateTimeParseException e) {
-                    System.out.println(e);
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body("Invalid date format for 'since'.");
-                }
+            } catch (DateTimeParseException e) {
+                System.out.println(e);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Invalid date format for 'since'.");
             }
         }
 
