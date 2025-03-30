@@ -30,25 +30,28 @@ public class WordController {
         System.out.println(since);
 
         if (since != null) {
-            try {
-                since = since.replace(" ", "T") + "Z";
-                Instant sinceDate = Instant.parse(since);
 
-                var words = this.wordService.getAllWords();
+            since = since.replace(" ", "T") + "Z";
 
-                words = words.stream().filter(w -> !w.getCreated().isBefore(sinceDate)).toList();
+            if(!since.equals(Instant.MIN)) {
+                try {
+                    Instant sinceDate = Instant.parse(since);
 
-                return ResponseEntity.ok(words);
+                    var words = this.wordService.getAllWords();
 
-            } catch (DateTimeParseException e) {
-                System.out.println(e);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Invalid date format for 'since'.");
+                    words = words.stream().filter(w -> !w.getCreated().isBefore(sinceDate)).toList();
+
+                    return ResponseEntity.ok(words);
+
+                } catch (DateTimeParseException e) {
+                    System.out.println(e);
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body("Invalid date format for 'since'.");
+                }
             }
-        } else {
-            // If no 'since' parameter, return all words
-            return ResponseEntity.ok(wordService.getAllWords());
         }
+
+        return ResponseEntity.ok(wordService.getAllWords());
     }
 
     // Get a single word by id
