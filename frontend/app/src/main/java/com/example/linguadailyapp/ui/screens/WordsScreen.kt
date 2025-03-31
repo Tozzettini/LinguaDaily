@@ -2,6 +2,7 @@ package com.example.linguadailyapp.ui.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -73,14 +75,14 @@ fun WordsScreen(navController: NavController, viewModel: WordViewModel = viewMod
             )
         },
         content = { paddingValues ->
-            WordsList(Modifier.padding(paddingValues), words)
+            WordsList(Modifier.padding(paddingValues), words, viewModel)
         }
     )
 
 }
 
 @Composable
-fun WordsList(modifier: Modifier, words: List<Word>) {
+fun WordsList(modifier: Modifier, words: List<Word>, viewModel: WordViewModel) {
 
     Surface (modifier = modifier.background(Color.LightGray)) {
         LazyColumn (
@@ -90,14 +92,16 @@ fun WordsList(modifier: Modifier, words: List<Word>) {
         )
         {
             items(words) {
-                    item -> WordCard(item)
+                    item -> WordCard(item, {
+                        viewModel.toggleBookmark(it)
+                    })
             }
         }
     }
 }
 
 @Composable
-fun WordCard(word: Word) {
+fun WordCard(word: Word, onBookmarkClick : (Word) -> Unit) {
 
     Row (modifier = Modifier
         .fillMaxWidth()
@@ -113,9 +117,12 @@ fun WordCard(word: Word) {
         WordInformation(word.word, word.description)
         Spacer(modifier = Modifier.weight(1f))
         Icon(
-            imageVector = Icons.Outlined.BookmarkBorder,
+            imageVector = if(!word.bookmarked) Icons.Outlined.BookmarkBorder else Icons.Filled.Bookmark,
             contentDescription = "Bookmark",
-            tint = Color.DarkGray
+            tint = Color.DarkGray,
+            modifier = Modifier.clickable {
+                onBookmarkClick(word)
+            }
         )
         Spacer(modifier = Modifier.width(8.dp))
     }

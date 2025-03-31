@@ -30,26 +30,41 @@ class Converters {
     }
 
 
-    private val localDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    private val instantFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     @TypeConverter
     fun fromInstant(instant: Instant?): String? {
-        return instant?.atZone(ZoneOffset.UTC)?.format(localDateTimeFormatter)
+        return instant?.atZone(ZoneOffset.UTC)?.format(instantFormatter)
     }
 
     @TypeConverter
     fun toInstant(value: String?): Instant? {
         return value?.let {
-            LocalDateTime.parse(it, localDateTimeFormatter)
+            LocalDateTime.parse(it, instantFormatter)
                 .atZone(ZoneOffset.UTC)
                 .toInstant()
         }
     }
 
 
+    private val localDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+
+    @TypeConverter
+    fun fromLocalDateTime(dateTime: LocalDateTime?): String? {
+        return dateTime?.format(localDateTimeFormatter)
+    }
+
+    @TypeConverter
+    fun toLocalDateTime(value: String?): LocalDateTime? {
+        return value?.let {
+            LocalDateTime.parse(it, localDateTimeFormatter)
+        }
+    }
+
+
 }
 
-@Database(entities = [Word::class, Settings::class], version = 2, exportSchema = false)
+@Database(entities = [Word::class, Settings::class], version = 5, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class LocalDatabase : RoomDatabase() {
 

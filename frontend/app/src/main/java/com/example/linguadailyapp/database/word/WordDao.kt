@@ -23,4 +23,7 @@ interface WordDao {
 
     @Query("SELECT * FROM words ORDER BY date DESC")
     fun getAllWordsFlow(): Flow<List<Word>>
+
+    @Update
+    suspend fun updateWord(word: Word)
 }

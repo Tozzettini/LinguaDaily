@@ -20,6 +20,10 @@ class WordRepository(val context : Context) {
         }
     }
 
+    suspend fun updateWord(word: Word) {
+        wordDao.updateWord(word)
+    }
+
     suspend fun getTodaysWord(): Word? {
         return wordDao.getWordForDay(LocalDate.now())
     }
