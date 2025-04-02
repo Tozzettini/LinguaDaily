@@ -2,6 +2,7 @@ package com.example.linguadailyapp
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,16 +39,16 @@ class MainActivity : ComponentActivity() {
         //Starts with false since system inital setting is Lightmode
         var isDarkmode = getDarkModeSetting(this)
 
-        try {
-            var syncViewModel = SyncViewModel(
-                WordRepository(this@MainActivity),
-                SettingsRepository(this@MainActivity)
-            )
-            GlobalScope.launch {
+        var syncViewModel = SyncViewModel(
+            WordRepository(this@MainActivity),
+            SettingsRepository(this@MainActivity)
+        )
+        GlobalScope.launch {
+            try {
                 syncViewModel.sync()
+            } catch (e: Exception) {
+                // We try again later...
             }
-        } catch (e: Exception) {
-            // We try again later...
         }
 
         val workRequest = PeriodicWorkRequestBuilder<DailyNotificationWorker>(1, TimeUnit.DAYS)
