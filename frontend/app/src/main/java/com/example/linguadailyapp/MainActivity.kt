@@ -11,7 +11,9 @@ import com.example.linguadailyapp.database.settings.SettingsRepository
 import com.example.linguadailyapp.database.word.WordRepository
 import com.example.linguadailyapp.navigation.AppNavigation
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
+import com.example.linguadailyapp.utils.ConnectionManager
 import com.example.linguadailyapp.utils.DailyNotificationWorker
+import com.example.linguadailyapp.utils.NetworkType
 import com.example.linguadailyapp.utils.NotificationPermission
 import com.example.linguadailyapp.utils.PreferencesManager
 import com.example.linguadailyapp.viewmodel.SyncViewModel
@@ -43,7 +45,9 @@ class MainActivity : ComponentActivity() {
         )
 
         val preferencesManager = PreferencesManager(this)
-        syncViewModel.sync(preferencesManager)
+        if(preferencesManager.getSyncAllowedOnData() || ConnectionManager.getNetworkType(this) == NetworkType.WIFI) {
+            syncViewModel.sync(preferencesManager)
+        }
 
 
         val workRequest = PeriodicWorkRequestBuilder<DailyNotificationWorker>(1, TimeUnit.DAYS)

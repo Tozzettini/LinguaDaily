@@ -53,6 +53,7 @@ class NotificationPermission(
             if ( !isGranted ) {
                 Toast.makeText(context, "Notification Permission Denied", Toast.LENGTH_SHORT).show()
             } else {
+                PreferencesManager(context).setNotificationsEnabled(true)
                 sendNotification("You enabled notifications!", "we are just checking they actually work ;)", context)
             }
         }

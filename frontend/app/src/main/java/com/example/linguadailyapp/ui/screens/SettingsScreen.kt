@@ -40,6 +40,7 @@ fun SettingsScreen(navController: NavController) {
     val preferencesManager = PreferencesManager(context)
 
     var isNotificationsEnabled by rememberSaveable  { mutableStateOf(preferencesManager.isNotificationsEnabled()) }  // Initial state for notifications
+    var allowSyncOnData by rememberSaveable  { mutableStateOf(preferencesManager.getSyncAllowedOnData()) }
 
     MaterialTheme (colorScheme = colorScheme) {
         Scaffold(
@@ -72,6 +73,14 @@ fun SettingsScreen(navController: NavController) {
                         onCheckedChange = {
                             preferencesManager.setNotificationsEnabled(it)
                             isNotificationsEnabled = it
+                        }
+                    )
+                    SwitchSetting(
+                        label = "Allow Sync on Mobile Data",
+                        isChecked = allowSyncOnData,
+                        onCheckedChange = {
+                            preferencesManager.setAllowSyncOnData(it)
+                            allowSyncOnData = it
                         }
                     )
                 }
