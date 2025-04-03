@@ -10,6 +10,8 @@ import com.example.linguadailyapp.R
 import com.example.linguadailyapp.database.word.Word
 
 fun sendNotification(title: String, message: String, context: Context) {
+    if(!PreferencesManager(context).isNotificationsEnabled()) return
+
     val notificationBuilder = NotificationCompat.Builder(context, "LinguaDailyChannel")
         .setSmallIcon(R.drawable.ic_icon_v1)
         .setContentTitle(title)
@@ -36,6 +38,8 @@ fun sendNotification(title: String, message: String, context: Context) {
 }
 
 fun sendDailyNotification(word: Word, context: Context) {
+    if(!PreferencesManager(context).isNotificationsEnabled()) return
+
     val notificationBuilder = NotificationCompat.Builder(context, "LinguaDailyChannel")
         .setSmallIcon(R.drawable.ic_icon_v1)
         .setContentTitle("Today's Word: ${word.word}")

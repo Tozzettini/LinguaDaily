@@ -2,7 +2,6 @@ package com.example.linguadailyapp
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,9 +13,8 @@ import com.example.linguadailyapp.navigation.AppNavigation
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 import com.example.linguadailyapp.utils.DailyNotificationWorker
 import com.example.linguadailyapp.utils.NotificationPermission
+import com.example.linguadailyapp.utils.PreferencesManager
 import com.example.linguadailyapp.viewmodel.SyncViewModel
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -43,13 +41,10 @@ class MainActivity : ComponentActivity() {
             WordRepository(this@MainActivity),
             SettingsRepository(this@MainActivity)
         )
-        GlobalScope.launch {
-            try {
-                syncViewModel.sync()
-            } catch (e: Exception) {
-                // We try again later...
-            }
-        }
+
+        val preferencesManager = PreferencesManager(this)
+        syncViewModel.sync(preferencesManager)
+
 
         val workRequest = PeriodicWorkRequestBuilder<DailyNotificationWorker>(1, TimeUnit.DAYS)
             .setInitialDelay(getInitialDelay(), TimeUnit.MILLISECONDS)
