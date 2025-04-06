@@ -6,8 +6,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.example.linguadailyapp.database.settings.Settings
-import com.example.linguadailyapp.database.settings.SettingsDao
 import com.example.linguadailyapp.database.word.Word
 import com.example.linguadailyapp.database.word.WordDao
 import java.time.Instant
@@ -64,12 +62,11 @@ class Converters {
 
 }
 
-@Database(entities = [Word::class, Settings::class], version = 5, exportSchema = false)
+@Database(entities = [Word::class], version = 6, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class LocalDatabase : RoomDatabase() {
 
     abstract fun wordDao(): WordDao
-    abstract fun settingsDao(): SettingsDao
 
     companion object {
         @Volatile

@@ -1,7 +1,6 @@
 package com.example.linguadailyapp.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.linguadailyapp.database.settings.SettingsRepository
 import com.example.linguadailyapp.database.word.WordRepository
 import com.example.linguadailyapp.retrofit.RetrofitClient
 import com.example.linguadailyapp.utils.PreferencesManager
@@ -12,7 +11,7 @@ import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.LocalDateTime
 
-class SyncViewModel(private val wordRepository: WordRepository, private val settingsRepository: SettingsRepository) : ViewModel() {
+class SyncViewModel(private val wordRepository: WordRepository) : ViewModel() {
 
     private suspend fun syncData(lastSynced: LocalDateTime): Boolean {
         return try {

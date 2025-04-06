@@ -3,7 +3,6 @@ package com.example.linguadailyapp.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.linguadailyapp.database.settings.SettingsRepository
 import com.example.linguadailyapp.database.word.WordRepository
 
 class WordViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
@@ -20,8 +19,7 @@ class SyncViewModelFactory(private val context: Context) : ViewModelProvider.Fac
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SyncViewModel::class.java)) {
             val wordRepository = WordRepository(context)
-            val settingsRepository = SettingsRepository(context)
-            return SyncViewModel(wordRepository, settingsRepository) as T
+            return SyncViewModel(wordRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
