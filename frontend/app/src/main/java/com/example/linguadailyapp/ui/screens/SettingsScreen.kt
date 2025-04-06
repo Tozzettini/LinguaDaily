@@ -1,6 +1,5 @@
 package com.example.linguadailyapp.ui.screens
 
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -19,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -30,8 +28,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.components.SwitchSetting
-import com.example.linguadailyapp.utils.NotificationPermission
 import com.example.linguadailyapp.utils.PreferencesManager
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import com.example.linguadailyapp.utils.notification.NotificationPermission
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,6 +44,23 @@ fun SettingsScreen(navController: NavController) {
 
     var isNotificationsEnabled by rememberSaveable  { mutableStateOf(preferencesManager.isNotificationsEnabled()) }  // Initial state for notifications
     var allowSyncOnData by rememberSaveable  { mutableStateOf(preferencesManager.getSyncAllowedOnData()) }
+
+    var showSettingsRedirect by rememberSaveable { mutableStateOf(false) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            preferencesManager.setNotificationsEnabled(true)
+            isNotificationsEnabled = true
+        } else {
+            showSettingsRedirect = true
+            preferencesManager.setNotificationsEnabled(false)
+            isNotificationsEnabled = false
+        }
+    }
+
+    val notificationPermission = NotificationPermission(context, permissionLauncher)
 
     MaterialTheme (colorScheme = colorScheme) {
         Scaffold(
@@ -70,13 +90,23 @@ fun SettingsScreen(navController: NavController) {
                     SwitchSetting(
                         label = "Enable Notifications",
                         isChecked = isNotificationsEnabled,
-                        onCheckedChange = {
-                            preferencesManager.setNotificationsEnabled(it)
-                            isNotificationsEnabled = it
+                        onCheckedChange = { isChecked ->
+                            if (isChecked) {
+                                if (notificationPermission.hasNotificationPermission()) {
+                                    preferencesManager.setNotificationsEnabled(true)
+                                    isNotificationsEnabled = true
+                                } else {
+                                    notificationPermission.relaunch()
+                                }
+                            } else {
+                                preferencesManager.setNotificationsEnabled(false)
+                                isNotificationsEnabled = false
+                            }
                         }
+
                     )
                     SwitchSetting(
-                        label = "Allow Sync on Mobile Data",
+                        label = "Allow Mobile Data Usage",
                         isChecked = allowSyncOnData,
                         onCheckedChange = {
                             preferencesManager.setAllowSyncOnData(it)
@@ -86,6 +116,27 @@ fun SettingsScreen(navController: NavController) {
                 }
             }
         )
+
+        if (showSettingsRedirect) {
+            AlertDialog(
+                onDismissRequest = { showSettingsRedirect = false },
+                title = { Text("Permission Blocked") },
+                text = { Text("You've permanently denied notification access. Please enable it manually in app settings.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showSettingsRedirect = false
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        }
+                        context.startActivity(intent)
+                    }) { Text("Open Settings") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showSettingsRedirect = false }) { Text("Cancel") }
+                }
+            )
+        }
+
     }
 }
 

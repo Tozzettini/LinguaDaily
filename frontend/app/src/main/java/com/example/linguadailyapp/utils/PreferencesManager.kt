@@ -15,6 +15,7 @@ class PreferencesManager(context: Context) {
     private val DEFAULT_LAST_SYNCED = LocalDateTime.MIN
     private val DEFAULT_NOTIFICATIONS_ENABLED = false
     private val DEFAULT_SYNC_ON_DATA = true
+    private val DEFAULT_FIRST_LAUNCH = true
 
     // ---- Methods to access settings ----
 
@@ -51,4 +52,15 @@ class PreferencesManager(context: Context) {
     fun getSyncAllowedOnData(): Boolean {
         return sharedPreferences.getBoolean("sync_on_data", DEFAULT_SYNC_ON_DATA)
     }
+
+    fun isFirstLaunch(): Boolean {
+        val isFirstLaunch = sharedPreferences.getBoolean("is_first_launch", DEFAULT_FIRST_LAUNCH)
+
+        if (isFirstLaunch) {
+            sharedPreferences.edit().putBoolean("is_first_launch", false).apply()
+        }
+
+        return isFirstLaunch
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.example.linguadailyapp.utils
+package com.example.linguadailyapp.utils.notification
 
 import android.Manifest
 import android.content.Context
@@ -8,6 +8,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.linguadailyapp.R
 import com.example.linguadailyapp.database.word.Word
+import com.example.linguadailyapp.utils.PreferencesManager
 
 fun sendNotification(title: String, message: String, context: Context) {
     if(!PreferencesManager(context).isNotificationsEnabled()) return

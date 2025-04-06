@@ -1,7 +1,6 @@
-package com.example.linguadailyapp.utils
+package com.example.linguadailyapp.utils.notification
 
 import android.content.Context
-import androidx.compose.ui.platform.LocalContext
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.linguadailyapp.database.word.WordRepository
