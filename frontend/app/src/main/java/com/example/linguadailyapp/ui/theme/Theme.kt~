@@ -35,6 +35,7 @@ private val LightColorScheme = lightColorScheme(
 
 val customLightColors = lightColorScheme(
     primary = Color(0xFFFDF5E6), // Container main color
+
     primaryContainer = Color(0xFFFDF5E6), // Container main color
     onPrimaryContainer = Color.Black, // Container Text color
     secondaryContainer = Color(0xFFFDF2E0), // Container secondary color

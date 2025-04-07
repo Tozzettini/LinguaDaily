@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
         WorkManager.getInstance(applicationContext).enqueue(workRequest)
 
         setContent {
-            LinguaDailyAppTheme(darkTheme = isDarkmode) {
+            LinguaDailyAppTheme {
                 AppNavigation().start()
             }
         }
