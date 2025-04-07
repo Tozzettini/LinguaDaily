@@ -8,14 +8,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.Instant
 import java.time.LocalDateTime
 
 class SyncViewModel(private val wordRepository: WordRepository) : ViewModel() {
 
     private suspend fun syncData(lastSynced: LocalDateTime): Boolean {
         return try {
-            val words = RetrofitClient.apiService.getWordsSince(lastSynced.toString())
+            val words = if(!lastSynced.isEqual(LocalDateTime.MIN)) RetrofitClient.apiService.getWordsSince(lastSynced.toString()) else RetrofitClient.apiService.getAllWords()
             wordRepository.insertAll(words)
             true
         } catch (e: Exception) {

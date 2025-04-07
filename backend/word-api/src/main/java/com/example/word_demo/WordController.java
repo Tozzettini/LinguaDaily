@@ -22,7 +22,7 @@ public class WordController {
     public ResponseEntity<?> getAllWords(@RequestParam(required = false) String since) {
         System.out.println(since);
 
-        if (since != null && !since.equals(Instant.MIN.toString())) {
+        if (since != null) {
             try {
                 Instant sinceDate = Instant.parse(since);
 

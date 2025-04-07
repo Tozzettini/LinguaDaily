@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
             WordRepository(this@MainActivity)
         )
 
-        if(preferencesManager.getSyncAllowedOnData() || ConnectionManager.getNetworkType(this) == NetworkType.WIFI) {
+        if(preferencesManager.getSyncAllowedOnData() || (ConnectionManager.getNetworkType(this) == NetworkType.WIFI)) {
             syncViewModel.sync(preferencesManager)
         }
 
