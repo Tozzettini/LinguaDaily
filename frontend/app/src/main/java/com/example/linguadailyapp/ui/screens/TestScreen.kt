@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material3.Card
@@ -40,12 +42,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.linguadailyapp.database.streakmanager.StreakCounter
+import com.example.linguadailyapp.ui.components.AnimatedEarthIcon
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-// Material Theme is not working as it supposed to
+// TODO: Check height of the cards + padding
 
 @Composable
 fun TwoCardsInRow() {
@@ -61,7 +64,10 @@ fun TwoCardsInRow() {
         // In your composable
         val context = LocalContext.current
         var streakCount by rememberSaveable  { mutableStateOf(0) }
-
+        //
+        val isOnline by  rememberSaveable  { mutableStateOf(true) }
+        //
+        val randomNumberOnline = remember { (1..200000).random() }
         LaunchedEffect(key1 = Unit) {
                 StreakCounter.updateStreak(context)
         }
@@ -69,7 +75,7 @@ fun TwoCardsInRow() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(24.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
 //            verticalAlignment = Alignment.CenterVertically
         ) {
@@ -78,7 +84,7 @@ fun TwoCardsInRow() {
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
                 modifier = Modifier
                     .weight(1f)
-                    .height(160.dp),
+                    .height(140.dp),
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 2.dp
                 ),
@@ -103,13 +109,18 @@ fun TwoCardsInRow() {
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+//                        Spacer(modifier = Modifier.height(4.dp))
+                        //Already pushed max to the button due to the padding
                         Text(
                             text = currentDate,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
+//                            modifier = Modifier.padding(bottom = 4.dp)
+//                            lineHeight = 6.sp
                         )
+//                        Spacer(modifier = Modifier.height(24.dp))
+
                     }
 
                     // Bottom half with different styling
@@ -173,16 +184,40 @@ fun TwoCardsInRow() {
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "Card 2",
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        fontWeight = FontWeight.Bold
-                    )
+                    AnimatedEarthIcon()
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Second card content",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .background(
+                                    color = if (isOnline) Color(0xFFA5E492) else Color.Yellow,
+                                    shape = CircleShape
+
+                                )
+                                // Using alpha 0.7f to make the border color slightly transparent,
+                                // so the background color of the Box can be seen through the border.
+                                // This gives a nice effect of the border blending with the background,
+                                // making the whole thing look more visually appealing.
+                                //
+                                .border(
+                                    width = 1.5.dp,
+                                    color = if (isOnline) Color(0xFF62AF7C).copy(alpha = 0.7f) else Color.Yellow.copy(alpha = 0.7f),
+                                    shape = CircleShape
+                                )
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (isOnline) "$randomNumberOnline Online" else "You are offline",
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 14.sp
+                        )
+                    }
+
                 }
             }
         }
