@@ -26,7 +26,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -34,29 +33,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.room.util.TableInfo
 import com.example.linguadailyapp.database.streakmanager.StreakCounter
 import com.example.linguadailyapp.ui.components.AnimatedEarthIcon
+import com.example.linguadailyapp.ui.components.MainWordCard
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-// Check height of the cards
+// TODO: Check height of the cards + padding
 
 @Composable
 fun TwoCardsInRow() {
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.surface,
-    ) {
+//    Surface(
+//        modifier = Modifier.fillMaxSize(),
+//        color = MaterialTheme.colorScheme.surface,
+//    ) {
 
         val greeting = remember { getTimeBasedGreeting() }
         val currentDate = remember { getCurrentDateFormatted() }
@@ -67,7 +66,10 @@ fun TwoCardsInRow() {
         //
         val isOnline by  rememberSaveable  { mutableStateOf(true) }
         //
-        val randomNumberOnline = remember { (1..200000).random() }
+        val randomNumberOnlineString = remember {
+            val randomNumber = (4..500).random()
+            "%,d".format(randomNumber)
+        }
         LaunchedEffect(key1 = Unit) {
                 StreakCounter.updateStreak(context)
         }
@@ -211,7 +213,7 @@ fun TwoCardsInRow() {
 
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (isOnline) "$randomNumberOnline Online" else "You are offline",
+                            text = if (isOnline) "$randomNumberOnlineString Online" else "You are offline",
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 14.sp
@@ -222,13 +224,20 @@ fun TwoCardsInRow() {
             }
         }
     }
-}
+//}
 
 @Preview(showBackground = true)
 @Composable
 fun TwoCardsPreview() {
     LinguaDailyAppTheme {
+
+        Column {
+
         TwoCardsInRow()
+S
+        MainWordCard()
+        }
+
     }
 }
 

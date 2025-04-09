@@ -1,0 +1,288 @@
+package com.example.linguadailyapp.ui.components
+
+import TwoCardsInRow
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.linguadailyapp.R
+import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
+
+@Preview(showBackground = true)
+@Composable
+fun MainWordCardPreview() {
+    LinguaDailyAppTheme {
+//        Column {
+
+//            TwoCardsInRow()
+//            Spacer(modifier = Modifier.height(16.dp))
+            MainWordCard()
+//        }
+    }
+}
+
+@Composable
+fun MainWordCard() {
+
+    val pageCount = 3
+    val pagerState = rememberPagerState(pageCount = {pageCount})
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(320.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFF7E5BE) // Cream/beige color
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
+        ),
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp)
+        ) {
+            // Word and part of speech, Top section
+            Text(
+                text = "minatory",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+
+            Text(
+                text = "adjective - MIN-uh-tor-ee",
+                fontSize = 16.sp,
+                color = Color.Black,
+                modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
+            )
+
+            // Divider
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                thickness = 1.dp,
+                color = Color(0xFFE0D5B8)
+            )
+
+            // How to use section - Middle section
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize()
+                ) { page ->
+                    when (page) {
+                        0 -> {
+                            // Page 1: How to use
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(vertical = 8.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "How to use minatory",
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = Color.Black
+                                    )
+
+                                    IconButton(
+                                        onClick = { /* Add functionality */ },
+                                        modifier = Modifier
+                                            .background(
+                                                color = Color(0xFF1F565E),
+                                                shape = CircleShape
+                                            )
+                                            .size(32.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Add,
+                                            contentDescription = "Add",
+                                            tint = Color.White,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                }
+
+                                Text(
+                                    text = "bomboclaat",
+                                fontSize = 16.sp,
+                                color = Color.Black,
+                                lineHeight = 24.sp
+                                )
+                            }
+                        }
+                        1 -> {
+                            // Page 2: Definition
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(vertical = 8.dp)
+                            ) {
+                                Text(
+                                    text = "Definition",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color.Black,
+                                    modifier = Modifier.padding(vertical = 8.dp)
+                                )
+
+                                Text(
+                                    text = "Threatening or menacing: expressing or conveying a threat.",
+                                    fontSize = 16.sp,
+                                    color = Color.Black,
+                                    lineHeight = 24.sp
+                                )
+                            }
+                        }
+                        2 -> {
+                            // Page 3: Etymology
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(vertical = 8.dp)
+                            ) {
+                                Text(
+                                    text = "Etymology",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color.Black,
+                                    modifier = Modifier.padding(vertical = 8.dp)
+                                )
+
+                                Text(
+                                    text = "From Latin minātōrius, from minātus, perfect participle of minārī to punch).",
+                                    fontSize = 16.sp,
+                                    color = Color.Black,
+                                    lineHeight = 24.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Pagination dots
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                repeat(3) { index ->
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .size(8.dp)
+                            .background(
+                                color = if (index == 0) Color(0xFF1F565E) else Color(0xFFD9D9D9),
+                                shape = CircleShape
+                            )
+                    )
+                }
+            }
+
+            // Bottom navigation
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Words",
+                        tint = Color(0xFF1F565E),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = "Words",
+                        fontSize = 12.sp,
+                        color = Color(0xFF1F565E)
+                    )
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Bookmarks",
+                        tint = Color(0xFF1F565E),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = "Bookmarks",
+                        fontSize = 12.sp,
+                        color = Color(0xFF1F565E)
+                    )
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Random",
+                        tint = Color(0xFF1F565E),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = "Random",
+                        fontSize = 12.sp,
+                        color = Color(0xFF1F565E)
+                    )
+                }
+            }
+        }
+    }
+}

@@ -67,7 +67,10 @@ fun TwoCardsInRow() {
         //
         val isOnline by  rememberSaveable  { mutableStateOf(true) }
         //
-        val randomNumberOnline = remember { (1..200000).random() }
+        val randomNumberOnlineString = remember {
+            val randomNumber = (4..500).random()
+            "%,d".format(randomNumber)
+        }
         LaunchedEffect(key1 = Unit) {
                 StreakCounter.updateStreak(context)
         }
@@ -211,7 +214,7 @@ fun TwoCardsInRow() {
 
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (isOnline) "$randomNumberOnline Online" else "You are offline",
+                            text = if (isOnline) "$randomNumberOnlineString Online" else "You are offline",
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 14.sp
