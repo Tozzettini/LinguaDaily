@@ -89,7 +89,7 @@ fun TwoCardsInRow() {
                 modifier = Modifier
                     .weight(1f)
                     .height(140.dp)
-                .heightIn(min = 140.dp),
+                .heightIn(min = 150.dp),
 
             elevation = CardDefaults.cardElevation(
                     defaultElevation = 16.dp
