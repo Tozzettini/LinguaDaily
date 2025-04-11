@@ -55,7 +55,7 @@ fun AnimatedEarthIcon() {
             imageVector = Icons.Outlined.Public,
             contentDescription = "Earth Icon",
             modifier = Modifier
-                .size(120.dp)
+                .size(100.dp)
                 .rotate(rotation)
                 .graphicsLayer {
                     translationY = yOffset

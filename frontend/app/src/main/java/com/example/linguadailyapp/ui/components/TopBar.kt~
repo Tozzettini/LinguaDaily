@@ -177,7 +177,7 @@ fun StyledTopBar(navController: NavController) {
         Box (modifier = Modifier.padding(horizontal = 10.dp)) {
             IconButton(
                 onClick = { /* Add functionality */ navController.navigate(
-                    NavigationDestinations.Settings.route) },
+                    NavigationDestinations.Se.route) },
                 modifier = Modifier
                     .size(38.dp)
                     .border(

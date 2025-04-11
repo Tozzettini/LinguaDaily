@@ -3,6 +3,7 @@ package com.example.linguadailyapp.ui.components
 import TwoCardsInRow
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,7 +52,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.R
+import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 import com.example.linguadailyapp.ui.theme.Playfair
 
@@ -63,13 +67,15 @@ fun MainWordCardPreview() {
 
 //            TwoCardsInRow()
 //            Spacer(modifier = Modifier.height(16.dp))
-            MainWordCard()
+        val navController = rememberNavController() // This would normally be used inside the NavHost
+
+            MainWordCard(navController = navController)
 //        }
     }
 }
 
 @Composable
-fun MainWordCard() {
+fun MainWordCard( navController: NavController) {
 
     val pageCount = 3
     val pagerState = rememberPagerState(pageCount = {pageCount})
@@ -78,8 +84,8 @@ fun MainWordCard() {
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(24.dp)
-            .height(420.dp),
+            .padding(horizontal = 24.dp)
+            .height(480.dp),
 
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
@@ -317,6 +323,8 @@ fun MainWordCard() {
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.clickable(onClick = { navController.navigate(
+                        NavigationDestinations.WordsList.route) })
                 ) {
                     Icon(
                         imageVector = Icons.Default.Lightbulb,
@@ -335,7 +343,9 @@ fun MainWordCard() {
                 }
 
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.clickable(onClick = { navController.navigate(
+                        NavigationDestinations.Bookmark.route) })
                 ) {
                     Icon(
                         imageVector = Icons.Default.Bookmarks,
@@ -355,7 +365,9 @@ fun MainWordCard() {
                 }
 
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.clickable(onClick = { navController.navigate(
+                        NavigationDestinations.WordsList.route) })
                 ) {
                     Icon(
                         imageVector = Icons.Default.Shuffle,

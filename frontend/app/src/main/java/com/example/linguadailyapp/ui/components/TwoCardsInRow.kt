@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import androidx.room.util.TableInfo
 import com.example.linguadailyapp.database.streakmanager.StreakCounter
 import com.example.linguadailyapp.ui.components.AnimatedEarthIcon
@@ -77,7 +78,7 @@ fun TwoCardsInRow() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding( horizontal = 24.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
 //            verticalAlignment = Alignment.CenterVertically
         ) {
@@ -88,7 +89,7 @@ fun TwoCardsInRow() {
                     .weight(1f)
                     .height(140.dp),
                 elevation = CardDefaults.cardElevation(
-                    defaultElevation = 2.dp
+                    defaultElevation = 16.dp
                 ),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -169,15 +170,18 @@ fun TwoCardsInRow() {
 
             // Second Card
             Card(
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
                 modifier = Modifier
                     .weight(1f)
-                    .height(160.dp),
+                    .height(140.dp),
                 elevation = CardDefaults.cardElevation(
-                    defaultElevation = 4.dp
+                    defaultElevation = 2.dp
                 ),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                 )
+
+
             ) {
                 Column(
                     modifier = Modifier
@@ -234,9 +238,8 @@ fun TwoCardsPreview() {
         Column {
 
         TwoCardsInRow()
-Spacer(modifier = Modifier.height(0.dp))
-        MainWordCard()
-        }
+            val navController = rememberNavController() // This would normally be used inside the NavHost
+            MainWordCard(navController = navController)        }
 
     }
 }
