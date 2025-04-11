@@ -35,8 +35,8 @@ import com.example.linguadailyapp.R
 import com.example.linguadailyapp.database.word.Word
 import com.example.linguadailyapp.database.word.WordRepository
 import com.example.linguadailyapp.ui.components.ButtonBanner
-import com.example.linguadailyapp.ui.components.TopBar
 import com.example.linguadailyapp.navigation.NavigationDestinations
+import com.example.linguadailyapp.ui.components.Languagetype
 import com.example.linguadailyapp.ui.components.MainWordCard
 import com.example.linguadailyapp.ui.components.MainWordDisplayContainer
 import com.example.linguadailyapp.ui.components.StyledTopBar
@@ -44,6 +44,7 @@ import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 import com.example.linguadailyapp.viewmodel.WordViewModel
 import com.example.linguadailyapp.viewmodel.WordViewModelFactory
 import kotlinx.coroutines.runBlocking
+import org.intellij.lang.annotations.Language
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,6 +92,7 @@ fun HomeScreen(
 //        end = Offset(0f, 1f)     // Bottom
 //    )
 
+    var currentLanguage by remember { mutableStateOf(Languagetype("English", "en")) }
 
 
     Scaffold(
@@ -101,8 +103,15 @@ fun HomeScreen(
                     .background(lightColor) // Apply background color
                     .padding(top = 10.dp) // Add padding to the bottom
             ) {
-                StyledTopBar(navController = navController)
-            }        },
+                StyledTopBar(
+                    navController = navController,
+                    onLanguageSelected = { language ->
+                        currentLanguage = language
+                        // Here you would implement the logic to change the app's language
+                        // and fetch words from the database according to the selected language
+                        println("Language changed to: ${language.name} (${language.code})")
+                    }
+                )            }        },
         content = { paddingValues ->
             // Main content of the HomeScreen
             Column(

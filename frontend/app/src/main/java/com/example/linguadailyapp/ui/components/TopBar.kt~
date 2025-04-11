@@ -16,6 +16,7 @@ import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.BookmarkAdd
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
@@ -42,126 +43,149 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.R
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
+import org.intellij.lang.annotations.Language
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopBar(
-    onLanguageIconClick: () -> Unit = {},
-    onSettingsIconClick: () -> Unit = {}
-) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-    var language by rememberSaveable  { mutableStateOf("EN") }
-    var expanded by remember { mutableStateOf(false) }
-
-
-    CenterAlignedTopAppBar(
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
-        title = {
-            Image(
-                painter = painterResource(id = R.drawable.logo_no_bg), // your logo image
-                contentDescription = null, // provide a description if needed
-                modifier = Modifier
-                    .padding(vertical = 0.dp) // Optional padding
-                    .graphicsLayer(translationY = 20f)
-                    .graphicsLayer(scaleX = 3.0f, scaleY = 3.0f)
-            )
-
-        },
-        navigationIcon = {
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start, // No space between elements
-                modifier = Modifier.padding(0.dp).clip(RoundedCornerShape(16.dp)).clickable(onClick = {
-
-
-                }),
-            ) {
-                // Language Icon
-
-                IconButton(
-                    onClick = { /* Add functionality */ },
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.secondary,
-                            shape = CircleShape,
-
-                        )
-                        .size(32.dp)
-                        .padding(horizontal = 0.dp)
-                        .border( BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground))
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Language,
-                        contentDescription = "Add",
-                        tint = Color.Black,
-//                        modifier = Modifier.size(18.dp)
-                    )
-                }
-
-
-
-                // "EN" text
-//                Row  ( verticalAlignment = Alignment.CenterVertically,
-//                    modifier = Modifier.offset(x = (-8).dp)
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun TopBar(
+//    onLanguageIconClick: () -> Unit = {},
+//    onSettingsIconClick: () -> Unit = {}
+//) {
+//    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+//    var language by rememberSaveable  { mutableStateOf("EN") }
+//    var expanded by remember { mutableStateOf(false) }
 //
-//                ) {
-//                    Text(
-//                        text = language,
-//                        style = MaterialTheme.typography.bodyLarge.copy(
-//                            color = Color.Black
-//                        ),
-//                        fontWeight = FontWeight.Bold,
-//                    )
 //
-//                    // Downward Arrow Icon for dropdown
+//    CenterAlignedTopAppBar(
+//        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+//            containerColor = MaterialTheme.colorScheme.primaryContainer,
+//            titleContentColor = MaterialTheme.colorScheme.primary,
+//        ),
+//        title = {
+//            Image(
+//                painter = painterResource(id = R.drawable.logo_no_bg), // your logo image
+//                contentDescription = null, // provide a description if needed
+//                modifier = Modifier
+//                    .padding(vertical = 0.dp) // Optional padding
+//                    .graphicsLayer(translationY = 20f)
+//                    .graphicsLayer(scaleX = 3.0f, scaleY = 3.0f)
+//            )
 //
-//                        Icon(
-//                            imageVector = Icons.Filled.ArrowDropDown,
-//                            contentDescription = "Dropdown"
+//        },
+//        navigationIcon = {
+//
+//            Row(
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.Start, // No space between elements
+//                modifier = Modifier.padding(0.dp).clip(RoundedCornerShape(16.dp)).clickable(onClick = {
+//
+//
+//                }),
+//            ) {
+//                // Language Icon
+//
+//                IconButton(
+//                    onClick = { /* Add functionality */ },
+//                    modifier = Modifier
+//                        .background(
+//                            color = MaterialTheme.colorScheme.secondary,
+//                            shape = CircleShape,
+//
 //                        )
-//
+//                        .size(32.dp)
+//                        .padding(horizontal = 0.dp)
+//                        .border( BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground))
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Default.Language,
+//                        contentDescription = "Add",
+//                        tint = Color.Black,
+////                        modifier = Modifier.size(18.dp)
+//                    )
 //                }
-            }
 //
-        },
-        actions = {
-            IconButton(onClick = onSettingsIconClick) {
-                Icon(
-                    imageVector = Icons.Filled.Settings,
-                    contentDescription = "Settings"
-                )
-            }
-        },
-        scrollBehavior = scrollBehavior,
+//
+//
+//                // "EN" text
+////                Row  ( verticalAlignment = Alignment.CenterVertically,
+////                    modifier = Modifier.offset(x = (-8).dp)
+////
+////                ) {
+////                    Text(
+////                        text = language,
+////                        style = MaterialTheme.typography.bodyLarge.copy(
+////                            color = Color.Black
+////                        ),
+////                        fontWeight = FontWeight.Bold,
+////                    )
+////
+////                    // Downward Arrow Icon for dropdown
+////
+////                        Icon(
+////                            imageVector = Icons.Filled.ArrowDropDown,
+////                            contentDescription = "Dropdown"
+////                        )
+////
+////                }
+//            }
+////
+//        },
+//        actions = {
+//            IconButton(onClick = onSettingsIconClick) {
+//                Icon(
+//                    imageVector = Icons.Filled.Settings,
+//                    contentDescription = "Settings"
+//                )
+//            }
+//        },
+//        scrollBehavior = scrollBehavior,
+//    )
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun TopBarPreview() {
+//    LinguaDailyAppTheme {
+//        TopBar(
+//            onLanguageIconClick = {
+//                // Handle back navigation in the preview
+//            },
+//            onSettingsIconClick = {
+//                // Handle menu icon click in the preview
+//            }
+//        )
+//    }
+//}
+//data class for storage
+data class Languagetype(val name: String, val code: String)
+
+
+// Composable function for styled TopBar with language dropdown
+@Composable
+fun StyledTopBar(
+    navController: NavController,
+    onLanguageSelected: (Languagetype) -> Unit
+) {
+    // Available languages
+    val languages = listOf(
+        Languagetype( name = "English", code = "en"),
+        Languagetype( name = "Italian", code = "it"),
+        Languagetype( name ="Dutch", code = "nl")
     )
-}
 
-@Preview(showBackground = true)
-@Composable
-fun TopBarPreview() {
-    LinguaDailyAppTheme {
-        TopBar(
-            onLanguageIconClick = {
-                // Handle back navigation in the preview
-            },
-            onSettingsIconClick = {
-                // Handle menu icon click in the preview
-            }
-        )
-    }
-}
+    // State to keep track of dropdown visibility
+    var showLanguageDropdown by remember { mutableStateOf(false) }
 
-@Composable
-fun StyledTopBar(navController: NavController) {
+    // State to keep track of selected language
+    var selectedLanguage by remember { mutableStateOf(languages[0]) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -170,69 +194,133 @@ fun StyledTopBar(navController: NavController) {
             .clip(RoundedCornerShape(15.dp))
             .border(2.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(15.dp))
             .background(MaterialTheme.colorScheme.primaryContainer),
-
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Box (modifier = Modifier.padding(horizontal = 10.dp)) {
+        Box(modifier = Modifier.padding(horizontal = 10.dp)) {
             IconButton(
-                onClick = { /* Add functionality */ navController.navigate(
-                    NavigationDestinations.Se.route) },
+                onClick = { showLanguageDropdown = true },
                 modifier = Modifier
                     .size(38.dp)
                     .border(
                         width = 2.dp,
                         color = MaterialTheme.colorScheme.onBackground,
-                        shape = CircleShape // 👈 this is essential!
-                    )                .background(
-    //                    color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = CircleShape
+                    )
+                    .background(
                         color = Color(0xFFFCEFD5),
                         shape = CircleShape,
-
-                        )
+                    )
                     .padding(horizontal = 0.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Language,
-                    contentDescription = "Add",
+                    contentDescription = "Language",
                     tint = Color.Black,
-    //                        modifier = Modifier.size(18.dp)
                 )
             }
         }
 
         Image(
-            painter = painterResource(id = R.drawable.logo_no_bg), // your logo image
-            contentDescription = null, // provide a description if needed
+            painter = painterResource(id = R.drawable.logo_no_bg),
+            contentDescription = null,
             modifier = Modifier
-                .padding(vertical = 0.dp) // Optional padding
+                .padding(vertical = 0.dp)
                 .graphicsLayer(translationY = 20f)
                 .graphicsLayer(scaleX = 3.0f, scaleY = 3.0f)
         )
 
-        Box (modifier = Modifier.padding(horizontal = 10.dp)) {
+        Box(modifier = Modifier.padding(horizontal = 10.dp)) {
             IconButton(
-                onClick = {  navController.navigate(
-                    NavigationDestinations.Settings.route) },
+                onClick = { navController.navigate(NavigationDestinations.Settings.route) },
                 modifier = Modifier
                     .size(38.dp)
                     .border(
                         width = 2.dp,
                         color = MaterialTheme.colorScheme.onBackground,
-                        shape = CircleShape // 👈 this is essential!
-                    )                .background(
+                        shape = CircleShape
+                    )
+                    .background(
                         color = MaterialTheme.colorScheme.secondaryContainer,
                         shape = CircleShape,
-
-                        )
+                    )
                     .padding(horizontal = 0.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
-                    contentDescription = "Add",
+                    contentDescription = "Settings",
                     tint = Color.Black,
-    //                        modifier = Modifier.size(18.dp)
                 )
+            }
+        }
+    }
+
+    // Display dropdown with dark overlay when showLanguageDropdown is true
+    if (true) {
+        Dialog(
+            onDismissRequest = { showLanguageDropdown = false },
+            properties = DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+                usePlatformDefaultWidth = false  // Important: This makes the dialog fill the entire width
+
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .clickable { showLanguageDropdown = false },
+                contentAlignment = Alignment.Center
+            ) {
+                Card(
+                    modifier = Modifier
+                        .padding(top = 64.dp, start = 20.dp, end = 20.dp)
+                        .clickable { /* Prevent dismissal when clicking card */ }
+                        .widthIn(max = 280.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = "Select Language",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        )
+
+                        HorizontalDivider(
+                     modifier = Modifier.fillMaxWidth(),
+                     thickness = 2.dp,
+                               color = Color(0xFFF7E5BE),
+                             )
+
+                        languages.forEach { language ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        selectedLanguage = language
+                                        onLanguageSelected(language)
+                                        showLanguageDropdown = false
+                                    }
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(text = language.name)
+
+                                if (language == selectedLanguage) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = "Selected",
+                                        tint = Color.Black
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -244,6 +332,11 @@ fun StyledTopBarPreview() {
     LinguaDailyAppTheme {
         val navController = rememberNavController()
 
-        StyledTopBar(navController = navController)
+        StyledTopBar(
+            navController = navController,
+            onLanguageSelected = { language ->
+                println("Selected language: $language")
+            },
+        )
     }
 }

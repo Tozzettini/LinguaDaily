@@ -35,7 +35,6 @@ import com.example.linguadailyapp.R
 import com.example.linguadailyapp.database.word.Word
 import com.example.linguadailyapp.database.word.WordRepository
 import com.example.linguadailyapp.ui.components.ButtonBanner
-import com.example.linguadailyapp.ui.components.TopBar
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.components.MainWordCard
 import com.example.linguadailyapp.ui.components.MainWordDisplayContainer
@@ -101,8 +100,15 @@ fun HomeScreen(
                     .background(lightColor) // Apply background color
                     .padding(top = 10.dp) // Add padding to the bottom
             ) {
-                StyledTopBar(navController = navController)
-            }        },
+                StyledTopBar(
+                    navController = navController,
+                    onLanguageSelected = { language ->
+                        currentLanguage = language
+                        // Here you would implement the logic to change the app's language
+                        // and fetch words from the database according to the selected language
+                        println("Language changed to: ${language.name} (${language.code})")
+                    }
+                )            }        },
         content = { paddingValues ->
             // Main content of the HomeScreen
             Column(
@@ -122,12 +128,12 @@ fun HomeScreen(
                 MainWordCard(navController = navController)
 
                 // This is where my screen ends!
-                Spacer(modifier = Modifier.height(45.dp))
-                Box(modifier = Modifier
-                    .fillMaxWidth()  // Ensure it stretches across the full width
-                    .height(1.dp)   // Set the height to 12.dp
-                    .background(Color.Cyan) // Set the background color to black
-                )
+//                Spacer(modifier = Modifier.height(45.dp))
+//                Box(modifier = Modifier
+//                    .fillMaxWidth()  // Ensure it stretches across the full width
+//                    .height(1.dp)   // Set the height to 12.dp
+//                    .background(Color.Cyan) // Set the background color to black
+//                )
             }
 
         }
