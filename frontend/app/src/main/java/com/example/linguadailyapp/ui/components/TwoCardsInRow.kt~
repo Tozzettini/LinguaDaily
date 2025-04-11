@@ -88,8 +88,8 @@ fun TwoCardsInRow() {
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
                 modifier = Modifier
                     .weight(1f)
-                    .height(140.dp)
-                .heightIn(min = 150.dp),
+                    .height(140.dp),
+                .heightIn(min = 240.dp),
 
             elevation = CardDefaults.cardElevation(
                     defaultElevation = 16.dp
@@ -169,7 +169,7 @@ fun TwoCardsInRow() {
             }
 
             // Space between cards
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(10.dp))
 
             // Second Card
             Card(

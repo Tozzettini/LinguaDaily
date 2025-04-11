@@ -169,7 +169,7 @@ fun TwoCardsInRow() {
             }
 
             // Space between cards
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(10.dp))
 
             // Second Card
             Card(
