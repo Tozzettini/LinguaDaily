@@ -103,7 +103,7 @@ fun TwoCardsInRow() {
                     // Top half
                     Column(
                         modifier = Modifier
-                            .weight(1.1f)
+                            .weight(1.2f)
                             .fillMaxWidth()
                             .widthIn( 100.dp)
                             .padding(16.dp),

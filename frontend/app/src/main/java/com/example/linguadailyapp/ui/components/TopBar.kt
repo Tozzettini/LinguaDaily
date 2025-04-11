@@ -184,7 +184,7 @@ fun StyledTopBar(
     var showLanguageDropdown by remember { mutableStateOf(false) }
 
     // State to keep track of selected language
-    var selectedLanguage by remember { mutableStateOf(languages[0]) }
+    var selectedLanguage by remember  { mutableStateOf(languages[0]) }
 
     Row(
         modifier = Modifier

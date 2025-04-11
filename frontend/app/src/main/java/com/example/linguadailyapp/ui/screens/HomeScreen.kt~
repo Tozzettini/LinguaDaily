@@ -36,6 +36,7 @@ import com.example.linguadailyapp.database.word.Word
 import com.example.linguadailyapp.database.word.WordRepository
 import com.example.linguadailyapp.ui.components.ButtonBanner
 import com.example.linguadailyapp.navigation.NavigationDestinations
+import com.example.linguadailyapp.ui.components.Languagetype
 import com.example.linguadailyapp.ui.components.MainWordCard
 import com.example.linguadailyapp.ui.components.MainWordDisplayContainer
 import com.example.linguadailyapp.ui.components.StyledTopBar
@@ -43,6 +44,7 @@ import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 import com.example.linguadailyapp.viewmodel.WordViewModel
 import com.example.linguadailyapp.viewmodel.WordViewModelFactory
 import kotlinx.coroutines.runBlocking
+import org.intellij.lang.annotations.Language
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,6 +92,7 @@ fun HomeScreen(
 //        end = Offset(0f, 1f)     // Bottom
 //    )
 
+    var currentLanguage by remember { mutableStateOf(Languagetype("English", "en")) }
 
 
     Scaffold(
@@ -144,6 +147,8 @@ fun HomeScreen(
 
 // TODO: Might have to redo everything with cards
 @Preview(showBackground = true)
+@Preview(name = "Small phone", device = "spec:width=411dp,height=491dp" +
+        "")
 @Composable
 fun HomeScreenPreview() {
     val navController = rememberNavController() // ✅ Correct way to provide a NavController in preview

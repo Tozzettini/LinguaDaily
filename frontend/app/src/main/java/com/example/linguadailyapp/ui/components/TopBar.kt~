@@ -181,10 +181,10 @@ fun StyledTopBar(
     )
 
     // State to keep track of dropdown visibility
-    var showLanguageDropdown by remember { mutableStateOf(false) }
+    var showLanguageDropdown by rememberSaveable { mutableStateOf(false) }
 
     // State to keep track of selected language
-    var selectedLanguage by remember { mutableStateOf(languages[0]) }
+    var selectedLanguage by rememberSaveable  { mutableStateOf(languages[0]) }
 
     Row(
         modifier = Modifier
@@ -256,7 +256,7 @@ fun StyledTopBar(
     }
 
     // Display dropdown with dark overlay when showLanguageDropdown is true
-    if (true) {
+    if (showLanguageDropdown) {
         Dialog(
             onDismissRequest = { showLanguageDropdown = false },
             properties = DialogProperties(

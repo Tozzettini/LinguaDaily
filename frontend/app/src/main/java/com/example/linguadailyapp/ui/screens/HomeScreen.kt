@@ -147,6 +147,8 @@ fun HomeScreen(
 
 // TODO: Might have to redo everything with cards
 @Preview(showBackground = true)
+@Preview(name = "Small phone", device = "spec:width=311dp,height=491dp" +
+        "")
 @Composable
 fun HomeScreenPreview() {
     val navController = rememberNavController() // ✅ Correct way to provide a NavController in preview
@@ -154,7 +156,7 @@ fun HomeScreenPreview() {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(750.dp) // Set a fixed height for the preview
+                .height(750.dp) // Set a fixed height for the preview for my phone
         ) {
             HomeScreen(navController = navController)
         }
