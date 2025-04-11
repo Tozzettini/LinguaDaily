@@ -43,6 +43,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.room.util.TableInfo
 import com.example.linguadailyapp.database.streakmanager.StreakCounter
 import com.example.linguadailyapp.ui.components.AnimatedEarthIcon
+import com.example.linguadailyapp.ui.components.LottieSpinningGlobe
 import com.example.linguadailyapp.ui.components.MainWordCard
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 import java.time.LocalDate
@@ -194,6 +195,7 @@ fun TwoCardsInRow() {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     AnimatedEarthIcon()
+//                    LottieSpinningGlobe()
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
                         verticalAlignment = Alignment.CenterVertically

@@ -13,12 +13,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 
 @Composable
 fun AnimatedEarthIcon() {
+
+//    val vector = painterResource(id = R.drawable.your_svg_icon)
+
     // Create infinite animations
     val infiniteTransition = rememberInfiniteTransition(label = "earth-animation")
 
@@ -52,11 +60,12 @@ fun AnimatedEarthIcon() {
         Icon(
             //replace with a custom svg if needed
             //if offiline use the offline icon?
+
             imageVector = Icons.Outlined.Public,
             contentDescription = "Earth Icon",
             modifier = Modifier
                 .size(80.dp)
-                .rotate(rotation)
+//                .rotate(rotation)
                 .graphicsLayer {
                     translationY = yOffset
                 },
@@ -73,3 +82,20 @@ fun PreviewAnimatedEarthIcon() {
     }
 
 }
+@Preview
+@Composable
+fun PreviewAnimatedEarth3DIcon() {
+    LinguaDailyAppTheme {
+        LottieSpinningGlobe()
+    }
+
+}
+
+@Composable
+fun LottieSpinningGlobe() {
+    val composition by rememberLottieComposition(LottieCompositionSpec.Asset("globe_animation.json"))
+    LottieAnimation(
+        composition = composition,
+        modifier = Modifier.size(80.dp),
+        iterations = LottieConstants.IterateForever // This ensures infinite looping
+    )}

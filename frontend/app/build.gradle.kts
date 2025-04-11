@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
         implementation("androidx.datastore:datastore-preferences:1.0.0")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation ("com.airbnb.android:lottie-compose:5.0.3")
 
 
     implementation(libs.androidx.core.ktx)
