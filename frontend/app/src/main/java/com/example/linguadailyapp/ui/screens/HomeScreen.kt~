@@ -145,7 +145,7 @@ fun HomeScreenPreview() {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(75.dp) // Set a fixed height for the preview
+                .height(750.dp) // Set a fixed height for the preview
         ) {
             HomeScreen(navController = navController)
         }

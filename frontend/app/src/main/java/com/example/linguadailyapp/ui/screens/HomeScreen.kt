@@ -122,12 +122,12 @@ fun HomeScreen(
                 MainWordCard(navController = navController)
 
                 // This is where my screen ends!
-                Spacer(modifier = Modifier.height(45.dp))
-                Box(modifier = Modifier
-                    .fillMaxWidth()  // Ensure it stretches across the full width
-                    .height(1.dp)   // Set the height to 12.dp
-                    .background(Color.Cyan) // Set the background color to black
-                )
+//                Spacer(modifier = Modifier.height(45.dp))
+//                Box(modifier = Modifier
+//                    .fillMaxWidth()  // Ensure it stretches across the full width
+//                    .height(1.dp)   // Set the height to 12.dp
+//                    .background(Color.Cyan) // Set the background color to black
+//                )
             }
 
         }
