@@ -1,10 +1,7 @@
 package com.example.word_demo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 // Represents the Word Table in the database
 
 @Entity
+@Table(name = "word")
 public class Word {
 
     @Id
@@ -22,10 +20,8 @@ public class Word {
     private String word;
     private String description;
     private String language;
-    private LocalDate date;
-
-    @JsonIgnore
-    private Instant created = Instant.now();
+    private String exampleSentence;
+    private String phoneticSpelling;
 
     // Getters and setters.
     public Long getId() {
@@ -60,19 +56,19 @@ public class Word {
         this.language = language;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public String getExampleSentence() {
+        return exampleSentence;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setExampleSentence(String exampleSentence) {
+        this.exampleSentence = exampleSentence;
     }
 
-    public Instant getCreated() {
-        return created;
+    public String getPhoneticSpelling() {
+        return phoneticSpelling;
     }
 
-    public void setCreated(Instant created) {
-        this.created = created;
+    public void setPhoneticSpelling(String phoneticSpelling) {
+        this.phoneticSpelling = phoneticSpelling;
     }
 }

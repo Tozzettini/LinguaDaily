@@ -27,4 +27,8 @@ public class WordService {
     public Word addWord(Word word) {
         return wordRepository.save(word);
     }
+
+    public List<Word> getWords(int skip, int limit) {
+        return wordRepository.fetchWordsWithOffset(skip, limit);
+    }
 }

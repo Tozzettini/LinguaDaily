@@ -4,9 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.util.Optional;
+import java.util.List;
 
 // Word Controller to define and use the API endpoints
 
@@ -17,36 +15,19 @@ public class WordController {
     @Autowired
     private WordService wordService;
 
-    // Get all words
+    private int DEFAULT_SKIP = 10;
+    private int DEFAULT_LIMIT = 10;
+
+    // Get {limit} number of words while skipping the first {skip} records
     @GetMapping
-    public ResponseEntity<?> getAllWords(@RequestParam(required = false) String since) {
-        System.out.println(since);
+    public List<Word> getWords(
+            @RequestParam(required = false) Integer skip, // Do not use primitive types, springboot cannot assign them null
+            @RequestParam(required = false) Integer limit
+    ) {
+        var effectiveSkip = skip == null ? DEFAULT_SKIP : skip;
+        var effectiveLimit = limit == null ? DEFAULT_LIMIT : limit;
 
-        if (since != null) {
-            try {
-                Instant sinceDate = Instant.parse(since);
-
-                var words = this.wordService.getAllWords();
-
-                words = words.stream().filter(w -> !w.getCreated().isBefore(sinceDate)).toList();
-
-                return ResponseEntity.ok(words);
-
-            } catch (DateTimeParseException e) {
-                System.out.println(e);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Invalid date format for 'since'.");
-            }
-        }
-
-        return ResponseEntity.ok(wordService.getAllWords());
-    }
-
-    // Get a single word by id
-    @GetMapping("/{id}")
-    public ResponseEntity<Word> getWordById(@PathVariable Long id) {
-        Optional<Word> word = wordService.getWordById(id);
-        return word.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        return wordService.getWords(effectiveSkip, effectiveLimit);
     }
 
     // Insert a new word
