@@ -234,7 +234,7 @@ fun TwoCardsPreview() {
         Column {
 
         TwoCardsInRow()
-S
+Spacer(modifier = Modifier.height(.dp))
         MainWordCard()
         }
 

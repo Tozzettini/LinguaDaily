@@ -6,20 +6,30 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkAdd
+import androidx.compose.material.icons.filled.Bookmarks
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Shuffle
+import androidx.compose.material.icons.filled.ShuffleOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -35,12 +45,15 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.linguadailyapp.R
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
+import com.example.linguadailyapp.ui.theme.Playfair
 
 @Preview(showBackground = true)
 @Composable
@@ -62,16 +75,19 @@ fun MainWordCard() {
     val pagerState = rememberPagerState(pageCount = {pageCount})
 
     Card(
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
         modifier = Modifier
             .fillMaxWidth()
-            .height(320.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF7E5BE) // Cream/beige color
-        ),
+            .padding(24.dp)
+            .height(420.dp),
+
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
         ),
-        shape = MaterialTheme.shapes.medium
+        shape = MaterialTheme.shapes.medium,
+          colors = CardDefaults.cardColors(
+        containerColor = MaterialTheme.colorScheme.primary,
+    ),
     ) {
         Column(
             modifier = Modifier
@@ -83,6 +99,7 @@ fun MainWordCard() {
                 text = "minatory",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
+                fontFamily = Playfair,
                 color = Color.Black
             )
 
@@ -90,21 +107,39 @@ fun MainWordCard() {
                 text = "adjective - MIN-uh-tor-ee",
                 fontSize = 16.sp,
                 color = Color.Black,
-                modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
+                modifier = Modifier.padding(top = 4.dp, bottom = 24.dp),
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight.SemiBold,
+
             )
 
             // Divider
-            HorizontalDivider(
-                modifier = Modifier.fillMaxWidth(),
-                thickness = 1.dp,
-                color = Color(0xFFE0D5B8)
-            )
+//            HorizontalDivider(
+//                modifier = Modifier.fillMaxWidth(),
+//                thickness = 2.dp,
+//                color = Color(0xFFF7E5BE),
+//            )
+
 
             // How to use section - Middle section
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
+                    .drawBehind {
+                        val strokeWidth = 2.dp.toPx()
+                        val horizontalPadding = 20.dp.toPx() // Adjust this to match your card's padding
+
+                        // Top line that extends beyond the box boundaries
+                        drawLine(
+                            color = Color(0xFFF7E5BE),
+                            start = Offset(-horizontalPadding, 0f),
+                            end = Offset(size.width + horizontalPadding, 0f),
+                            strokeWidth = strokeWidth
+                        )
+
+
+                    }
             ) {
                 HorizontalPager(
                     state = pagerState,
@@ -128,34 +163,54 @@ fun MainWordCard() {
                                     Text(
                                         text = "How to use minatory",
                                         fontSize = 18.sp,
-                                        fontWeight = FontWeight.Medium,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = FontFamily.Default,
+
                                         color = Color.Black
                                     )
 
-                                    IconButton(
-                                        onClick = { /* Add functionality */ },
-                                        modifier = Modifier
-                                            .background(
-                                                color = Color(0xFF1F565E),
-                                                shape = CircleShape
+                                    Box  (modifier = Modifier.padding(horizontal = 10.dp)) {
+                                        IconButton(
+                                            onClick = { /* Add functionality */ },
+                                            modifier = Modifier
+                                                .background(
+                                                    color = Color(0xFF1F565E),
+                                                    shape = CircleShape
+                                                )
+                                                .size(32.dp)
+                                                .padding(horizontal = 0.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.BookmarkAdd,
+                                                contentDescription = "Add",
+                                                tint = Color.White,
+                                                modifier = Modifier.size(18.dp)
                                             )
-                                            .size(32.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Add,
-                                            contentDescription = "Add",
-                                            tint = Color.White,
-                                            modifier = Modifier.size(18.dp)
-                                        )
+                                        }
                                     }
+//                                    Spacer(modifier = Modifier.width(0.dp))
                                 }
 
-                                Text(
-                                    text = "bomboclaat",
-                                fontSize = 16.sp,
-                                color = Color.Black,
-                                lineHeight = 24.sp
-                                )
+//                                Text(
+//                                    text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,Lorem ipsum dolor sit amet, consectetur adip",
+//                                fontSize = 16.sp,
+//                                color = Color.Black,
+//                                lineHeight = 24.sp,
+//                                    maxLines = Int.MAX_VALUE,
+//                                    overflow = TextOverflow.Visible
+//                                )
+                                Box(
+                                    modifier = Modifier
+                                        .height(200.dp)
+                                        .verticalScroll(rememberScrollState())
+                                ) {
+                                    Text(
+                                        text = "Lorem ipsum dolor sit amet... \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,Lorem ipsum dolor sit amet, consectetur adip",
+                                        fontSize = 16.sp,
+                                        color = Color.Black,
+                                        lineHeight = 24.sp
+                                    )
+                                }
                             }
                         }
                         1 -> {
@@ -170,7 +225,7 @@ fun MainWordCard() {
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Medium,
                                     color = Color.Black,
-                                    modifier = Modifier.padding(vertical = 8.dp)
+                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)
                                 )
 
                                 Text(
@@ -208,45 +263,73 @@ fun MainWordCard() {
                 }
             }
 
-            // Pagination dots - shows current page
-            Row(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.Center
+                    .drawBehind {
+                        val strokeWidth = 2.dp.toPx()
+                        val horizontalPadding = 24.dp.toPx()
+
+                        // Draw line at the top of this box (above the dots)
+                        drawLine(
+                            color = Color(0xFFF7E5BE),
+                            start = Offset(-horizontalPadding, size.height),
+                            end = Offset(size.width + horizontalPadding, size.height),
+                            strokeWidth = strokeWidth)
+
+                    }
             ) {
-                repeat(pageCount) { index ->
-                    Box(
-                        modifier = Modifier
-                            .padding(horizontal = 4.dp)
-                            .size(8.dp)
-                            .background(
-                                color = if (pagerState.currentPage == index) Color(0xFF1F565E) else Color(0xFFD9D9D9),
-                                shape = CircleShape
-                            )
-                    )
+                // Row with dots
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp,bottom = 16.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    repeat(pageCount) { index ->
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = 4.dp)
+                                .size(8.dp)
+                                .background(
+                                    color = if (pagerState.currentPage == index) Color(0xFF1F565E) else Color(0xFFD9D9D9),
+                                    shape = CircleShape
+                                )
+                        )
+                    }
                 }
             }
+            // Pagination dots - shows current page
 
-            // Bottom navigation
+
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
+
+
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+//                Circle(Icons.Default.Lightbulb, Color(0xFFBBDEFB), "Words") { navController.navigate(NavigationDestinations.WordsList.route) }
+//            Circle(Icons.Default.Bookmarks, Color(0xFFFFAB91), "Bookmarks") { navController.navigate(NavigationDestinations.Bookmark.route)}
+//            Circle(Icons.Default.Shuffle,
+
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Add,
+                        imageVector = Icons.Default.Lightbulb,
                         contentDescription = "Words",
                         tint = Color(0xFF1F565E),
                         modifier = Modifier.size(24.dp)
                     )
                     Text(
                         text = "Words",
+                        fontFamily = FontFamily.Default,
                         fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+
                         color = Color(0xFF1F565E)
                     )
                 }
@@ -255,14 +338,18 @@ fun MainWordCard() {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Add,
+                        imageVector = Icons.Default.Bookmarks,
                         contentDescription = "Bookmarks",
                         tint = Color(0xFF1F565E),
                         modifier = Modifier.size(24.dp)
                     )
                     Text(
                         text = "Bookmarks",
+                        fontFamily = FontFamily.Default,
+
                         fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+
                         color = Color(0xFF1F565E)
                     )
                 }
@@ -271,14 +358,17 @@ fun MainWordCard() {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Add,
+                        imageVector = Icons.Default.Shuffle,
                         contentDescription = "Random",
                         tint = Color(0xFF1F565E),
                         modifier = Modifier.size(24.dp)
                     )
                     Text(
                         text = "Random",
+                        fontFamily = FontFamily.Default,
+
                         fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
                         color = Color(0xFF1F565E)
                     )
                 }

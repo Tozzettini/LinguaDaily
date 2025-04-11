@@ -37,7 +37,6 @@ val Typography = Typography(
 
  val AppTypography = Typography(
 
-
      displayLarge = TextStyle(
         fontFamily = Quicksand,
         fontWeight = FontWeight.Bold,

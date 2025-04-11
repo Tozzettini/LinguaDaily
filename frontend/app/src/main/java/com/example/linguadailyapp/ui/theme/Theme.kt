@@ -51,6 +51,9 @@ val Quicksand = FontFamily(
     Font(R.font.quicksand_bold, FontWeight.Bold)
 )
 
+val Playfair = FontFamily(
+    Font(R.font.playfairdisplay_bold, FontWeight.Bold),
+    )
 
 
 
