@@ -235,7 +235,7 @@ fun TwoCardsInRow() {
 //}
 
 @Preview(showBackground = true)
-@Preview(name = "Small phone", device = "spec:width=381dp,height=891dp" + "")
+@Preview(name = "Small phone", device = "spec:width=481dp,height=291dp" + "")
 @Composable
 fun TwoCardsPreview() {
     LinguaDailyAppTheme {

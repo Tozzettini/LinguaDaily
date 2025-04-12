@@ -17,10 +17,14 @@ import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.RadioButtonChecked
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Feedback
 import androidx.compose.material.icons.outlined.Info
@@ -37,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -50,6 +55,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.R
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
+import com.example.linguadailyapp.ui.theme.Playfair
 import org.intellij.lang.annotations.Language
 
 //@OptIn(ExperimentalMaterial3Api::class)
@@ -175,16 +181,24 @@ fun StyledTopBar(
 ) {
     // Available languages
     val languages = listOf(
-        Languagetype( name = "English", code = "en"),
-        Languagetype( name = "Italian", code = "it"),
-        Languagetype( name ="Dutch", code = "nl")
+        Languagetype(name = "English", code = "en"),
+        Languagetype(name = "Italian", code = "it"),
+        Languagetype(name = "Dutch", code = "nl")
+    )
+    val languageToFlag = mapOf(
+        "en" to "🇺🇸",  // English - United States
+        "es" to "🇪🇸",  // Spanish - Spain
+        "it" to "🇮🇹",  // Italian - Italy
+        "pt" to "🇵🇹",  // Portuguese - Portugal
+        "nl" to "🇳🇱",  // Dutch - Netherlands
+        // Add more languages as needed
     )
 
     // State to keep track of dropdown visibility
     var showLanguageDropdown by remember { mutableStateOf(false) }
 
     // State to keep track of selected language
-    var selectedLanguage by remember  { mutableStateOf(languages[0]) }
+    var selectedLanguage by remember { mutableStateOf(languages[0]) }
 
     Row(
         modifier = Modifier
@@ -210,7 +224,8 @@ fun StyledTopBar(
                     .background(
                         color = Color(0xFFFCEFD5),
                         shape = CircleShape,
-                    )
+
+                        )
                     .padding(horizontal = 0.dp)
             ) {
                 Icon(
@@ -219,112 +234,119 @@ fun StyledTopBar(
                     tint = Color.Black,
                 )
             }
-        }
 
-        Image(
-            painter = painterResource(id = R.drawable.logo_no_bg),
-            contentDescription = null,
-            modifier = Modifier
-                .padding(vertical = 0.dp)
-                .graphicsLayer(translationY = 20f)
-                .graphicsLayer(scaleX = 3.0f, scaleY = 3.0f)
-        )
-
-        Box(modifier = Modifier.padding(horizontal = 10.dp)) {
-            IconButton(
-                onClick = { navController.navigate(NavigationDestinations.Settings.route) },
+            DropdownMenu(
+                expanded = showLanguageDropdown,
+                onDismissRequest = { showLanguageDropdown = false },
                 modifier = Modifier
-                    .size(38.dp)
-                    .border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        shape = CircleShape
-                    )
-                    .background(
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        shape = CircleShape,
-                    )
-                    .padding(horizontal = 0.dp)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .clip(RoundedCornerShape(0.dp))
+                    .widthIn(min = 180.dp)
+                    .border(2.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(0.dp))
             ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings",
-                    tint = Color.Black,
+                Text(
+                    text = "Select Language",
+                    fontWeight = FontWeight.Bold,
+//                    fontFamily = Playfair,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
-            }
-        }
-    }
 
-    // Display dropdown with dark overlay when showLanguageDropdown is true
-    if (showLanguageDropdown) {
-        Dialog(
-            onDismissRequest = { showLanguageDropdown = false },
-            properties = DialogProperties(
-                dismissOnBackPress = true,
-                dismissOnClickOutside = true,
-                usePlatformDefaultWidth = false  // Important: This makes the dialog fill the entire width
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    thickness = 2.dp,
+                    color = Color(0xFFF7E5BE),
+                )
 
-            )
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .clickable { showLanguageDropdown = false },
-                contentAlignment = Alignment.Center
-            ) {
-                Card(
-                    modifier = Modifier
-                        .padding(top = 64.dp, start = 20.dp, end = 20.dp)
-                        .clickable { /* Prevent dismissal when clicking card */ }
-                        .widthIn(max = 280.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    ) {
-                        Text(
-                            text = "Select Language",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                        )
+                // Using forEachIndexed instead of forEach to get the index
+                languages.forEachIndexed { index, language ->
+                    Column {
+                        DropdownMenuItem(
+                            text = {
+                                Row {
+                                    Text (languageToFlag[language.code] ?: "bruh")
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(text = language.name)
 
-                        HorizontalDivider(
-                     modifier = Modifier.fillMaxWidth(),
-                     thickness = 2.dp,
-                               color = Color(0xFFF7E5BE),
-                             )
-
-                        languages.forEach { language ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        selectedLanguage = language
-                                        onLanguageSelected(language)
-                                        showLanguageDropdown = false
-                                    }
-                                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(text = language.name)
-
+                                }
+                                   },
+                            onClick = {
+                                selectedLanguage = language
+                                onLanguageSelected(language)
+                                showLanguageDropdown = false
+                            },
+                            trailingIcon = {
                                 if (language == selectedLanguage) {
                                     Icon(
-                                        imageVector = Icons.Default.Check,
+                                        imageVector = Icons.Default.RadioButtonChecked,
                                         contentDescription = "Selected",
-                                        tint = Color.Black
+                                        tint = Color.Black,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                                else {
+                                    Icon(
+                                        imageVector = Icons.Default.RadioButtonUnchecked,
+                                        contentDescription = "Not selected",
+                                        tint = Color.Black,
+                                        modifier = Modifier.size(18.dp)
+
                                     )
                                 }
                             }
+                        )
+
+                        // Add divider after each item except the last one
+                        if (index < languages.size - 1) {
+                            HorizontalDivider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                thickness = 1.dp,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
                         }
                     }
                 }
             }
         }
+
+
+
+            Image(
+                painter = painterResource(id = R.drawable.logo_no_bg),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(vertical = 0.dp)
+                    .graphicsLayer(translationY = 20f)
+                    .graphicsLayer(scaleX = 3.0f, scaleY = 3.0f)
+            )
+
+            Box(modifier = Modifier.padding(horizontal = 10.dp)) {
+                IconButton(
+                    onClick = { navController.navigate(NavigationDestinations.Settings.route) },
+                    modifier = Modifier
+                        .size(38.dp)
+                        .border(
+                            width = 2.dp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            shape = CircleShape
+                        )
+                        .background(
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            shape = CircleShape,
+                        )
+                        .padding(horizontal = 0.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Settings",
+                        tint = Color.Black,
+                    )
+                }
+            }
+        }
     }
-}
+
 
 @Preview(showBackground = true)
 @Composable
