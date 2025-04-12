@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Menu
@@ -45,9 +46,11 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
@@ -224,8 +227,7 @@ fun StyledTopBar(
                     .background(
                         color = Color(0xFFFCEFD5),
                         shape = CircleShape,
-
-                        )
+                    )
                     .padding(horizontal = 0.dp)
             ) {
                 Icon(
@@ -247,7 +249,210 @@ fun StyledTopBar(
                 Text(
                     text = "Select Language",
                     fontWeight = FontWeight.Bold,
-//                    fontFamily = Playfair,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    thickness = 2.dp,
+                    color = Color(0xFFF7E5BE),
+                )
+
+                // Using forEachIndexed instead of forEach to get the index
+                languages.forEachIndexed { index , language ->
+                    Column {
+                        // Replace DropdownMenuItem with custom implementation
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedLanguage = language
+                                    onLanguageSelected(language)
+                                    // Do not close dropdown here
+                                }
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(languageToFlag[language.code] ?: "")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(text = language.name)
+                            }
+
+                            if (language == selectedLanguage) {
+                                Icon(
+                                    imageVector = Icons.Default.RadioButtonChecked,
+                                    contentDescription = "Selected",
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.RadioButtonUnchecked,
+                                    contentDescription = "Not selected",
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+
+                        // Add divider after each item except the last one
+                        if (index < languages.size - 1) {
+                            HorizontalDivider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                thickness = 1.dp,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    }
+                }
+
+
+            }
+        }
+
+        Image(
+            painter = painterResource(id = R.drawable.logo_no_bg),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(vertical = 0.dp)
+                .graphicsLayer(translationY = 20f)
+                .graphicsLayer(scaleX = 3.0f, scaleY = 3.0f)
+        )
+
+        Box(modifier = Modifier.padding(horizontal = 10.dp)) {
+            IconButton(
+                onClick = { navController.navigate(NavigationDestinations.Settings.route) },
+                modifier = Modifier
+                    .size(38.dp)
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        shape = CircleShape
+                    )
+                    .background(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = CircleShape,
+                    )
+                    .padding(horizontal = 0.dp)
+
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings",
+                    tint = Color.Black,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun StyledTopBarMultiLingual(
+    navController: NavController,
+    onLanguageSelected: (List<Languagetype>) -> Unit
+) {
+    // Available languages
+    val languages = listOf(
+        Languagetype(name = "English", code = "en"),
+        Languagetype(name = "Italian", code = "it"),
+        Languagetype(name = "Dutch", code = "nl")
+    )
+    val languageToFlag = mapOf(
+        "en" to "🇺🇸",  // English - United States
+        "es" to "🇪🇸",  // Spanish - Spain
+        "it" to "🇮🇹",  // Italian - Italy
+        "pt" to "🇵🇹",  // Portuguese - Portugal
+        "nl" to "🇳🇱",  // Dutch - Netherlands
+        // Add more languages as needed
+    )
+
+    // State to keep track of dropdown visibility
+    var showLanguageDropdown by remember { mutableStateOf(false) }
+
+    // State to keep track of selected languages (now a list)
+    var selectedLanguages by remember { mutableStateOf(listOf(languages[0])) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .height(56.dp)
+            .clip(RoundedCornerShape(15.dp))
+            .border(2.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(15.dp))
+            .background(MaterialTheme.colorScheme.primaryContainer),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Box(modifier = Modifier.padding(horizontal = 10.dp)) {
+            IconButton(
+                onClick = { showLanguageDropdown = true },
+                modifier = Modifier
+                    .size(38.dp)
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        shape = CircleShape
+                    )
+                    .background(
+                        color = Color(0xFFFCEFD5),
+                        shape = CircleShape,
+                    )
+            ) {
+                // Display the number of selected languages if more than 1
+                if (selectedLanguages.size > 1) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Language,
+                            contentDescription = "Language",
+                            tint = Color.Black,
+                        )
+                        Text(
+                            text = selectedLanguages.size.toString(),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .background(Color.White, CircleShape)
+                                .padding(2.dp)
+                                .size(12.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Language,
+                        contentDescription = "Language",
+                        tint = Color.Black,
+                    )
+                }
+            }
+
+            DropdownMenu(
+                expanded = showLanguageDropdown,
+                onDismissRequest = {
+                    if (selectedLanguages.isNotEmpty()) {
+                        showLanguageDropdown = false
+                        // Call onLanguageSelected with the list of selected languages
+                        onLanguageSelected(selectedLanguages)
+                    } else {
+                        // Don't allow closing if no languages are selected
+                        // Maybe show a toast or some other feedback
+                    }
+                },
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .clip(RoundedCornerShape(0.dp))
+                    .widthIn(min = 180.dp)
+                    .border(2.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(0.dp))
+            ) {
+                Text(
+                    text = "Select Languages",
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
 
@@ -260,40 +465,45 @@ fun StyledTopBar(
                 // Using forEachIndexed instead of forEach to get the index
                 languages.forEachIndexed { index, language ->
                     Column {
-                        DropdownMenuItem(
-                            text = {
-                                Row {
-                                    Text (languageToFlag[language.code] ?: "bruh")
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(text = language.name)
-
+                        // Replace checkbox with our custom implementation
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedLanguages = if (selectedLanguages.contains(language)) {
+                                        // If already selected, remove it
+                                        selectedLanguages - language
+                                    } else {
+                                        // If not selected, add it
+                                        selectedLanguages + language
+                                    }
                                 }
-                                   },
-                            onClick = {
-                                selectedLanguage = language
-                                onLanguageSelected(language)
-                                showLanguageDropdown = false
-                            },
-                            trailingIcon = {
-                                if (language == selectedLanguage) {
-                                    Icon(
-                                        imageVector = Icons.Default.RadioButtonChecked,
-                                        contentDescription = "Selected",
-                                        tint = Color.Black,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                }
-                                else {
-                                    Icon(
-                                        imageVector = Icons.Default.RadioButtonUnchecked,
-                                        contentDescription = "Not selected",
-                                        tint = Color.Black,
-                                        modifier = Modifier.size(18.dp)
-
-                                    )
-                                }
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(languageToFlag[language.code] ?: "")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(text = language.name)
                             }
-                        )
+
+                            if (selectedLanguages.contains(language)) {
+                                Icon(
+                                    imageVector = Icons.Default.CheckBox,
+                                    contentDescription = "Selected",
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.CheckBoxOutlineBlank,
+                                    contentDescription = "Not selected",
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
 
                         // Add divider after each item except the last one
                         if (index < languages.size - 1) {
@@ -310,43 +520,39 @@ fun StyledTopBar(
             }
         }
 
+        Image(
+            painter = painterResource(id = R.drawable.logo_no_bg),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(vertical = 0.dp)
+                .graphicsLayer(translationY = 20f)
+                .graphicsLayer(scaleX = 3.0f, scaleY = 3.0f)
+        )
 
-
-            Image(
-                painter = painterResource(id = R.drawable.logo_no_bg),
-                contentDescription = null,
+        Box(modifier = Modifier.padding(horizontal = 10.dp)) {
+            IconButton(
+                onClick = { navController.navigate(NavigationDestinations.Settings.route) },
                 modifier = Modifier
-                    .padding(vertical = 0.dp)
-                    .graphicsLayer(translationY = 20f)
-                    .graphicsLayer(scaleX = 3.0f, scaleY = 3.0f)
-            )
-
-            Box(modifier = Modifier.padding(horizontal = 10.dp)) {
-                IconButton(
-                    onClick = { navController.navigate(NavigationDestinations.Settings.route) },
-                    modifier = Modifier
-                        .size(38.dp)
-                        .border(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            shape = CircleShape
-                        )
-                        .background(
-                            color = MaterialTheme.colorScheme.secondaryContainer,
-                            shape = CircleShape,
-                        )
-                        .padding(horizontal = 0.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = "Settings",
-                        tint = Color.Black,
+                    .size(38.dp)
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        shape = CircleShape
                     )
-                }
+                    .background(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = CircleShape,
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings",
+                    tint = Color.Black,
+                )
             }
         }
     }
-
+}
 
 @Preview(showBackground = true)
 @Composable

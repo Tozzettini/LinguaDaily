@@ -40,6 +40,7 @@ import com.example.linguadailyapp.ui.components.Languagetype
 import com.example.linguadailyapp.ui.components.MainWordCard
 import com.example.linguadailyapp.ui.components.MainWordDisplayContainer
 import com.example.linguadailyapp.ui.components.StyledTopBar
+import com.example.linguadailyapp.ui.components.StyledTopBarMultiLingual
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 import com.example.linguadailyapp.viewmodel.WordViewModel
 import com.example.linguadailyapp.viewmodel.WordViewModelFactory
@@ -92,6 +93,8 @@ fun HomeScreen(
 //        end = Offset(0f, 1f)     // Bottom
 //    )
 
+//    var currentLanguages by remember { mutableStateOf(listOf(Languagetype("English", "en"))) }
+//    var currentPrimaryLanguage by remember { mutableStateOf(currentLanguages.first()) }
     var currentLanguage by remember { mutableStateOf(Languagetype("English", "en")) }
 
 
@@ -103,6 +106,17 @@ fun HomeScreen(
                     .background(lightColor) // Apply background color
                     .padding(top = 10.dp) // Add padding to the bottom
             ) {
+//                StyledTopBarMultiLingual (
+//                    navController = navController,
+//                    onLanguageSelected = { languages ->
+//                        currentLanguages = languages
+//                        // Here you would implement the logic to change the app's language
+//                        // and fetch words from the database according to the selected language
+//                        if (languages.isNotEmpty()) {
+//                            currentPrimaryLanguage = languages.first()
+//                        }
+//                    }
+//                )
                 StyledTopBar(
                     navController = navController,
                     onLanguageSelected = { language ->
@@ -111,7 +125,8 @@ fun HomeScreen(
                         // and fetch words from the database according to the selected language
                         println("Language changed to: ${language.name} (${language.code})")
                     }
-                )            }        },
+                )
+            }        },
         content = { paddingValues ->
             // Main content of the HomeScreen
             Column(
