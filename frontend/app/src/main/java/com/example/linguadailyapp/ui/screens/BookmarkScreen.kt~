@@ -217,7 +217,7 @@ fun BookmarkCard(word: Word, onTrashClicked: (Word) -> Unit) {
                             color = accentColor,
                             shape = CircleShape
                         )
-                        .padding(horizontal = 0.dp)
+                        .padding(horizontal = )
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Delete,

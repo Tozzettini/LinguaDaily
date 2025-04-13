@@ -4,6 +4,7 @@ enum class NavigationDestinations(val route: String) {
     Home("home"),
     Settings("settings"),
     WordsList("wordsList"),
-    Bookmark("bookMark")
+    Bookmark("bookMark"),
+    Word("word"),
 
 }

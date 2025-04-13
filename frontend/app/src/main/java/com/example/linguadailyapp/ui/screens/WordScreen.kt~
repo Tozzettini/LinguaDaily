@@ -1,0 +1,9 @@
+package com.example.linguadailyapp.ui.screens
+
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+
+@Composable
+fun WordScreen(navController: NavHostController) {
+
+}

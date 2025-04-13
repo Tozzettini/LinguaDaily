@@ -57,6 +57,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.R
+import com.example.linguadailyapp.database.word.WordDetails
+import com.example.linguadailyapp.database.word.sampleWordDetails
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 import com.example.linguadailyapp.ui.theme.Playfair
@@ -76,9 +78,13 @@ fun MainWordCardPreview() {
     }
 }
 
-@Composable
-fun MainWordCard( navController: NavController) {
 
+
+@Composable
+fun MainWordCard(
+    navController: NavController,
+    wordDetails: WordDetails = sampleWordDetails // Default to sample data if not provided
+) {
     val pageCount = 3
     val pagerState = rememberPagerState(pageCount = {pageCount})
 
@@ -87,33 +93,28 @@ fun MainWordCard( navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
+            .heightIn(min = 370.dp, max = 680.dp)
             .fillMaxHeight()
-            .heightIn(min = 370.dp)
             .padding(
-                bottom = 46.dp
-            )
-        , //480 - 370
-
-
-
-
+                bottom = 48.dp
+            ),
+        //370 - 480
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
         ),
         shape = MaterialTheme.shapes.medium,
-          colors = CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.primary,
-    ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+        ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(start = 20.dp, top = 20.dp, end = 20.dp, bottom = 10.dp) // Set individual padding values
-
+                .padding(start = 20.dp, top = 20.dp, end = 20.dp, bottom = 10.dp)
         ) {
             // Word and part of speech, Top section
             Text(
-                text = "minatory",
+                text = wordDetails.word,
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = Playfair,
@@ -121,22 +122,13 @@ fun MainWordCard( navController: NavController) {
             )
 
             Text(
-                text = "adjective - MIN-uh-tor-ee",
+                text = "${wordDetails.partOfSpeech} - ${wordDetails.pronunciation}",
                 fontSize = 16.sp,
                 color = Color.Black,
                 modifier = Modifier.padding(top = 4.dp, bottom = 24.dp),
                 fontFamily = FontFamily.Default,
                 fontWeight = FontWeight.SemiBold,
-
             )
-
-            // Divider
-//            HorizontalDivider(
-//                modifier = Modifier.fillMaxWidth(),
-//                thickness = 2.dp,
-//                color = Color(0xFFF7E5BE),
-//            )
-
 
             // How to use section - Middle section
             Box(
@@ -145,7 +137,7 @@ fun MainWordCard( navController: NavController) {
                     .fillMaxWidth()
                     .drawBehind {
                         val strokeWidth = 2.dp.toPx()
-                        val horizontalPadding = 20.dp.toPx() // Adjust this to match your card's padding
+                        val horizontalPadding = 20.dp.toPx()
 
                         // Top line that extends beyond the box boundaries
                         drawLine(
@@ -154,8 +146,10 @@ fun MainWordCard( navController: NavController) {
                             end = Offset(size.width + horizontalPadding, 0f),
                             strokeWidth = strokeWidth
                         )
-
-
+                    }
+                    .clickable {
+                        // Navigate to the detailed word screen and pass the current word details
+                        navController.navigate(NavigationDestinations.Word.route)
                     }
             ) {
                 HorizontalPager(
@@ -178,15 +172,14 @@ fun MainWordCard( navController: NavController) {
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = "How to use minatory",
+                                        text = "How to use ${wordDetails.word}",
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.Bold,
                                         fontFamily = FontFamily.Default,
-
                                         color = Color.Black
                                     )
 
-                                    Box  (modifier = Modifier.padding(horizontal = 10.dp)) {
+                                    Box(modifier = Modifier.padding(horizontal = 10.dp)) {
                                         IconButton(
                                             onClick = { /* Add functionality */ },
                                             modifier = Modifier
@@ -198,31 +191,26 @@ fun MainWordCard( navController: NavController) {
                                                 .padding(horizontal = 0.dp)
                                         ) {
                                             Icon(
-                                                imageVector = Icons.Default.BookmarkAdd,
-                                                contentDescription = "Add",
+                                                imageVector =
+                                                    if (wordDetails.isBookmarked) Icons.Default.Bookmark
+                                                    else Icons.Default.BookmarkAdd,
+                                                contentDescription =
+                                                    if (wordDetails.isBookmarked) "Remove from bookmarks"
+                                                    else "Add to bookmarks",
                                                 tint = Color.White,
                                                 modifier = Modifier.size(18.dp)
                                             )
                                         }
                                     }
-//                                    Spacer(modifier = Modifier.width(0.dp))
                                 }
 
-//                                Text(
-//                                    text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,Lorem ipsum dolor sit amet, consectetur adip",
-//                                fontSize = 16.sp,
-//                                color = Color.Black,
-//                                lineHeight = 24.sp,
-//                                    maxLines = Int.MAX_VALUE,
-//                                    overflow = TextOverflow.Visible
-//                                )
                                 Box(
                                     modifier = Modifier
-                                        .height(200.dp)
+//                                        .height(200.dp)
                                         .verticalScroll(rememberScrollState())
                                 ) {
                                     Text(
-                                        text = "Lorem ipsum dolor sit amet... \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,Lorem ipsum dolor sit amet, consectetur adip",
+                                        text = wordDetails.usageSamples.joinToString(separator = "\n\n"),
                                         fontSize = 16.sp,
                                         color = Color.Black,
                                         lineHeight = 24.sp
@@ -246,7 +234,7 @@ fun MainWordCard( navController: NavController) {
                                 )
 
                                 Text(
-                                    text = "Threatening or menacing: expressing or conveying a threat.",
+                                    text = wordDetails.definition,
                                     fontSize = 16.sp,
                                     color = Color.Black,
                                     lineHeight = 24.sp
@@ -269,7 +257,7 @@ fun MainWordCard( navController: NavController) {
                                 )
 
                                 Text(
-                                    text = "From Latin minātōrius, from minātus, perfect participle of minārī to punch).",
+                                    text = wordDetails.etymology,
                                     fontSize = 16.sp,
                                     color = Color.Black,
                                     lineHeight = 24.sp
@@ -293,14 +281,13 @@ fun MainWordCard( navController: NavController) {
                             start = Offset(-horizontalPadding, size.height),
                             end = Offset(size.width + horizontalPadding, size.height),
                             strokeWidth = strokeWidth)
-
                     }
             ) {
                 // Row with dots
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp,bottom = 16.dp),
+                        .padding(top = 8.dp, bottom = 16.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     repeat(pageCount) { index ->
@@ -316,22 +303,13 @@ fun MainWordCard( navController: NavController) {
                     }
                 }
             }
-            // Pagination dots - shows current page
-
-
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
-
-
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-//                Circle(Icons.Default.Lightbulb, Color(0xFFBBDEFB), "Words") { navController.navigate(NavigationDestinations.WordsList.route) }
-//            Circle(Icons.Default.Bookmarks, Color(0xFFFFAB91), "Bookmarks") { navController.navigate(NavigationDestinations.Bookmark.route)}
-//            Circle(Icons.Default.Shuffle,
-
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.clickable(onClick = { navController.navigate(
@@ -348,14 +326,13 @@ fun MainWordCard( navController: NavController) {
                         fontFamily = FontFamily.Default,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-
                         color = Color(0xFF1F565E)
                     )
                 }
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.clickable(onClick = { navController.navigate(
+                    modifier = Modifier.clickable(onClick = { navController.navigate(
                         NavigationDestinations.Bookmark.route) })
                 ) {
                     Icon(
@@ -367,10 +344,8 @@ fun MainWordCard( navController: NavController) {
                     Text(
                         text = "Bookmarks",
                         fontFamily = FontFamily.Default,
-
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-
                         color = Color(0xFF1F565E)
                     )
                 }
@@ -389,7 +364,6 @@ fun MainWordCard( navController: NavController) {
                     Text(
                         text = "Random",
                         fontFamily = FontFamily.Default,
-
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF1F565E)
