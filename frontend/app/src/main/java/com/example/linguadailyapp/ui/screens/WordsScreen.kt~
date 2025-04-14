@@ -207,7 +207,7 @@ fun WordCard(word: Word, onBookmarkClick: (Word) -> Unit) {
                 definition = word.description,
                 modifier = Modifier.weight(1f)
             )
-            Spacer()
+            Spacer(modifier = Modifier.width(16.dp))
 
             IconButton(
                 onClick = { onBookmarkClick(word) },
