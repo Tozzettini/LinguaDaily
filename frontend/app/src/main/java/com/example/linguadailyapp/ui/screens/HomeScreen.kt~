@@ -133,7 +133,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)  // This ensures correct padding is applied
-                    .background(Color.White),
+                    .background(Color.Black),
 //                    .background(Brush.linearGradient(
 //                        colors = listOf(lightColor, darkerColor),
 //                        start = Offset(0f, 0f),

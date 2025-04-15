@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -44,6 +45,8 @@ import com.example.linguadailyapp.database.streakmanager.StreakCounter
 import com.example.linguadailyapp.ui.components.AnimatedEarthIcon
 import com.example.linguadailyapp.ui.components.MainWordCard
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -63,17 +66,25 @@ fun TwoCardsInRow() {
         // In your composable
         // In your composable
         val context = LocalContext.current
-        var streakCount by rememberSaveable  { mutableStateOf(1) }
-        //
+
+    var streakCount by rememberSaveable {
+        mutableIntStateOf(StreakCounter.getCurrentStreak(context))
+    }        //
         val isOnline by  rememberSaveable  { mutableStateOf(true) }
         //
         val randomNumberOnlineString = remember {
             val randomNumber = (4..500).random()
             "%,d".format(randomNumber)
         }
-        LaunchedEffect(key1 = Unit) {
-                StreakCounter.updateStreak(context)
+
+    // Update streak when the screen becomes visible
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO) {
+            // This updates the streak based on the current date and returns the new value
+            val updatedStreak = StreakCounter.updateStreak(context)
+            streakCount = updatedStreak
         }
+    }
 
         Row(
             modifier = Modifier

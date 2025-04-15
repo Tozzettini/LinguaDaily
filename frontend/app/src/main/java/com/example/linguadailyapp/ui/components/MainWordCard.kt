@@ -174,7 +174,7 @@ fun MainWordCard(
                                     Text(
                                         text = "How to use ${wordDetails.word}",
                                         fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.SemiBold,
                                         fontFamily = FontFamily.Default,
                                         color = Color.Black
                                     )
