@@ -72,7 +72,7 @@ fun handlePermissionResult(context: Context, isGranted: Boolean) {
         Toast.makeText(context, "Notification Permission Denied", Toast.LENGTH_SHORT).show()
     } else {
         PreferencesManager(context).setNotificationsEnabled(true)
-        sendNotification("You're Daily words are:", "List of daily words in diffrent languages;)", context)
+        sendNotification("You enabled notifications!", "we are just checking they actually work ;)", context)
     }
 }
 
