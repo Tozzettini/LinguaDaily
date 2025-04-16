@@ -78,8 +78,8 @@ class LanguageViewModel(private val sharedPreferences: SharedPreferences) : View
         Languagetype("English", "en"),
         Languagetype("Italian", "it"),
         Languagetype("Dutch", "nl"),
-        Languagetype("Spanish", "es"),
-        Languagetype("Portuguese", "pt")
+//        Languagetype("Spanish", "es"),
+//        Languagetype("Portuguese", "pt")
     )
 
     init {
@@ -153,9 +153,9 @@ fun ImprovedStyledTopBar2(
 
     val languageToFlag = mapOf(
         "en" to "🇺🇸",  // English - United States
-        "es" to "🇪🇸",  // Spanish - Spain
+//        "es" to "🇪🇸",  // Spanish - Spain
         "it" to "🇮🇹",  // Italian - Italy
-        "pt" to "🇵🇹",  // Portuguese - Portugal
+//        "pt" to "🇵🇹",  // Portuguese - Portugal
         "nl" to "🇳🇱",  // Dutch - Netherlands
     )
 
