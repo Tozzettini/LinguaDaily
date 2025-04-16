@@ -22,6 +22,26 @@ public class Word {
     private String language;
     private String exampleSentence;
     private String phoneticSpelling;
+    private String partOfSpeech;
+    private String etymology;
+
+    public String getPartOfSpeech() {
+        return partOfSpeech;
+    }
+
+    public void setPartOfSpeech(String partOfSpeech) {
+        this.partOfSpeech = partOfSpeech;
+    }
+
+    public String getEtymology() {
+        return etymology;
+    }
+
+    public void setEtymology(String etymology) {
+        this.etymology = etymology;
+    }
+
+
 
     // Getters and setters.
     public Long getId() {
