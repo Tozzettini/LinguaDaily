@@ -6,5 +6,7 @@ enum class NavigationDestinations(val route: String) {
     WordsList("wordsList"),
     Bookmark("bookMark"),
     Word("word"),
+    Challenge("challenge"),
+
 
 }

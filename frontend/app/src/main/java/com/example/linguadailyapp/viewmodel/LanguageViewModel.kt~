@@ -1,55 +1,154 @@
-package com.example.linguadailyapp.ui.screens
+package com.example.linguadailyapp.viewmodel
 
-
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CheckBox
-import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
-import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.R
 import com.example.linguadailyapp.navigation.NavigationDestinations
-import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
+import com.example.linguadailyapp.ui.screens.ImprovedStyledTopBar
+import com.example.linguadailyapp.ui.screens.Languagetype
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
-// Define the Languagetype class if it's not already defined elsewhere
-data class Languagetype(val name: String, val code: String)
-@Composable
-fun ImprovedStyledTopBar(
-    navController: NavController,
-    onLanguagesSelected: (Set<Languagetype>) -> Unit
-) {
+// ViewModel using SharedPreferences for language preferences
+class LanguageViewModel(private val sharedPreferences: SharedPreferences) : ViewModel() {
+    // SharedPreferences key
+    private val SELECTED_LANGUAGES_KEY = "selected_languages"
+
+    // MutableStateFlow to hold the current selections
+    private val _selectedLanguages = MutableStateFlow<Set<Languagetype>>(setOf())
+    val selectedLanguages: StateFlow<Set<Languagetype>> = _selectedLanguages
+
     // Available languages
-    val languages = listOf(
-        Languagetype(name = "English", code = "en"),
-        Languagetype(name = "Italian", code = "it"),
-        Languagetype(name = "Dutch", code = "nl")
+    val availableLanguages = listOf(
+        Languagetype("English", "en"),
+        Languagetype("Italian", "it"),
+        Languagetype("Dutch", "nl"),
+        Languagetype("Spanish", "es"),
+        Languagetype("Portuguese", "pt")
     )
+
+    init {
+        // Load saved languages on initialization
+        loadSelectedLanguages()
+    }
+
+    private fun loadSelectedLanguages() {
+        // Get saved language codes from SharedPreferences
+        val savedLanguageCodes = sharedPreferences.getStringSet(
+            SELECTED_LANGUAGES_KEY,
+            setOf("en") // Default to English if nothing is saved
+        ) ?: setOf("en")
+
+        // Convert codes to Languagetype objects
+        val languageSet = savedLanguageCodes.mapNotNull { code ->
+            availableLanguages.find { it.code == code }
+        }.toSet()
+
+        // Use default if empty
+        val result = if (languageSet.isEmpty()) {
+            setOf(availableLanguages.first())
+        } else {
+            languageSet
+        }
+
+        _selectedLanguages.value = result
+    }
+
+    // Function to update selected languages
+    fun updateSelectedLanguages(languages: Set<Languagetype>) {
+        // Ensure we have at least one language selected
+        val languagesToSave = if (languages.isEmpty()) {
+            setOf(availableLanguages.first()) // Default to first language
+        } else {
+            languages
+        }
+
+        // Save to SharedPreferences
+        sharedPreferences.edit().apply {
+            putStringSet(
+                SELECTED_LANGUAGES_KEY,
+                languagesToSave.map { it.code }.toSet()
+            )
+            apply() // Apply changes asynchronously
+        }
+
+        // Update state
+        _selectedLanguages.value = languagesToSave
+    }
+}
+
+// Factory for ViewModel instantiation
+class LanguageViewModelFactory(private val sharedPreferences: SharedPreferences) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(LanguageViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return LanguageViewModel(sharedPreferences) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+// Improved TopBar component using ViewModel with SharedPreferences
+@Composable
+fun ImprovedStyledTopBar2(
+    navController: NavController,
+    viewModel: LanguageViewModel
+) {
+    val languages = viewModel.availableLanguages
 
     val languageToFlag = mapOf(
         "en" to "🇺🇸",  // English - United States
@@ -60,10 +159,15 @@ fun ImprovedStyledTopBar(
     )
 
     // State to keep track of dropdown visibility
-    var showLanguageDropdown by remember { mutableStateOf(true) }
+    var showLanguageDropdown by remember { mutableStateOf(false) }
 
-    // State to keep track of selected languages - use mutableStateOf with a mutableSetOf
-    var selectedLanguages by remember { mutableStateOf(mutableSetOf<Languagetype>()) }
+    // Collect the selectedLanguages from the ViewModel
+    val selectedLanguages by viewModel.selectedLanguages.collectAsState()
+
+    // Local state for dropdown selections - initialized with current selections
+    var tempSelectedLanguages by remember(selectedLanguages) {
+        mutableStateOf(selectedLanguages.toMutableSet())
+    }
 
     // Animated colors
     val containerColor = animateColorAsState(
@@ -93,7 +197,11 @@ fun ImprovedStyledTopBar(
             // Language selector
             Box(modifier = Modifier.padding(start = 12.dp)) {
                 IconButton(
-                    onClick = { showLanguageDropdown = true },
+                    onClick = {
+                        showLanguageDropdown = true
+                        // Initialize temp selection with current selection
+                        tempSelectedLanguages = selectedLanguages.toMutableSet()
+                    },
                     modifier = Modifier
                         .size(38.dp)
                         .clip(CircleShape)
@@ -122,26 +230,27 @@ fun ImprovedStyledTopBar(
                         }
                     }
                 }
-                Spacer(modifier = Modifier.width(208.dp))
                 // If more than one language is selected, show a count
-                //showing this like a colomn when it should be a row
                 if (selectedLanguages.size > 1) {
                     Text(
                         text = "+${selectedLanguages.size - 1}",
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                         color = Color(0xFF1F565E),
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 6.dp)
+                        modifier = Modifier.align(Alignment.TopEnd)
                     )
                 }
-
                 DropdownMenu(
                     expanded = showLanguageDropdown,
-                    onDismissRequest = { showLanguageDropdown = false },
+                    onDismissRequest = {
+                        showLanguageDropdown = false
+                        // Cancel changes if dismissed without clicking Done
+                        tempSelectedLanguages = selectedLanguages.toMutableSet()
+                    },
                     modifier = Modifier
                         .background(Color.White)
                         .clip(RoundedCornerShape(12.dp))
-                        .shadow(elevation = 4.dp)
+                        .shadow(elevation = 0.dp)
                         .width(180.dp)
                 ) {
                     Text(
@@ -164,16 +273,14 @@ fun ImprovedStyledTopBar(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    // Create a new set to trigger recomposition
-                                    val updatedSelection = selectedLanguages.toMutableSet()
+                                    // Toggle selection in temp state only
+                                    val updatedSelection = tempSelectedLanguages.toMutableSet()
                                     if (updatedSelection.contains(language)) {
                                         updatedSelection.remove(language)
                                     } else {
                                         updatedSelection.add(language)
                                     }
-                                    selectedLanguages = updatedSelection
-                                    // Call the callback with the updated set
-                                    onLanguagesSelected(updatedSelection)
+                                    tempSelectedLanguages = updatedSelection
                                 }
                                 .padding(horizontal = 16.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -192,7 +299,7 @@ fun ImprovedStyledTopBar(
                             )
 
                             // Show checkmark if selected
-                            if (selectedLanguages.contains(language)) {
+                            if (tempSelectedLanguages.contains(language)) {
                                 Box(
                                     modifier = Modifier
                                         .size(18.dp)
@@ -226,38 +333,38 @@ fun ImprovedStyledTopBar(
                         }
                     }
 
-//                    // Add a done button to close the dropdown and confirm selections
-//                    HorizontalDivider(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(horizontal = 8.dp),
-//                        thickness = 1.dp,
-//                        color = Color(0xFFE0E0E0)
-//                    )
-//
-//                    Button(
-//                        onClick = {
-//                            showLanguageDropdown = false
-//                            // Final callback to ensure parent component gets the selections
-//                            onLanguagesSelected(selectedLanguages)
-//                        },
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(horizontal = 16.dp, vertical = 8.dp),
-//                        colors = ButtonDefaults.buttonColors(
-//                            containerColor = Color(0xFF1F565E)
-//                        )
-//                    ) {
-//                        Text(
-//                            text = "Done (${selectedLanguages.size})",
-//                            color = Color.White
-//                        )
-//                    }
+                    // Add a done button to close the dropdown and confirm selections
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        thickness = 1.dp,
+                        color = Color(0xFFE0E0E0)
+                    )
+
+                    Button(
+                        onClick = {
+                            showLanguageDropdown = false
+                            // Save to ViewModel which persists to SharedPreferences
+                            viewModel.updateSelectedLanguages(tempSelectedLanguages)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF1F565E)
+                        )
+                    ) {
+                        Text(
+                            text = "Done (${tempSelectedLanguages.size})",
+                            color = Color.White
+                        )
+                    }
                 }
             }
 
-
-                    // Logo in the center
+            // Add any other TopBar elements here if needed...
+            // Logo in the center
             Box(
                 modifier = Modifier
                     .weight(1f),
@@ -297,19 +404,56 @@ fun ImprovedStyledTopBar(
     }
 }
 
-@Preview(showBackground = true)
+// Example usage in your Activity or Fragment
 @Composable
-fun ImprovedStyledTopBarPreview() {
-    LinguaDailyAppTheme {
-        Box(
+fun YourAppScreen() {
+    // Get the application context
+    val context = LocalContext.current
+
+    // Get SharedPreferences instance
+    val sharedPreferences = remember {
+        context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+    }
+
+    // Create the ViewModel using the factory
+    val viewModel: LanguageViewModel = viewModel(
+        factory = LanguageViewModelFactory(sharedPreferences)
+    )
+
+    val navController = rememberNavController()
+
+    Scaffold(
+        topBar = {
+            ImprovedStyledTopBar2(
+                navController = navController,
+                viewModel = viewModel
+            )
+        }
+    ) { paddingValues ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(480.dp)
-                .background(Color.White)
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp)
         ) {
-            ImprovedStyledTopBar(
-                navController = rememberNavController(),
-                onLanguagesSelected = {})
+            // Example of accessing selected languages in your UI
+            val selectedLanguages by viewModel.selectedLanguages.collectAsState()
+
+            Text(
+                text = "Currently Selected Languages:",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            selectedLanguages.forEach { language ->
+                Text(
+                    text = "• ${language.name}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+            // Rest of your app content
         }
     }
 }

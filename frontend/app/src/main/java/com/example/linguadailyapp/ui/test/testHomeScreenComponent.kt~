@@ -1,6 +1,6 @@
 package com.example.linguadailyapp.ui.screens
 
-import android.content.Context
+import TwoCardsInRow
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -10,11 +10,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -25,16 +25,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.ui.components.*
-import com.example.linguadailyapp.ui.components.DailyChallengeCard
-import com.example.linguadailyapp.ui.components.VocabularyStatsWidget
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
-import com.example.linguadailyapp.viewmodel.ImprovedStyledTopBar2
-import com.example.linguadailyapp.viewmodel.LanguageViewModel
-import com.example.linguadailyapp.viewmodel.LanguageViewModelFactory
 import com.example.linguadailyapp.viewmodel.WordViewModel
 import com.example.linguadailyapp.viewmodel.WordViewModelFactory
 import kotlinx.coroutines.delay
-import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,27 +39,12 @@ fun HomeScreen(
     val todaysWord by viewModel.todaysWord.collectAsState()
     var currentLanguage by remember { mutableStateOf(Languagetype("English", "en")) }
 
-    // Get the application context
-    val context = LocalContext.current
-
-    // Get SharedPreferences instance
-    val sharedPreferences = remember {
-        context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
-    }
-
-    // Create the ViewModel using the factory
-    val viewModel: LanguageViewModel = viewModel(
-        factory = LanguageViewModelFactory(sharedPreferences)
-    )
-
     // Animation states
     var isHeaderVisible by remember { mutableStateOf(false) }
     var isStatsVisible by remember { mutableStateOf(false) }
+    var isCardsVisible by remember { mutableStateOf(false) }
     var isChallengeVisible by remember { mutableStateOf(false) }
     var isWordCardVisible by remember { mutableStateOf(false) }
-    var isWordCardVisible2 by remember { mutableStateOf(false) }
-    var isWordCardVisible3 by remember { mutableStateOf(false) }
-
 
     // Staggered animation
     LaunchedEffect(Unit) {
@@ -74,13 +53,11 @@ fun HomeScreen(
         delay(200)
         isStatsVisible = true
         delay(200)
+        isCardsVisible = true
+        delay(200)
         isChallengeVisible = true
         delay(200)
         isWordCardVisible = true
-        delay(250)
-        isWordCardVisible2 = true
-        delay(300)
-        isWordCardVisible3 = true
     }
 
     // Background gradients
@@ -95,20 +72,20 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            // Use our new improved top bar
-//            ImprovedStyledTopBar(
-//                navController = navController,
-//                onLanguagesSelected = { selectedLangs ->
-//                    // Store your selected languages here
-//                    // For example, update a ViewModel or save to preferences
-////                    viewModel.updateSelectedLanguages(selectedLangs)
-//                }
-//            )
-
-            ImprovedStyledTopBar2(
-                navController = navController,
-                viewModel = viewModel
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .shadow(elevation = 4.dp)
+                    .padding(vertical = 8.dp)
+            ) {
+                StyledTopBar(
+                    navController = navController,
+                    onLanguageSelected = { language ->
+                        currentLanguage = language
+                    }
+                )
+            }
         },
         content = { paddingValues ->
             Box(
@@ -154,6 +131,20 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Animated cards row
+                    AnimatedVisibility(
+                        visible = isCardsVisible,
+                        enter = fadeIn(animationSpec = tween(500)) +
+                                slideInVertically(
+                                    initialOffsetY = { it / 2 },
+                                    animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                                )
+                    ) {
+                        TwoCardsInRow()
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     // Daily challenge
                     AnimatedVisibility(
                         visible = isChallengeVisible,
@@ -163,7 +154,7 @@ fun HomeScreen(
                                     animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
                                 )
                     ) {
-                        DailyChallengeCard(navController = navController)
+                        DailyChallengeCard()
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -181,91 +172,10 @@ fun HomeScreen(
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
-
-                    // Animated main word card2
-                    AnimatedVisibility(
-                        visible = isWordCardVisible2,
-                        enter = fadeIn(animationSpec = tween(900)) +
-                                slideInVertically(
-                                    initialOffsetY = { it / 5 },
-                                    animationSpec = tween(durationMillis = 900, easing = FastOutSlowInEasing)
-                                )
-                    ) {
-                        MainWordCard2(navController = navController)
-                    }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // Animated main word card3
-                    AnimatedVisibility(
-                        visible = isWordCardVisible3,
-                        enter = fadeIn(animationSpec = tween(1100)) +
-                                slideInVertically(
-                                    initialOffsetY = { it / 5 },
-                                    animationSpec = tween(durationMillis = 1100, easing = FastOutSlowInEasing)
-                                )
-                    ) {
-                        MainWordCard2(navController = navController)
-                    }
-                    Spacer(modifier = Modifier.height(24.dp))
-
                 }
             }
         }
     )
-}
-fun getTimeBasedGreeting(): String {
-    val currentHour = LocalTime.now().hour
-
-    return when (currentHour) {
-        in 5..11 -> "Good Morning princess!"
-        in 12..16 -> "Good Afternoon!"
-        in 17..21 -> "Good Evening!"
-        else -> "Wow you're up late!"
-    }
-}
-@Composable
-fun DailyInspirationBanner() {
-    val bannerColor = Color(0xFF1F565E).copy(alpha = 0.08f)
-    val todaysWord = "minatory"
-    val greeting = getTimeBasedGreeting()
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp)
-            .height(70.dp),
-        colors = CardDefaults.cardColors(containerColor = bannerColor),
-        shape = MaterialTheme.shapes.medium
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = androidx.compose.material.icons.Icons.Default.Lightbulb,
-                contentDescription = "Inspiration",
-                tint = Color(0xFF1F565E),
-                modifier = Modifier.size(32.dp)
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column {
-                Text(
-                    text = greeting,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color(0xFF1F565E)
-                )
-                Text(
-                    text = "Word of the Day: ${todaysWord}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF1F565E).copy(alpha = 0.7f)
-                )
-            }
-        }
-    }
 }
 
 @Preview(showBackground = true)

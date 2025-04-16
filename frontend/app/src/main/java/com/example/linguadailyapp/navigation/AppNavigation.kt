@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.ui.screens.BookmarkScreen
+import com.example.linguadailyapp.ui.screens.DailyChallengeScreen
 import com.example.linguadailyapp.ui.screens.HomeScreen
 import com.example.linguadailyapp.ui.screens.SettingsScreen
 import com.example.linguadailyapp.ui.screens.WordDetailScreen
@@ -25,6 +26,8 @@ class AppNavigation {
             composable(NavigationDestinations.WordsList.route) { WordsScreen(navController) }
             composable(NavigationDestinations.Bookmark.route) { BookmarkScreen(navController) }
             composable(NavigationDestinations.Word.route) { WordDetailScreen(navController) }
+            composable(NavigationDestinations.Challenge.route) { DailyChallengeScreen(navController) }
+
 
         }
     }

@@ -109,12 +109,11 @@ fun WordDetailScreen(
                     .padding(16.dp)
                     .fillMaxSize(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFFDFDFD))
             ) {
                 Column(
                     modifier = Modifier
                         .verticalScroll(scrollState)
-                        .background(brush = primaryBackground)
                         .padding(20.dp)
                 ) {
                     // Word + Pronunciation

@@ -5,6 +5,11 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -42,8 +47,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -63,6 +70,7 @@ import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.theme.Playfair
 import com.example.linguadailyapp.utils.PreferencesManager
 import com.example.linguadailyapp.utils.notification.NotificationPermission
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,6 +100,23 @@ fun SettingsScreen(navController: NavController) {
     }
 
     val notificationPermission = NotificationPermission(context, permissionLauncher)
+
+    // Animation states
+    var isSettingVisable0 by remember { mutableStateOf(false) }
+    var isSettingVisable1 by remember { mutableStateOf(false) }
+
+
+
+
+
+    // Staggered animation
+    LaunchedEffect(Unit) {
+        delay(100)
+        isSettingVisable0 = true
+        delay(200)
+        isSettingVisable1 = true
+
+    }
 
     Scaffold(
         containerColor = backgroundColor,
@@ -176,36 +201,56 @@ fun SettingsScreen(navController: NavController) {
                 }
 
                 // Settings Items
-                SettingItem(
-                    icon = if (isNotificationsEnabled) Icons.Default.NotificationsActive else Icons.Default.Notifications,
-                    title = "Daily Word Notifications",
-                    description = "Receive notifications for your daily word",
-                    isChecked = isNotificationsEnabled,
-                    onCheckedChange = { isChecked ->
-                        if (isChecked) {
-                            if (notificationPermission.hasNotificationPermission()) {
-                                preferencesManager.setNotificationsEnabled(true)
-                                isNotificationsEnabled = true
-                            } else {
-                                notificationPermission.relaunch()
-                            }
-                        } else {
-                            preferencesManager.setNotificationsEnabled(false)
-                            isNotificationsEnabled = false
-                        }
-                    }
-                )
+                AnimatedVisibility(
+                    visible = isSettingVisable0,
+                    enter = fadeIn(animationSpec = tween(500)) +
+                            slideInVertically(
+                                initialOffsetY = { it },
+                                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                            )
+                ) {
 
-                SettingItem(
-                    icon = Icons.Default.DataUsage,
-                    title = "Allow Mobile Data Usage",
-                    description = "Download new words using mobile data",
-                    isChecked = allowSyncOnData,
-                    onCheckedChange = {
-                        preferencesManager.setAllowSyncOnData(it)
-                        allowSyncOnData = it
-                    }
-                )
+                    SettingItem(
+                        icon = if (isNotificationsEnabled) Icons.Default.NotificationsActive else Icons.Default.Notifications,
+                        title = "Daily Word Notifications",
+                        description = "Receive notifications for your daily word",
+                        isChecked = isNotificationsEnabled,
+                        onCheckedChange = { isChecked ->
+                            if (isChecked) {
+                                if (notificationPermission.hasNotificationPermission()) {
+                                    preferencesManager.setNotificationsEnabled(true)
+                                    isNotificationsEnabled = true
+                                } else {
+                                    notificationPermission.relaunch()
+                                }
+                            } else {
+                                preferencesManager.setNotificationsEnabled(false)
+                                isNotificationsEnabled = false
+                            }
+                        }
+                    )
+                }
+
+                AnimatedVisibility(
+                    visible = isSettingVisable1,
+                    enter = fadeIn(animationSpec = tween(500)) +
+                            slideInVertically(
+                                initialOffsetY = { it/2 },
+                                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                            )
+                ) {
+
+                    SettingItem(
+                        icon = Icons.Default.DataUsage,
+                        title = "Allow Mobile Data Usage",
+                        description = "Download new words using mobile data",
+                        isChecked = allowSyncOnData,
+                        onCheckedChange = {
+                            preferencesManager.setAllowSyncOnData(it)
+                            allowSyncOnData = it
+                        }
+                    )
+                }
             }
         }
     )

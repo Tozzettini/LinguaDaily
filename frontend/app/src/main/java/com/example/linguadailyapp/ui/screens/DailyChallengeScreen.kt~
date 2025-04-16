@@ -1,0 +1,279 @@
+package com.example.linguadailyapp.ui.screens
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.linguadailyapp.navigation.NavigationDestinations
+import com.example.linguadailyapp.ui.theme.Playfair
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DailyChallengeScreen(
+    navController: NavController
+) {
+    val backgroundColor = Color(0xFFF7F7F7)
+    val accentColor = Color(0xFF1F565E)
+    val primaryColor = Color(0xFFF7E5BE)
+
+    val today = LocalDate.now()
+    val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d", Locale.ENGLISH)
+    val formattedDate = today.format(formatter)
+
+
+
+    Scaffold(
+        containerColor = backgroundColor,
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        "Daily Challenge",
+                        fontFamily = Playfair,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp,
+                        color = Color.Black
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        if (navController.previousBackStackEntry != null) {
+                            navController.popBackStack()
+                        } else {
+                            navController.navigate(NavigationDestinations.Home.route)
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.Black
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = backgroundColor
+                )
+            )
+        },
+        content = { paddingValues ->
+            ComingSoonContent(
+                modifier = Modifier.padding(paddingValues),
+                formattedDate = formattedDate,
+                accentColor = accentColor,
+                primaryColor = primaryColor
+            )
+        }
+    )
+}
+
+@Composable
+fun ComingSoonContent(
+    modifier: Modifier = Modifier,
+    formattedDate: String,
+    accentColor: Color,
+    primaryColor: Color
+
+) {
+
+    val primaryBackground = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFFF7F5F0),  // Light cream color
+            Color(0xFFF1E4D2),  // Slightly darker cream
+        ),
+        start = Offset(0f, 0f),
+        end = Offset(0f, Float.POSITIVE_INFINITY)
+    )
+    
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        // Date display
+        Text(
+            text = formattedDate,
+            fontFamily = Playfair,
+            fontWeight = FontWeight.Medium,
+            fontSize = 18.sp,
+            color = Color.Black.copy(alpha = 0.7f)
+        )
+
+        // Trophy icon in circle
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .background(primaryColor, CircleShape)
+                .padding(24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.EmojiEvents,
+                contentDescription = null,
+                tint = accentColor,
+                modifier = Modifier.size(64.dp)
+            )
+        }
+
+        // Coming soon card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(1.dp, Color.Black.copy(alpha = 0.1f)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.Transparent
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(brush = primaryBackground)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Coming Soon!",
+                    fontFamily = Playfair,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 28.sp,
+                    color = accentColor,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "We're working on exciting daily language challenges to help you improve your vocabulary and language skills.",
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color.Black.copy(alpha = 0.8f)
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Divider
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(Color.Black.copy(alpha = 0.1f))
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = "Check back soon for:",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                BulletPoint(text = "Daily word quizzes")
+                BulletPoint(text = "Pronunciation exercises")
+                BulletPoint(text = "Translation challenges")
+                BulletPoint(text = "Vocabulary streaks")
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    onClick = { /* Do nothing for now */ },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = accentColor
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+//                        text = "Get Notified When Available",
+                        text = "Let me cook!",
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun BulletPoint(text: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(6.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF1F565E))
+            )
+            Text(
+                text = text,
+                fontSize = 15.sp,
+                color = Color.Black.copy(alpha = 0.8f)
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewDailyChallengeScreen() {
+    val navController = rememberNavController()
+    MaterialTheme {
+        DailyChallengeScreen(navController = navController)
+    }
+}
