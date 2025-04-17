@@ -15,7 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.example.linguadailyapp.database.word.WordRepository
+import com.example.linguadailyapp.database.availableword.AvailableWordRepository
 import com.example.linguadailyapp.navigation.AppNavigation
 import com.example.linguadailyapp.ui.screens.LoadingScreen
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
@@ -56,8 +56,8 @@ class MainActivity : ComponentActivity() {
 
         WorkManager.getInstance(applicationContext).enqueue(workRequest)
 
-        val syncViewModel = SyncViewModel(WordRepository(this))
-        val wordRepository = WordRepository(this)
+        val syncViewModel = SyncViewModel(AvailableWordRepository(this))
+        val availableWordRepository = AvailableWordRepository(this)
         val context = this
 
         setContent {
@@ -65,8 +65,8 @@ class MainActivity : ComponentActivity() {
                 var appReady by remember { mutableStateOf(false) }
 
                 LaunchedEffect(Unit) {
-                    if(wordRepository.getWordCount() != 0) {
-                        syncViewModel.sync(preferencesManager)
+                    if(availableWordRepository.getWordCount() != 0) {
+                        syncViewModel.syncInBackground(preferencesManager)
                         appReady = true
                         return@LaunchedEffect
                     }

@@ -2,40 +2,40 @@ package com.example.linguadailyapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.linguadailyapp.database.word.Word
-import com.example.linguadailyapp.database.word.WordRepository
+import com.example.linguadailyapp.database.availableword.AvailableWordRepository
+import com.example.linguadailyapp.database.learnedWord.LearnedWord
+import com.example.linguadailyapp.database.learnedWord.LearnedWordRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class WordViewModel(private val repository: WordRepository) : ViewModel() {
+class WordViewModel(private val learnedWordRepository: LearnedWordRepository, private val availableWordRepository: AvailableWordRepository) : ViewModel() {
 
-    private val _words = MutableStateFlow<List<Word>>(emptyList())
-    val words: StateFlow<List<Word>> = _words
+    private val _words = MutableStateFlow<List<LearnedWord>>(emptyList())
+    val words: StateFlow<List<LearnedWord>> = _words
 
-    private val _todaysWord = MutableStateFlow(Word(word = "", description = "", language = "", date = LocalDate.MIN))
-    val todaysWord: StateFlow<Word> = _todaysWord
+    private val _todaysLearnedWord = MutableStateFlow<LearnedWord?>(null)
+    val todaysLearnedWord: StateFlow<LearnedWord?> = _todaysLearnedWord
 
-    private val _bookmarkedWords = MutableStateFlow<List<Word>>(emptyList())
-    val bookmarkedWords: StateFlow<List<Word>> = _bookmarkedWords
+    private val _bookmarkedWords = MutableStateFlow<List<LearnedWord>>(emptyList())
+    val bookmarkedWords: StateFlow<List<LearnedWord>> = _bookmarkedWords
 
     init {
         viewModelScope.launch {
-            repository.getAllWordsFlow().collect { allWords ->
+            learnedWordRepository.getAllWordsFlow().collect { allWords ->
                 _words.value = allWords
-                val today = LocalDate.now()
-                _todaysWord.value = allWords.firstOrNull { it.date == today } ?: Word(word = "Ciao", description = "Hello", language = "Italian", date = LocalDate.now())
+                _todaysLearnedWord.value = allWords.firstOrNull { it.learnedAt == LocalDate.now() && it.isWordOfTheDay }
                 _bookmarkedWords.value = allWords.filter { word -> word.bookmarked }
             }
         }
     }
 
-    fun toggleBookmark(word: Word) {
+    fun toggleBookmark(learnedWord: LearnedWord) {
         viewModelScope.launch {
-            val updatedWord = word.copy(bookmarked = !word.bookmarked, bookmarkedAt = LocalDateTime.now())
-            repository.updateWord(updatedWord)
+            val updatedWord = learnedWord.copy(bookmarked = !learnedWord.bookmarked, bookmarkedAt = LocalDateTime.now())
+            learnedWordRepository.updateWord(updatedWord)
         }
     }
 }

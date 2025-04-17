@@ -7,7 +7,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.linguadailyapp.R
-import com.example.linguadailyapp.database.word.Word
+import com.example.linguadailyapp.database.learnedWord.LearnedWord
 import com.example.linguadailyapp.utils.PreferencesManager
 
 fun sendNotification(title: String, message: String, context: Context) {
@@ -38,13 +38,13 @@ fun sendNotification(title: String, message: String, context: Context) {
     notificationManager.notify(1, notificationBuilder.build()) // 1 is the notification ID
 }
 
-fun sendDailyNotification(word: Word, context: Context) {
+fun sendDailyNotification(learnedWord: LearnedWord, context: Context) {
     if(!PreferencesManager(context).isNotificationsEnabled()) return
 
     val notificationBuilder = NotificationCompat.Builder(context, "LinguaDailyChannel")
         .setSmallIcon(R.drawable.ic_icon_v1)
-        .setContentTitle("Today's Word: ${word.word}")
-        .setContentText(word.description)
+        .setContentTitle("Today's Word: ${learnedWord.word}")
+        .setContentText(learnedWord.description)
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
     val notificationManager = NotificationManagerCompat.from(context)

@@ -9,30 +9,25 @@ class PreferencesManager(context: Context) {
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("preferences", Context.MODE_PRIVATE)
 
-    private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-
     // ---- Default values ----
-    private val DEFAULT_LAST_SYNCED = LocalDateTime.MIN
     private val DEFAULT_NOTIFICATIONS_ENABLED = false
     private val DEFAULT_SYNC_ON_DATA = true
     private val DEFAULT_FIRST_LAUNCH = true
     private val DEFAULT_OUT_OF_WORDS = true
+    private val DEFAULT_SKIP = 0
 
     // ---- Methods to access settings ----
 
-    // Save and retrieve LocalDateTime
-    fun setLastSynced(value: LocalDateTime) {
+    fun setSkip(skip: Int) {
         sharedPreferences.edit()
-            .putString("last_synced", value.format(formatter))
+            .putInt("skip", skip)
             .apply()
     }
 
-    fun getLastSynced(): LocalDateTime {
-        val storedValue = sharedPreferences.getString("last_synced", null)
-        return storedValue?.let { LocalDateTime.parse(it, formatter) } ?: DEFAULT_LAST_SYNCED
+    fun getSkip(): Int {
+        return sharedPreferences.getInt("skip", DEFAULT_SKIP)
     }
 
-    // Save and retrieve notification preference
     fun setNotificationsEnabled(enabled: Boolean) {
         sharedPreferences.edit()
             .putBoolean("notifications_enabled", enabled)
@@ -43,7 +38,6 @@ class PreferencesManager(context: Context) {
         return sharedPreferences.getBoolean("notifications_enabled", DEFAULT_NOTIFICATIONS_ENABLED)
     }
 
-    // Save and retrieve network preferences
     fun setAllowSyncOnData(value: Boolean) {
         sharedPreferences.edit()
             .putBoolean("sync_on_data", value)

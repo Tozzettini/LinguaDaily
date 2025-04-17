@@ -1,4 +1,4 @@
-package com.example.linguadailyapp.database.word
+package com.example.linguadailyapp.database.learnedWord
 
 // Data model for a word and its details
 data class WordDetails(

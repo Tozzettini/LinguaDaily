@@ -2,7 +2,6 @@ package com.example.linguadailyapp.ui.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +20,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.outlined.BookmarkBorder
@@ -31,7 +29,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,7 +38,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -55,7 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.linguadailyapp.database.word.Word
+import com.example.linguadailyapp.database.learnedWord.LearnedWord
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.components.LinguaBottomNavigation
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
@@ -117,7 +113,7 @@ fun WordsScreen(
             } else {
                 WordsList(
                     modifier = Modifier.padding(paddingValues),
-                    words = words,
+                    learnedWords = words,
                     viewModel = viewModel
                 )
             }
@@ -161,7 +157,7 @@ fun EmptyWordsView(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun WordsList(modifier: Modifier, words: List<Word>, viewModel: WordViewModel) {
+fun WordsList(modifier: Modifier, learnedWords: List<LearnedWord>, viewModel: WordViewModel) {
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -172,7 +168,7 @@ fun WordsList(modifier: Modifier, words: List<Word>, viewModel: WordViewModel) {
             contentPadding = PaddingValues(16.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(words) { word ->
+            items(learnedWords) { word ->
                 WordCard(word) { viewModel.toggleBookmark(it) }
             }
         }
@@ -180,7 +176,7 @@ fun WordsList(modifier: Modifier, words: List<Word>, viewModel: WordViewModel) {
 }
 
 @Composable
-fun WordCard(word: Word, onBookmarkClick: (Word) -> Unit) {
+fun WordCard(learnedWord: LearnedWord, onBookmarkClick: (LearnedWord) -> Unit) {
     val primaryColor = Color(0xFFF7E5BE) // Light beige
     val accentColor = Color(0xFF1F565E) // Dark teal
 
@@ -203,31 +199,31 @@ fun WordCard(word: Word, onBookmarkClick: (Word) -> Unit) {
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            DateCircle(date = word.date)
+            DateCircle(date = learnedWord.learnedAt)
 
             Spacer(modifier = Modifier.width(16.dp))
 
             WordInformation(
-                word = word.word,
-                definition = word.description,
+                word = learnedWord.word,
+                definition = learnedWord.description,
                 modifier = Modifier.weight(1f)
             )
             Spacer(modifier = Modifier.width(16.dp))
 
             IconButton(
-                onClick = { onBookmarkClick(word) },
+                onClick = { onBookmarkClick(learnedWord) },
                 modifier = Modifier
                     .size(40.dp)
                     .background(
-                        color = if (word.bookmarked) accentColor else Color.Transparent,
+                        color = if (learnedWord.bookmarked) accentColor else Color.Transparent,
                         shape = CircleShape
                     )
                     .padding(horizontal = 0.dp)
             ) {
                 Icon(
-                    imageVector = if (word.bookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                    contentDescription = if (word.bookmarked) "Remove bookmark" else "Add bookmark",
-                    tint = if (word.bookmarked) Color.White else accentColor,
+                    imageVector = if (learnedWord.bookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                    contentDescription = if (learnedWord.bookmarked) "Remove bookmark" else "Add bookmark",
+                    tint = if (learnedWord.bookmarked) Color.White else accentColor,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -319,12 +315,14 @@ fun PreviewWordInformation() {
 fun PreviewWordCard() {
     LinguaDailyAppTheme {
         WordCard(
-            word = Word(
+            learnedWord = LearnedWord(
                 word = "Serendipity",
                 description = "The occurrence and development of events by chance in a happy or beneficial way",
                 language = "English",
-                date = LocalDate.now(),
-                bookmarked = true
+                phoneticSpelling = "",
+                exampleSentence = "",
+                partOfSpeech = "",
+                etymology = ""
             ),
             onBookmarkClick = {}
         )

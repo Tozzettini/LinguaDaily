@@ -19,8 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
@@ -51,7 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.linguadailyapp.database.word.Word
+import com.example.linguadailyapp.database.learnedWord.LearnedWord
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.components.LinguaBottomNavigation
 import com.example.linguadailyapp.ui.theme.Playfair
@@ -117,7 +115,7 @@ fun BookmarkScreen(
             } else {
                 BookmarkGrid(
                     modifier = Modifier.padding(paddingValues),
-                    words = bookmarkedWords,
+                    learnedWords = bookmarkedWords,
                     onTrashClicked = { word -> viewModel.toggleBookmark(word) }
                 )
             }
@@ -163,8 +161,8 @@ fun EmptyBookmarksView(modifier: Modifier = Modifier) {
 @Composable
 fun BookmarkGrid(
     modifier: Modifier = Modifier,
-    words: List<Word>,
-    onTrashClicked: (Word) -> Unit
+    learnedWords: List<LearnedWord>,
+    onTrashClicked: (LearnedWord) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -174,14 +172,14 @@ fun BookmarkGrid(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(words) { word ->
+        items(learnedWords) { word ->
             BookmarkCard(word, onTrashClicked)
         }
     }
 }
 
 @Composable
-fun BookmarkCard(word: Word, onTrashClicked: (Word) -> Unit) {
+fun BookmarkCard(learnedWord: LearnedWord, onTrashClicked: (LearnedWord) -> Unit) {
     val primaryColor = Color(0xFFF7E5BE) // Light beige like in MainWordCard
     val accentColor = Color(0xFF1F565E) // Dark teal like in MainWordCard
 
@@ -207,7 +205,7 @@ fun BookmarkCard(word: Word, onTrashClicked: (Word) -> Unit) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 val formatter = DateTimeFormatter.ofPattern("dd MMM", Locale.ENGLISH)
-                val formattedDate = word.bookmarkedAt?.format(formatter) ?: "Unknown date"
+                val formattedDate = learnedWord.bookmarkedAt?.format(formatter) ?: "Unknown date"
 
                 Text(
                     text = formattedDate,
@@ -217,7 +215,7 @@ fun BookmarkCard(word: Word, onTrashClicked: (Word) -> Unit) {
                 )
 
                 IconButton(
-                    onClick = { onTrashClicked(word) },
+                    onClick = { onTrashClicked(learnedWord) },
                     modifier = Modifier
                         .size(28.dp)
                         .background(
@@ -255,7 +253,7 @@ fun BookmarkCard(word: Word, onTrashClicked: (Word) -> Unit) {
 
             // Word
             Text(
-                text = word.word,
+                text = learnedWord.word,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = Playfair,
@@ -265,7 +263,7 @@ fun BookmarkCard(word: Word, onTrashClicked: (Word) -> Unit) {
 
             // Description
             Text(
-                text = word.description,
+                text = learnedWord.description,
                 fontSize = 14.sp,
                 lineHeight = 20.sp,
                 color = Color.Black.copy(alpha = 0.8f),
@@ -290,12 +288,15 @@ fun PreviewBookmarkScreen() {
 fun PreviewBookmarkCard() {
     MaterialTheme {
         BookmarkCard(
-            Word(
+            LearnedWord(
                 word = "Serendipity",
                 description = "The occurrence and development of events by chance in a happy or beneficial way",
                 language = "English",
-                date = LocalDate.now(),
-                bookmarkedAt = LocalDate.now().atStartOfDay()
+                exampleSentence = "",
+                phoneticSpelling = "",
+                etymology = "",
+                partOfSpeech = ""
+
             ),
             onTrashClicked = {}
         )

@@ -42,7 +42,7 @@ fun HomeScreen(
     navController: NavController,
     viewModel: WordViewModel = viewModel(factory = WordViewModelFactory(LocalContext.current))
 ) {
-    val todaysWord by viewModel.todaysWord.collectAsState()
+    val todaysWord by viewModel.todaysLearnedWord.collectAsState()
     var currentLanguage by remember { mutableStateOf(Languagetype("English", "en")) }
 
     // Get the application context

@@ -2,50 +2,48 @@ package com.example.linguadailyapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.linguadailyapp.database.word.WordRepository
+import com.example.linguadailyapp.database.availableword.AvailableWord
+import com.example.linguadailyapp.database.availableword.AvailableWordRepository
 import com.example.linguadailyapp.retrofit.RetrofitClient
 import com.example.linguadailyapp.utils.PreferencesManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.time.LocalDateTime
 
-class SyncViewModel(private val wordRepository: WordRepository) : ViewModel() {
+class SyncViewModel(private val availableWordRepository: AvailableWordRepository) : ViewModel() {
 
-    private suspend fun syncData(lastSynced: LocalDateTime): Boolean {
-        return try {
-            val words = if(!lastSynced.isEqual(LocalDateTime.MIN)) RetrofitClient.apiService.getWordsSince(lastSynced.toString()) else RetrofitClient.apiService.getAllWords()
-            wordRepository.insertAll(words)
-            true
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    fun sync(preferencesManager: PreferencesManager) {
-        val lastSynced = preferencesManager.getLastSynced()
-
-        viewModelScope.launch(Dispatchers.Main) {
-            val success = withContext(Dispatchers.IO) {
-                syncData(lastSynced)
-            }
-
-            if (success) {
-                preferencesManager.setLastSynced(LocalDateTime.now())
-            }
-        }
-    }
+    private val DATABASE_SIZE_LIMIT = 10
 
     suspend fun syncBlocking(preferencesManager: PreferencesManager) {
-        val lastSynced = preferencesManager.getLastSynced()
+        var successfullyAdded = mutableListOf<AvailableWord>()
 
-        val success = withContext(Dispatchers.IO) {
-            syncData(lastSynced)
-        }
+        var countWords = availableWordRepository.getWordCount()
 
-        if (success) {
-            preferencesManager.setLastSynced(LocalDateTime.now())
+        if(countWords == DATABASE_SIZE_LIMIT) return
+
+        var skip = preferencesManager.getSkip()
+        var limit = DATABASE_SIZE_LIMIT - countWords
+
+
+        try {
+            var words = RetrofitClient.apiService.getWordsWithSkipAndLimit(skip, limit)
+
+            for(word in words) {
+                availableWordRepository.insert(word)
+                successfullyAdded.add(word)
+            }
+
+            preferencesManager.setSkip(skip + limit)
+        } catch (e: Exception) {
+            for(word in successfullyAdded) {
+                availableWordRepository.removeWord(word)
+            }
         }
     }
+
+    fun syncInBackground(preferencesManager: PreferencesManager) {
+        viewModelScope.launch(Dispatchers.Main) {
+            syncBlocking(preferencesManager)
+        }
+    }
+
 }

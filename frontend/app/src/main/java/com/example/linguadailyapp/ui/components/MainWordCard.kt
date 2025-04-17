@@ -70,8 +70,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.R
-import com.example.linguadailyapp.database.word.WordDetails
-import com.example.linguadailyapp.database.word.sampleWordDetails
+import com.example.linguadailyapp.database.learnedWord.WordDetails
+import com.example.linguadailyapp.database.learnedWord.sampleWordDetails
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.screens.NavigationIcon
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
