@@ -1,8 +1,14 @@
 package com.example.linguadailyapp.ui.screens
 
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,81 +29,114 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.R
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
+import com.example.linguadailyapp.viewmodel.LanguageViewModel
 
 // Define the Languagetype class if it's not already defined elsewhere
 data class Languagetype(val name: String, val code: String)
 @Composable
-fun ImprovedStyledTopBar(
+fun ImprovedStyledTopBar3(
     navController: NavController,
-    onLanguagesSelected: (Set<Languagetype>) -> Unit
+    viewModel: LanguageViewModel
 ) {
-    // Available languages
-    val languages = listOf(
-        Languagetype(name = "English", code = "en"),
-        Languagetype(name = "Italian", code = "it"),
-        Languagetype(name = "Dutch", code = "nl")
-    )
+    val languages = viewModel.availableLanguages
 
     val languageToFlag = mapOf(
         "en" to "🇺🇸",  // English - United States
-        "es" to "🇪🇸",  // Spanish - Spain
         "it" to "🇮🇹",  // Italian - Italy
-        "pt" to "🇵🇹",  // Portuguese - Portugal
         "nl" to "🇳🇱",  // Dutch - Netherlands
     )
 
     // State to keep track of dropdown visibility
-    var showLanguageDropdown by remember { mutableStateOf(true) }
+    var showLanguageDropdown by remember { mutableStateOf(false) }
 
-    // State to keep track of selected languages - use mutableStateOf with a mutableSetOf
-    var selectedLanguages by remember { mutableStateOf(mutableSetOf<Languagetype>()) }
+    // Collect the selectedLanguages from the ViewModel
+    val selectedLanguages by viewModel.selectedLanguages.collectAsState()
 
-    // Animated colors
+    // Local state for dropdown selections - initialized with current selections
+    var tempSelectedLanguages by remember(selectedLanguages) {
+        mutableStateOf(selectedLanguages.toMutableSet())
+    }
+
+    // Animated colors with smoother transition
     val containerColor = animateColorAsState(
         targetValue = Color.White,
-        animationSpec = tween(300)
+        animationSpec = tween(400, easing = FastOutSlowInEasing)
     )
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
                 .shadow(
-                    elevation = 2.dp,
+                    elevation = 3.dp,
                     shape = RoundedCornerShape(16.dp),
-                    spotColor = Color(0xFF1F565E).copy(alpha = 0.1f)
+                    spotColor = Color(0xFF1F565E).copy(alpha = 0.08f),
+                    ambientColor = Color(0xFF1F565E).copy(alpha = 0.04f)
                 )
                 .clip(RoundedCornerShape(16.dp))
                 .background(containerColor.value),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Language selector
-            Box(modifier = Modifier.padding(start = 12.dp)) {
+            // Language selector with improved visual design
+            Box(modifier = Modifier.padding(start = 14.dp)) {
+
+                this@Row.AnimatedVisibility(
+                    visible = selectedLanguages.size > 1,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut()
+                ) {
+                    Text(
+                        text = "+${selectedLanguages.size - 1}",
+                        fontSize = 11.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .offset(x = 22.dp, y = (-4).dp)
+                            .size(16.dp)
+                            .background(Color(0xFF1F565E), CircleShape)
+                            .wrapContentSize(Alignment.Center)
+                    )
+                }
+
                 IconButton(
-                    onClick = { showLanguageDropdown = true },
+                    onClick = {
+                        showLanguageDropdown = true
+                        tempSelectedLanguages = selectedLanguages.toMutableSet()
+                    },
                     modifier = Modifier
-                        .size(38.dp)
+                        .size(40.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF1F565E).copy(alpha = 0.08f))
+                        .background(
+                            brush = Brush.radialGradient(
+                                colors = listOf(
+                                    Color(0xFF1F565E).copy(alpha = 0.12f),
+                                    Color(0xFF1F565E).copy(alpha = 0.06f)
+                                )
+                            )
+                        )
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -106,49 +145,44 @@ fun ImprovedStyledTopBar(
                         // Show first selected language flag or a default icon
                         if (selectedLanguages.isNotEmpty()) {
                             Text(
-                                text = selectedLanguages.firstOrNull()?.let { languageToFlag[it.code] } ?: "🌐",
-                                fontSize = 16.sp,
-                                modifier = Modifier.padding(end = 2.dp)
+                                text = selectedLanguages.firstOrNull()?.let {
+                                    languageToFlag[it.code] } ?: "🌐",
+                                fontSize = 18.sp
                             )
-
                         } else {
-                            // Default icon when no languages selected
                             Icon(
                                 imageVector = Icons.Default.Language,
                                 contentDescription = "Language",
                                 tint = Color(0xFF1F565E),
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(22.dp)
                             )
                         }
                     }
                 }
-                Spacer(modifier = Modifier.width(208.dp))
-                // If more than one language is selected, show a count
-                //showing this like a colomn when it should be a row
-                if (selectedLanguages.size > 1) {
-                    Text(
-                        text = "+${selectedLanguages.size - 1}",
-                        fontSize = 10.sp,
-                        color = Color(0xFF1F565E),
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 6.dp)
-                    )
-                }
 
                 DropdownMenu(
                     expanded = showLanguageDropdown,
-                    onDismissRequest = { showLanguageDropdown = false },
+                    offset = DpOffset(x = 28.dp, y = (-8).dp),
+                    onDismissRequest = {
+                        showLanguageDropdown = false
+                        tempSelectedLanguages = selectedLanguages.toMutableSet()
+                    },
                     modifier = Modifier
                         .background(Color.White)
-                        .clip(RoundedCornerShape(12.dp))
-                        .shadow(elevation = 4.dp)
-                        .width(180.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .shadow(
+                            elevation = 6.dp,
+                            shape = RoundedCornerShape(16.dp),
+                            spotColor = Color(0xFF1F565E).copy(alpha = 0.1f)
+                        )
+                        .width(200.dp)
                 ) {
                     Text(
                         text = "Select Languages",
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF1F565E),
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp)
                     )
 
                     HorizontalDivider(
@@ -164,52 +198,64 @@ fun ImprovedStyledTopBar(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    // Create a new set to trigger recomposition
-                                    val updatedSelection = selectedLanguages.toMutableSet()
+                                    val updatedSelection = tempSelectedLanguages.toMutableSet()
                                     if (updatedSelection.contains(language)) {
                                         updatedSelection.remove(language)
                                     } else {
                                         updatedSelection.add(language)
                                     }
-                                    selectedLanguages = updatedSelection
-                                    // Call the callback with the updated set
-                                    onLanguagesSelected(updatedSelection)
+                                    tempSelectedLanguages = updatedSelection
                                 }
-                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                                .padding(horizontal = 18.dp, vertical = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
                                 text = languageToFlag[language.code] ?: "🌐",
-                                fontSize = 16.sp,
-                                modifier = Modifier.padding(end = 8.dp)
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(end = 12.dp)
                             )
 
                             Text(
                                 text = language.name,
                                 color = Color.Black,
-                                fontSize = 14.sp,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Medium,
                                 modifier = Modifier.weight(1f)
                             )
 
-                            // Show checkmark if selected
-                            if (selectedLanguages.contains(language)) {
+                            // Show checkmark if selected with animation
+                            AnimatedVisibility(
+                                visible = tempSelectedLanguages.contains(language),
+                                enter = fadeIn() + scaleIn(),
+                                exit = fadeOut() + scaleOut()
+                            ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(18.dp)
-                                        .background(Color(0xFF1F565E), CircleShape),
+                                        .size(20.dp)
+                                        .background(
+                                            brush = Brush.radialGradient(
+                                                colors = listOf(
+                                                    Color(0xFF1F565E),
+                                                    Color(0xFF1F565E).copy(alpha = 0.9f)
+                                                )
+                                            ),
+                                            CircleShape
+                                        ),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Check,
                                         contentDescription = "Selected",
                                         tint = Color.White,
-                                        modifier = Modifier.size(12.dp)
+                                        modifier = Modifier.size(14.dp)
                                     )
                                 }
-                            } else {
+                            }
+
+                            if (!tempSelectedLanguages.contains(language)) {
                                 Box(
                                     modifier = Modifier
-                                        .size(18.dp)
+                                        .size(20.dp)
                                         .border(1.dp, Color(0xFF1F565E), CircleShape)
                                 )
                             }
@@ -219,45 +265,45 @@ fun ImprovedStyledTopBar(
                             HorizontalDivider(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
+                                    .padding(horizontal = 18.dp),
                                 thickness = 0.5.dp,
                                 color = Color(0xFFE0E0E0)
                             )
                         }
                     }
 
-//                    // Add a done button to close the dropdown and confirm selections
-//                    HorizontalDivider(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(horizontal = 8.dp),
-//                        thickness = 1.dp,
-//                        color = Color(0xFFE0E0E0)
-//                    )
-//
-//                    Button(
-//                        onClick = {
-//                            showLanguageDropdown = false
-//                            // Final callback to ensure parent component gets the selections
-//                            onLanguagesSelected(selectedLanguages)
-//                        },
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(horizontal = 16.dp, vertical = 8.dp),
-//                        colors = ButtonDefaults.buttonColors(
-//                            containerColor = Color(0xFF1F565E)
-//                        )
-//                    ) {
-//                        Text(
-//                            text = "Done (${selectedLanguages.size})",
-//                            color = Color.White
-//                        )
-//                    }
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        thickness = 1.dp,
+                        color = Color(0xFFE0E0E0)
+                    )
+
+                    Button(
+                        onClick = {
+                            showLanguageDropdown = false
+                            viewModel.updateSelectedLanguages(tempSelectedLanguages)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 18.dp, vertical = 12.dp)
+                            .height(44.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF1F565E)
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = "Done (${tempSelectedLanguages.size})",
+                            color = Color.White,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
 
-
-                    // Logo in the center
+            // Logo in the center with improved scaling
             Box(
                 modifier = Modifier
                     .weight(1f),
@@ -267,29 +313,37 @@ fun ImprovedStyledTopBar(
                     painter = painterResource(id = R.drawable.logo_no_bg),
                     contentDescription = "Logo",
                     modifier = Modifier
-                        .height(60.dp)
-                        .padding(top = 12.dp)
+                        .height(45.dp)
+                        .padding(top = 6.dp)
                         .graphicsLayer(
-                            scaleX = 4.0f,
-                            scaleY = 4.0f
-                        )
+                            scaleX = 1.8f,
+                            scaleY = 1.8f
+                        ),
+                    colorFilter = ColorFilter.tint(Color(0xFF1F565E))
                 )
             }
 
-            // Settings button
-            Box(modifier = Modifier.padding(end = 12.dp)) {
+            // Settings button with improved visual design
+            Box(modifier = Modifier.padding(end = 14.dp)) {
                 IconButton(
                     onClick = { navController.navigate(NavigationDestinations.Settings.route) },
                     modifier = Modifier
-                        .size(38.dp)
+                        .size(40.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF1F565E).copy(alpha = 0.08f))
+                        .background(
+                            brush = Brush.radialGradient(
+                                colors = listOf(
+                                    Color(0xFF1F565E).copy(alpha = 0.12f),
+                                    Color(0xFF1F565E).copy(alpha = 0.06f)
+                                )
+                            )
+                        )
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
                         contentDescription = "Settings",
                         tint = Color(0xFF1F565E),
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(22.dp)
                     )
                 }
             }
@@ -307,9 +361,10 @@ fun ImprovedStyledTopBarPreview() {
                 .height(480.dp)
                 .background(Color.White)
         ) {
-            ImprovedStyledTopBar(
+            ImprovedStyledTopBar3(
                 navController = rememberNavController(),
-                onLanguagesSelected = {})
+                viewModel = LanguageViewModel(preferredLanguage = "it")
+            )
         }
     }
 }

@@ -2,6 +2,7 @@ package com.example.linguadailyapp.ui.components
 
 import TwoCardsInRow
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -27,6 +28,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -54,6 +56,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -153,7 +156,7 @@ fun MainWordCard(
             AnimatedVisibility(
                 visible = expanded,
                 enter = expandVertically(animationSpec = tween(300)),
-                exit = shrinkVertically(animationSpec = tween(300))
+                exit = shrinkVertically(animationSpec = tween(600))
             ) {
                 Column(
                     modifier = Modifier
@@ -392,13 +395,17 @@ fun MainWordCard2(
     val pagerState = rememberPagerState(pageCount = {pageCount})
     var expanded by remember { mutableStateOf(false) }
 
+    val animatedHeight by animateDpAsState(
+        targetValue = if (expanded) 400.dp else 105.dp,
+        animationSpec = tween(durationMillis = 400)
+    )
 
     Card(
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
-            .heightIn(min = 208.dp, max = if (expanded) 400.dp else 10.dp)
+            .heightIn(min = 208.dp, max = animatedHeight)
             .padding(bottom = 0.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = MaterialTheme.shapes.medium,
@@ -412,10 +419,11 @@ fun MainWordCard2(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clip(RoundedCornerShape(5.dp)) // This clips the Row's corners
                     .clickable { expanded = !expanded },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.weight(1f)) {
+                Column(modifier = Modifier.weight(1f).padding( all = 2.dp)) {
                     Text(
                         text = wordDetails.word,
                         fontSize = 32.sp,
@@ -444,8 +452,8 @@ fun MainWordCard2(
 
             AnimatedVisibility(
                 visible = expanded,
-                enter = expandVertically(animationSpec = tween(300)),
-                exit = shrinkVertically(animationSpec = tween(300))
+                enter = expandVertically(animationSpec = tween(400)),
+                exit = shrinkVertically(animationSpec = tween(400))
             ) {
                 Column(
                     modifier = Modifier

@@ -110,6 +110,9 @@ fun HomeScreen(
                 viewModel = viewModel
             )
         },
+        bottomBar = {
+                LinguaBottomNavigation(navController = navController)
+                    },
         content = { paddingValues ->
             Box(
                 modifier = Modifier
@@ -177,7 +180,7 @@ fun HomeScreen(
                                     animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing)
                                 )
                     ) {
-                        MainWordCard(navController = navController)
+                        MainWordCard2(navController = navController)
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))

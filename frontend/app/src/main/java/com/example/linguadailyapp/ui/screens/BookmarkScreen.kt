@@ -53,6 +53,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.database.word.Word
 import com.example.linguadailyapp.navigation.NavigationDestinations
+import com.example.linguadailyapp.ui.components.LinguaBottomNavigation
 import com.example.linguadailyapp.ui.theme.Playfair
 import com.example.linguadailyapp.viewmodel.WordViewModel
 import com.example.linguadailyapp.viewmodel.WordViewModelFactory
@@ -86,6 +87,7 @@ fun BookmarkScreen(
                         color = Color.Black
                     )
                 },
+
                 navigationIcon = {
                     IconButton(onClick = {
                         if (navController.previousBackStackEntry != null) {
@@ -105,6 +107,9 @@ fun BookmarkScreen(
                     containerColor = backgroundColor
                 )
             )
+        },
+        bottomBar = {
+            LinguaBottomNavigation(navController = navController)
         },
         content = { paddingValues ->
             if (bookmarkedWords.isEmpty()) {

@@ -59,6 +59,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.R
 import com.example.linguadailyapp.navigation.NavigationDestinations
+import com.example.linguadailyapp.ui.screens.ImprovedStyledTopBar
 import com.example.linguadailyapp.ui.screens.Languagetype
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
