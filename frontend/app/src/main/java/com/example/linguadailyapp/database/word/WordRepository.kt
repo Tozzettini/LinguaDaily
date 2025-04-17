@@ -20,6 +20,10 @@ class WordRepository(val context : Context) {
         }
     }
 
+    suspend fun getWordCount() : Int {
+        return wordDao.getWordCount()
+    }
+
     suspend fun updateWord(word: Word) {
         wordDao.updateWord(word)
     }

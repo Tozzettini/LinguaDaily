@@ -1,6 +1,7 @@
 package com.example.linguadailyapp.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.linguadailyapp.database.word.WordRepository
 import com.example.linguadailyapp.retrofit.RetrofitClient
 import com.example.linguadailyapp.utils.PreferencesManager
@@ -25,7 +26,7 @@ class SyncViewModel(private val wordRepository: WordRepository) : ViewModel() {
     fun sync(preferencesManager: PreferencesManager) {
         val lastSynced = preferencesManager.getLastSynced()
 
-        GlobalScope.launch(Dispatchers.Main) {
+        viewModelScope.launch(Dispatchers.Main) {
             val success = withContext(Dispatchers.IO) {
                 syncData(lastSynced)
             }
@@ -33,6 +34,18 @@ class SyncViewModel(private val wordRepository: WordRepository) : ViewModel() {
             if (success) {
                 preferencesManager.setLastSynced(LocalDateTime.now())
             }
+        }
+    }
+
+    suspend fun syncBlocking(preferencesManager: PreferencesManager) {
+        val lastSynced = preferencesManager.getLastSynced()
+
+        val success = withContext(Dispatchers.IO) {
+            syncData(lastSynced)
+        }
+
+        if (success) {
+            preferencesManager.setLastSynced(LocalDateTime.now())
         }
     }
 }

@@ -16,6 +16,7 @@ class PreferencesManager(context: Context) {
     private val DEFAULT_NOTIFICATIONS_ENABLED = false
     private val DEFAULT_SYNC_ON_DATA = true
     private val DEFAULT_FIRST_LAUNCH = true
+    private val DEFAULT_OUT_OF_WORDS = true
 
     // ---- Methods to access settings ----
 
@@ -61,6 +62,16 @@ class PreferencesManager(context: Context) {
         }
 
         return isFirstLaunch
+    }
+
+    fun setOutOfWordsMode(value: Boolean) {
+        sharedPreferences.edit()
+            .putBoolean("is_out_of_words", value)
+            .apply()
+    }
+
+    fun getOutOfWordsMode() : Boolean {
+        return sharedPreferences.getBoolean("is_out_of_words", DEFAULT_OUT_OF_WORDS)
     }
 
 }
