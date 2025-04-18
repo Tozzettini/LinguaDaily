@@ -24,9 +24,15 @@ class WordViewModel(private val learnedWordRepository: LearnedWordRepository, pr
 
     init {
         viewModelScope.launch {
+            var todaysWord = learnedWordRepository.getTodaysWord()
+
+            if(todaysWord == null) {
+                todaysWord = getRandomWordBlocking(isWordOfDay = true)
+            }
+            _todaysLearnedWord.value = todaysWord
+
             learnedWordRepository.getAllWordsFlow().collect { allWords ->
                 _words.value = allWords
-                _todaysLearnedWord.value = allWords.firstOrNull { it.learnedAt == LocalDate.now() && it.isWordOfTheDay }
                 _bookmarkedWords.value = allWords.filter { word -> word.bookmarked }
             }
         }
@@ -44,12 +50,12 @@ class WordViewModel(private val learnedWordRepository: LearnedWordRepository, pr
     }
 
 
-    suspend fun getRandomWordBlocking() : LearnedWord? {
+    suspend fun getRandomWordBlocking(isWordOfDay: Boolean = false) : LearnedWord? {
         val randomWord = availableWordRepository.getRandomWord()
 
         if(randomWord == null) return randomWord
 
-        val learnedWord = LearnedWord.of(randomWord)
+        val learnedWord = LearnedWord.of(availableWord = randomWord, isWordOfTheDay = isWordOfDay)
 
         learnedWordRepository.insert(learnedWord)
         availableWordRepository.removeWord(randomWord)

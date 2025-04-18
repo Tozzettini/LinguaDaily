@@ -44,6 +44,19 @@ data class LearnedWord(
                 isWordOfTheDay = isWordOfTheDay
             )
         }
+        fun default(): LearnedWord {
+            return LearnedWord(
+                id = -1,
+                word = "Default",
+                description = "No description available.",
+                language = "en",
+                exampleSentence = "This is a default word.",
+                phoneticSpelling = "[ˈdɪˌfɔlt]",
+                partOfSpeech = "noun",
+                etymology = "From Latin 'defallere'"
+            )
+        }
+
     }
 }
 

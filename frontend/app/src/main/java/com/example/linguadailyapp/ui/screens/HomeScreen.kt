@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.linguadailyapp.database.learnedWord.LearnedWord
 import com.example.linguadailyapp.ui.components.*
 import com.example.linguadailyapp.ui.components.DailyChallengeCard
 import com.example.linguadailyapp.ui.components.VocabularyStatsWidget
@@ -180,7 +181,7 @@ fun HomeScreen(
                                     animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing)
                                 )
                     ) {
-                        MainWordCard2(navController = navController)
+                        MainWordCard2(learnedWord = todaysWord?: LearnedWord.default(), navController = navController)
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))

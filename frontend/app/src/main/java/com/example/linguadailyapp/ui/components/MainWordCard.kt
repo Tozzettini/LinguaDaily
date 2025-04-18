@@ -53,6 +53,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +61,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -67,15 +69,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.R
+import com.example.linguadailyapp.database.learnedWord.LearnedWord
 import com.example.linguadailyapp.database.learnedWord.WordDetails
 import com.example.linguadailyapp.database.learnedWord.sampleWordDetails
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.screens.NavigationIcon
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 import com.example.linguadailyapp.ui.theme.Playfair
+import com.example.linguadailyapp.viewmodel.WordViewModel
+import com.example.linguadailyapp.viewmodel.WordViewModelFactory
 
 @Preview(showBackground = true)
 @Composable
@@ -97,12 +103,14 @@ fun MainWordCardPreview() {
 @Composable
 fun MainWordCard(
     navController: NavController,
-    wordDetails: WordDetails = sampleWordDetails // Default to sample data if not provided
+    learnedWord : LearnedWord = LearnedWord.default(),
+    wordViewModel: WordViewModel = viewModel(factory = WordViewModelFactory(LocalContext.current))
 ) {
     val pageCount = 3
     val pagerState = rememberPagerState(pageCount = {pageCount})
     var expanded by remember { mutableStateOf(false) }
 
+    var isBookmarked by rememberSaveable { mutableStateOf(learnedWord.bookmarked) }
 
     Card(
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
@@ -128,14 +136,14 @@ fun MainWordCard(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = wordDetails.word,
+                        text = learnedWord.word,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = Playfair,
                         color = Color.Black
                     )
                     Text(
-                        text = "${wordDetails.partOfSpeech} - ${wordDetails.pronunciation}",
+                        text = "${learnedWord.partOfSpeech} - ${learnedWord.phoneticSpelling}",
                         fontSize = 16.sp,
                         color = Color.Black,
                         modifier = Modifier.padding(top = 4.dp),
@@ -183,7 +191,7 @@ fun MainWordCard(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = "How to use ${wordDetails.word}",
+                                            text = "How to use ${learnedWord.word}",
                                             fontSize = 18.sp,
                                             fontWeight = FontWeight.SemiBold,
                                             color = Color.Black
@@ -191,7 +199,10 @@ fun MainWordCard(
 
                                         Box(modifier = Modifier.padding(horizontal = 10.dp)) {
                                             IconButton(
-                                                onClick = { /* Add functionality */ },
+                                                onClick = {
+                                                    wordViewModel.toggleBookmark(learnedWord)
+                                                    isBookmarked = !isBookmarked
+                                                },
                                                 modifier = Modifier
                                                     .background(
                                                         color = Color(0xFF1F565E),
@@ -200,8 +211,8 @@ fun MainWordCard(
                                                     .size(32.dp)
                                             ) {
                                                 Icon(
-                                                    imageVector = if (wordDetails.isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkAdd,
-                                                    contentDescription = if (wordDetails.isBookmarked) "Remove from bookmarks" else "Add to bookmarks",
+                                                    imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkAdd,
+                                                    contentDescription = if (isBookmarked) "Remove from bookmarks" else "Add to bookmarks",
                                                     tint = Color.White,
                                                     modifier = Modifier.size(18.dp)
                                                 )
@@ -214,7 +225,7 @@ fun MainWordCard(
                                             .verticalScroll(rememberScrollState())
                                     ) {
                                         Text(
-                                            text = wordDetails.usageSamples.joinToString(separator = "\n\n"),
+                                            text = learnedWord.exampleSentence,
                                             fontSize = 16.sp,
                                             color = Color.Black,
                                             lineHeight = 24.sp
@@ -239,7 +250,7 @@ fun MainWordCard(
                                     )
 
                                     Text(
-                                        text = wordDetails.definition,
+                                        text = learnedWord.description,
                                         fontSize = 16.sp,
                                         color = Color.Black,
                                         lineHeight = 24.sp
@@ -263,7 +274,7 @@ fun MainWordCard(
                                     )
 
                                     Text(
-                                        text = wordDetails.etymology,
+                                        text = learnedWord.etymology,
                                         fontSize = 16.sp,
                                         color = Color.Black,
                                         lineHeight = 24.sp
@@ -389,11 +400,14 @@ fun MainWordCardPreview2() {
 @Composable
 fun MainWordCard2(
     navController: NavController,
-    wordDetails: WordDetails = sampleWordDetails // Default to sample data if not provided
+    learnedWord : LearnedWord = LearnedWord.default(),
+    wordViewModel: WordViewModel = viewModel(factory = WordViewModelFactory(LocalContext.current))
 ) {
     val pageCount = 3
     val pagerState = rememberPagerState(pageCount = {pageCount})
     var expanded by remember { mutableStateOf(false) }
+
+    var isBookmarked by rememberSaveable {mutableStateOf(learnedWord.bookmarked)}
 
     val animatedHeight by animateDpAsState(
         targetValue = if (expanded) 400.dp else 105.dp,
@@ -425,14 +439,14 @@ fun MainWordCard2(
             ) {
                 Column(modifier = Modifier.weight(1f).padding( all = 2.dp)) {
                     Text(
-                        text = wordDetails.word,
+                        text = learnedWord.word,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = Playfair,
                         color = Color.Black
                     )
                     Text(
-                        text = "${wordDetails.partOfSpeech} - ${wordDetails.pronunciation}",
+                        text = "${learnedWord.partOfSpeech} - ${learnedWord.phoneticSpelling}",
                         fontSize = 16.sp,
                         color = Color.Black,
                         modifier = Modifier.padding(top = 4.dp),
@@ -480,7 +494,7 @@ fun MainWordCard2(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = "How to use ${wordDetails.word}",
+                                            text = "How to use ${learnedWord.word}",
                                             fontSize = 18.sp,
                                             fontWeight = FontWeight.SemiBold,
                                             color = Color.Black
@@ -488,7 +502,10 @@ fun MainWordCard2(
 
                                         Box(modifier = Modifier.padding(horizontal = 10.dp)) {
                                             IconButton(
-                                                onClick = { /* Add functionality */ },
+                                                onClick = {
+                                                    wordViewModel.toggleBookmark(learnedWord)
+                                                    isBookmarked = !isBookmarked
+                                                },
                                                 modifier = Modifier
                                                     .background(
                                                         color = Color(0xFF1F565E),
@@ -497,8 +514,8 @@ fun MainWordCard2(
                                                     .size(32.dp)
                                             ) {
                                                 Icon(
-                                                    imageVector = if (wordDetails.isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkAdd,
-                                                    contentDescription = if (wordDetails.isBookmarked) "Remove from bookmarks" else "Add to bookmarks",
+                                                    imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkAdd,
+                                                    contentDescription = if (isBookmarked) "Remove from bookmarks" else "Add to bookmarks",
                                                     tint = Color.White,
                                                     modifier = Modifier.size(18.dp)
                                                 )
@@ -511,7 +528,7 @@ fun MainWordCard2(
                                             .verticalScroll(rememberScrollState())
                                     ) {
                                         Text(
-                                            text = wordDetails.usageSamples.joinToString(separator = "\n\n"),
+                                            text = learnedWord.exampleSentence,
                                             fontSize = 16.sp,
                                             color = Color.Black,
                                             lineHeight = 24.sp
@@ -536,7 +553,7 @@ fun MainWordCard2(
                                     )
 
                                     Text(
-                                        text = wordDetails.definition,
+                                        text = learnedWord.description,
                                         fontSize = 16.sp,
                                         color = Color.Black,
                                         lineHeight = 24.sp
@@ -560,7 +577,7 @@ fun MainWordCard2(
                                     )
 
                                     Text(
-                                        text = wordDetails.etymology,
+                                        text = learnedWord.etymology,
                                         fontSize = 16.sp,
                                         color = Color.Black,
                                         lineHeight = 24.sp
