@@ -2,6 +2,7 @@ package com.example.linguadailyapp.ui.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -116,6 +117,7 @@ fun BookmarkScreen(
                 BookmarkGrid(
                     modifier = Modifier.padding(paddingValues),
                     learnedWords = bookmarkedWords,
+                    navController = navController,
                     onTrashClicked = { word -> viewModel.toggleBookmark(word) }
                 )
             }
@@ -161,8 +163,9 @@ fun EmptyBookmarksView(modifier: Modifier = Modifier) {
 @Composable
 fun BookmarkGrid(
     modifier: Modifier = Modifier,
+    navController: NavController,
     learnedWords: List<LearnedWord>,
-    onTrashClicked: (LearnedWord) -> Unit
+    onTrashClicked: (LearnedWord) -> Unit,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -173,13 +176,13 @@ fun BookmarkGrid(
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(learnedWords) { word ->
-            BookmarkCard(word, onTrashClicked)
+            BookmarkCard(word, navController, onTrashClicked)
         }
     }
 }
 
 @Composable
-fun BookmarkCard(learnedWord: LearnedWord, onTrashClicked: (LearnedWord) -> Unit) {
+fun BookmarkCard(learnedWord: LearnedWord, navController: NavController, onTrashClicked: (LearnedWord) -> Unit) {
     val primaryColor = Color(0xFFF7E5BE) // Light beige like in MainWordCard
     val accentColor = Color(0xFF1F565E) // Dark teal like in MainWordCard
 
@@ -197,6 +200,7 @@ fun BookmarkCard(learnedWord: LearnedWord, onTrashClicked: (LearnedWord) -> Unit
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
+                .clickable {navController.navigate(NavigationDestinations.Word.createRoute(learnedWord.id))}
         ) {
             // Header with date and delete icon
             Row(
@@ -286,6 +290,8 @@ fun PreviewBookmarkScreen() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewBookmarkCard() {
+    val navController = rememberNavController()
+
     MaterialTheme {
         BookmarkCard(
             LearnedWord(
@@ -298,6 +304,7 @@ fun PreviewBookmarkCard() {
                 partOfSpeech = ""
 
             ),
+            navController = navController,
             onTrashClicked = {}
         )
     }
