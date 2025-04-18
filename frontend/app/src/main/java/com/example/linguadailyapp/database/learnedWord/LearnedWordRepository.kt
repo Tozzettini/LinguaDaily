@@ -34,6 +34,10 @@ class LearnedWordRepository(val context : Context) {
         return wordDao.getAllWordsFlow()
     }
 
+    suspend fun getWordById(id: Int): LearnedWord? {
+        return wordDao.getWordById(id)
+    }
+
 
 }
 

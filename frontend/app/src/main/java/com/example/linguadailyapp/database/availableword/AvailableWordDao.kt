@@ -2,6 +2,7 @@ package com.example.linguadailyapp.database.availableword
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import retrofit2.http.GET
 import java.time.LocalDate
 
 @Dao
@@ -17,4 +18,7 @@ interface AvailableWordDao {
 
     @Update
     suspend fun updateWord(learnedWord: AvailableWord)
+
+    @Query("SELECT * FROM availableWords")
+    suspend fun getAllWords(): List<AvailableWord>
 }

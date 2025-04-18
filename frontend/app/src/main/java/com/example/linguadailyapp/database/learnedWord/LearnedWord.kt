@@ -2,6 +2,7 @@ package com.example.linguadailyapp.database.learnedWord
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.linguadailyapp.database.availableword.AvailableWord
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -19,4 +20,31 @@ data class LearnedWord(
     val bookmarked: Boolean = false,
     val bookmarkedAt: LocalDateTime? = LocalDateTime.now(),
     val isWordOfTheDay: Boolean = false
-)
+) {
+    companion object {
+        fun of(
+            availableWord: AvailableWord,
+            learnedAt: LocalDate = LocalDate.now(),
+            bookmarked: Boolean = false,
+            bookmarkedAt: LocalDateTime? =  LocalDateTime.now(),
+            isWordOfTheDay: Boolean = false
+        ): LearnedWord {
+            return LearnedWord(
+                id = availableWord.id,
+                word = availableWord.word,
+                description = availableWord.description,
+                language = availableWord.language,
+                exampleSentence = availableWord.exampleSentence,
+                phoneticSpelling = availableWord.phoneticSpelling,
+                partOfSpeech = availableWord.partOfSpeech,
+                etymology = availableWord.etymology,
+                learnedAt = learnedAt,
+                bookmarked = bookmarked,
+                bookmarkedAt = bookmarkedAt,
+                isWordOfTheDay = isWordOfTheDay
+            )
+        }
+    }
+}
+
+

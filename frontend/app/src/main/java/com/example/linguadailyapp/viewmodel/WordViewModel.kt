@@ -32,10 +32,28 @@ class WordViewModel(private val learnedWordRepository: LearnedWordRepository, pr
         }
     }
 
+    suspend fun getLearnedWordById(id : Int): LearnedWord? {
+        return learnedWordRepository.getWordById(id)
+    }
+
     fun toggleBookmark(learnedWord: LearnedWord) {
         viewModelScope.launch {
             val updatedWord = learnedWord.copy(bookmarked = !learnedWord.bookmarked, bookmarkedAt = LocalDateTime.now())
             learnedWordRepository.updateWord(updatedWord)
         }
+    }
+
+
+    suspend fun getRandomWordBlocking() : LearnedWord? {
+        val randomWord = availableWordRepository.getRandomWord()
+
+        if(randomWord == null) return randomWord
+
+        val learnedWord = LearnedWord.of(randomWord)
+
+        learnedWordRepository.insert(learnedWord)
+        availableWordRepository.removeWord(randomWord)
+
+        return learnedWord
     }
 }

@@ -25,9 +25,13 @@ class AppNavigation {
             composable(NavigationDestinations.Settings.route) { SettingsScreen(navController) }
             composable(NavigationDestinations.WordsList.route) { WordsScreen(navController) }
             composable(NavigationDestinations.Bookmark.route) { BookmarkScreen(navController) }
-            composable(NavigationDestinations.Word.route) { WordDetailScreen(navController) }
             composable(NavigationDestinations.Challenge.route) { DailyChallengeScreen(navController) }
-
+            composable(NavigationDestinations.Word.route) { backStackEntry ->
+                val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
+                if (id != null) {
+                    WordDetailScreen(navController, id)
+                }
+            }
 
         }
     }

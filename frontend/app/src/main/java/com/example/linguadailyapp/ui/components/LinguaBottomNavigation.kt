@@ -32,10 +32,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
+import com.example.linguadailyapp.database.learnedWord.LearnedWord
 import com.example.linguadailyapp.navigation.NavigationDestinations
-
+import com.example.linguadailyapp.viewmodel.WordViewModel
+import com.example.linguadailyapp.viewmodel.WordViewModelFactory
+import kotlinx.coroutines.runBlocking
 
 
 @Preview
@@ -47,7 +51,10 @@ fun LinguaBottomNavigationPreview() {
 
 
 @Composable
-fun LinguaBottomNavigation(navController: NavController) {
+fun LinguaBottomNavigation(
+    navController: NavController,
+    wordViewModel: WordViewModel = viewModel(factory = WordViewModelFactory(LocalContext.current))
+    ) {
     // Define navigation items
     val items = listOf(
         NavigationItem(
@@ -127,11 +134,15 @@ fun LinguaBottomNavigation(navController: NavController) {
                 selected = selected,
                 onClick = {
                     if (item.route == "random_word") {
-                        // Add logic to navigate to a random word
-                        // For example, fetch a random word ID first, then navigate
-                        // viewModel.getRandomWordId { wordId ->
-                        //     navController.navigate("word_details/$wordId")
-                        // }
+                        var randomWord : LearnedWord? = null
+                        runBlocking {
+                            randomWord = wordViewModel.getRandomWordBlocking()
+                        }
+
+                        if(randomWord != null) {
+                            navController.navigate(NavigationDestinations.Word.createRoute(randomWord.id))
+                        }
+
                     } else {
                         navController.navigate(item.route) {
                             // Pop up to the start destination of the graph to avoid

@@ -22,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,28 +30,42 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.linguadailyapp.database.learnedWord.LearnedWord
 import com.example.linguadailyapp.database.learnedWord.WordDetails
 import com.example.linguadailyapp.database.learnedWord.sampleWordDetails
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 import com.example.linguadailyapp.ui.theme.Playfair
+import com.example.linguadailyapp.viewmodel.WordViewModel
+import com.example.linguadailyapp.viewmodel.WordViewModelFactory
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WordDetailScreen(
     navController: NavController,
-    wordDetails: WordDetails = sampleWordDetails
+    wordId : Int? = null,
+    wordViewModel: WordViewModel = viewModel(factory = WordViewModelFactory(LocalContext.current))
 ) {
     val scrollState = rememberScrollState()
     var contentVisible by remember { mutableStateOf(false) }
+
+    var learnedWord : LearnedWord
+    runBlocking {
+        learnedWord = wordViewModel.getLearnedWordById(wordId!!)!!
+    }
+
+    var isBookmarked by rememberSaveable { mutableStateOf(learnedWord.bookmarked) }
 
     LaunchedEffect(Unit) {
         delay(300)
@@ -82,9 +97,12 @@ fun WordDetailScreen(
                     IconButton(onClick = { /* share logic */ }) {
                         Icon(Icons.Default.Share, contentDescription = "Share")
                     }
-                    IconButton(onClick = { /* toggle bookmark */ }) {
+                    IconButton(onClick = {
+                        wordViewModel.toggleBookmark(learnedWord)
+                        isBookmarked = !isBookmarked
+                    }) {
                         Icon(
-                            imageVector = if (wordDetails.isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                            imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                             contentDescription = "Bookmark"
                         )
                     }
@@ -119,7 +137,7 @@ fun WordDetailScreen(
                 ) {
                     // Word + Pronunciation
                     Text(
-                        text = wordDetails.word,
+                        text = learnedWord.word,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = Playfair,
@@ -130,7 +148,7 @@ fun WordDetailScreen(
                             modifier = Modifier
                             .padding(bottom = 10.dp)) {
                         Text(
-                            text = "${wordDetails.partOfSpeech} • ${wordDetails.pronunciation}",
+                            text = "${learnedWord.partOfSpeech} • ${learnedWord.phoneticSpelling}",
                             fontSize = 16.sp,
                             color = Color.Gray
                         )
@@ -148,10 +166,10 @@ fun WordDetailScreen(
 //                    Divider(modifier = Modifier.padding(vertical = 16.dp), thickness = 1.dp)
 
                     // Sections
-                    DetailSection("How to use", wordDetails.usageSamples.joinToString("\n\n"))
-                    DetailSection("Definition", wordDetails.definition)
-                    DetailSection("Etymology", wordDetails.etymology)
-                    DetailSection("Example Sentences", wordDetails.examples.joinToString("\n\n") { "- $it" })
+                    DetailSection("How to use", learnedWord.exampleSentence)
+                    DetailSection("Definition", learnedWord.description)
+                    DetailSection("Etymology", learnedWord.etymology)
+//                    DetailSection("Example Sentences", wordDetails.examples.joinToString("\n\n") { "- $it" })
 
 //                    Spacer(modifier = Modifier.height(24.dp))
                 }

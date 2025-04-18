@@ -23,4 +23,7 @@ interface LearnedWordDao {
 
     @Update
     suspend fun updateWord(learnedWord: LearnedWord)
+
+    @Query("SELECT * FROM learnedWords WHERE id = :id")
+    suspend fun getWordById(id: Int) : LearnedWord?
 }
