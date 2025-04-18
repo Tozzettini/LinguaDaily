@@ -2,6 +2,7 @@ package com.example.linguadailyapp.ui.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -114,7 +115,8 @@ fun WordsScreen(
                 WordsList(
                     modifier = Modifier.padding(paddingValues),
                     learnedWords = words,
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    navController = navController
                 )
             }
         }
@@ -157,7 +159,7 @@ fun EmptyWordsView(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun WordsList(modifier: Modifier, learnedWords: List<LearnedWord>, viewModel: WordViewModel) {
+fun WordsList(modifier: Modifier, learnedWords: List<LearnedWord>, viewModel: WordViewModel, navController: NavController) {
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -169,14 +171,14 @@ fun WordsList(modifier: Modifier, learnedWords: List<LearnedWord>, viewModel: Wo
             modifier = Modifier.fillMaxSize()
         ) {
             items(learnedWords) { word ->
-                WordCard(word) { viewModel.toggleBookmark(it) }
+                WordCard(word, navController) { viewModel.toggleBookmark(it) }
             }
         }
     }
 }
 
 @Composable
-fun WordCard(learnedWord: LearnedWord, onBookmarkClick: (LearnedWord) -> Unit) {
+fun WordCard(learnedWord: LearnedWord, navController: NavController, onBookmarkClick: (LearnedWord) -> Unit) {
     val primaryColor = Color(0xFFF7E5BE) // Light beige
     val accentColor = Color(0xFF1F565E) // Dark teal
 
@@ -206,7 +208,7 @@ fun WordCard(learnedWord: LearnedWord, onBookmarkClick: (LearnedWord) -> Unit) {
             WordInformation(
                 word = learnedWord.word,
                 definition = learnedWord.description,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f).clickable { navController.navigate(NavigationDestinations.Word.createRoute(learnedWord.id))   }
             )
             Spacer(modifier = Modifier.width(16.dp))
 
@@ -313,6 +315,8 @@ fun PreviewWordInformation() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewWordCard() {
+    val navController = rememberNavController()
+
     LinguaDailyAppTheme {
         WordCard(
             learnedWord = LearnedWord(
@@ -324,7 +328,8 @@ fun PreviewWordCard() {
                 partOfSpeech = "",
                 etymology = ""
             ),
-            onBookmarkClick = {}
+            navController,
+            onBookmarkClick = {},
         )
     }
 }

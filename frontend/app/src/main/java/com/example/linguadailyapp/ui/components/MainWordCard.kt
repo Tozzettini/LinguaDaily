@@ -169,7 +169,7 @@ fun MainWordCard(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .clickable { navController.navigate(NavigationDestinations.Word.route)   }
+                        .clickable { navController.navigate(NavigationDestinations.Word.createRoute(learnedWord.id))   }
                 ) {
                     HorizontalPager(
                         state = pagerState,
@@ -472,7 +472,7 @@ fun MainWordCard2(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .clickable { navController.navigate(NavigationDestinations.Word.route)   }
+                        .clickable { navController.navigate(NavigationDestinations.Word.createRoute(learnedWord.id))   }
                 ) {
                     HorizontalPager(
                         state = pagerState,

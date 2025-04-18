@@ -88,6 +88,7 @@ class MainActivity : ComponentActivity() {
                         preferencesManager = preferencesManager,
                         onCancelled = {
                             preferencesManager.setOutOfWordsMode(true)
+                            appReady = true
                         },
                         onSyncTriggered = {
                             val updatedNetworkType = ConnectionManager.getNetworkType(context)
