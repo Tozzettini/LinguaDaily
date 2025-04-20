@@ -40,8 +40,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.database.learnedWord.LearnedWord
-import com.example.linguadailyapp.database.learnedWord.WordDetails
-import com.example.linguadailyapp.database.learnedWord.sampleWordDetails
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 import com.example.linguadailyapp.ui.theme.Playfair
