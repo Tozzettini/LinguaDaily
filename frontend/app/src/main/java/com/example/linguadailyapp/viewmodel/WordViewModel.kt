@@ -24,12 +24,8 @@ class WordViewModel(private val learnedWordRepository: LearnedWordRepository, pr
 
     init {
         viewModelScope.launch {
-            var todaysWord = learnedWordRepository.getTodaysWord()
 
-            if(todaysWord == null) {
-                todaysWord = getRandomWordBlocking(isWordOfDay = true)
-            }
-            _todaysLearnedWord.value = todaysWord
+            _todaysLearnedWord.value = getTodaysLearnedWord()
 
             learnedWordRepository.getAllWordsFlow().collect { allWords ->
                 _words.value = allWords
@@ -61,5 +57,15 @@ class WordViewModel(private val learnedWordRepository: LearnedWordRepository, pr
         availableWordRepository.removeWord(randomWord)
 
         return learnedWord
+    }
+
+    suspend fun getTodaysLearnedWord() : LearnedWord? {
+        var todaysWord = learnedWordRepository.getTodaysWord()
+
+        if(todaysWord == null) {
+            todaysWord = getRandomWordBlocking(isWordOfDay = true)
+        }
+
+        return todaysWord
     }
 }
