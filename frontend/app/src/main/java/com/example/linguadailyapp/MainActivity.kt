@@ -48,13 +48,15 @@ class MainActivity : ComponentActivity() {
                     handlePermissionResult(this, isGranted)
                 }
             ).init()
+
+            val workRequest = PeriodicWorkRequestBuilder<DailyNotificationWorker>(1, TimeUnit.DAYS)
+                .setInitialDelay(getInitialDelay(), TimeUnit.MILLISECONDS)
+                .build()
+
+            WorkManager.getInstance(applicationContext).enqueue(workRequest)
         }
 
-        val workRequest = PeriodicWorkRequestBuilder<DailyNotificationWorker>(1, TimeUnit.DAYS)
-            .setInitialDelay(getInitialDelay(), TimeUnit.MILLISECONDS)
-            .build()
 
-        WorkManager.getInstance(applicationContext).enqueue(workRequest)
 
         val syncViewModel = SyncViewModel(AvailableWordRepository(this))
         val availableWordRepository = AvailableWordRepository(this)
