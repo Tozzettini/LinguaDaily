@@ -158,7 +158,7 @@ fun HomeScreen(
                                     animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
                                 )
                     ) {
-                        VocabularyStatsWidget(viewModel = statsViewModel)
+                        VocabularyStatsWidget()
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))

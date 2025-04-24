@@ -2,8 +2,10 @@ package com.example.linguadailyapp.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import androidx.core.content.edit
 
 class PreferencesManager(context: Context) {
     private val sharedPreferences: SharedPreferences =
@@ -15,6 +17,60 @@ class PreferencesManager(context: Context) {
     private val DEFAULT_FIRST_LAUNCH = true
     private val DEFAULT_OUT_OF_WORDS = true
     private val DEFAULT_SKIP = 0
+
+    // New keys for vocabulary statistics
+    private  val KEY_WORDS_LEARNED = "words_learned"
+    private  val KEY_TOTAL_GOAL = "total_goal"
+    private  val KEY_STREAK_DAYS = "streak_days"
+    private  val KEY_LAST_OPENED_DATE = "last_opened_date"
+
+
+
+
+    // New methods for vocabulary statistics
+
+    fun getWordsLearned(): Int {
+        return sharedPreferences.getInt(KEY_WORDS_LEARNED, 0)
+    }
+
+    fun setWordsLearned(count: Int) {
+        sharedPreferences.edit() { putInt(KEY_WORDS_LEARNED, count) }
+    }
+
+    fun getTotalGoal(): Int {
+        return sharedPreferences.getInt(KEY_TOTAL_GOAL, 365)
+    }
+
+    fun setTotalGoal(goal: Int) {
+        sharedPreferences.edit() { putInt(KEY_TOTAL_GOAL, goal) }
+    }
+
+    fun getStreakDays(): Int {
+        return sharedPreferences.getInt(KEY_STREAK_DAYS, 0)
+    }
+
+    fun setStreakDays(days: Int) {
+        sharedPreferences.edit() { putInt(KEY_STREAK_DAYS, days) }
+    }
+
+    fun getLastOpenedDate(): LocalDate? {
+        val dateString = sharedPreferences.getString(KEY_LAST_OPENED_DATE, null)
+        return if (dateString != null) {
+            LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE)
+        } else {
+            null
+        }
+    }
+
+    fun setLastOpenedDate(date: LocalDate?) {
+        sharedPreferences.edit() {
+            if (date != null) {
+                putString(KEY_LAST_OPENED_DATE, date.format(DateTimeFormatter.ISO_LOCAL_DATE))
+            } else {
+                remove(KEY_LAST_OPENED_DATE)
+            }
+        }
+    }
 
     // ---- Methods to access settings ----
 

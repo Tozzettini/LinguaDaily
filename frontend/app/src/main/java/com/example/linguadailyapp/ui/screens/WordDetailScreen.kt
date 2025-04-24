@@ -118,12 +118,13 @@ fun WordDetailScreen(
             enter = fadeIn() + expandVertically(),
             exit = fadeOut()
         ) {
+
             Card(
                 shape = RoundedCornerShape(28.dp),
                 modifier = Modifier
                     .padding(paddingValues)
                     .padding(16.dp)
-                    .fillMaxSize(),
+                    .fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.Transparent)
             ) {

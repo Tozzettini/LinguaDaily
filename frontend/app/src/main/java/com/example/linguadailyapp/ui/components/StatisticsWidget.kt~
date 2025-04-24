@@ -28,7 +28,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun VocabularyStatsWidget(
-    viewModel: VocabularyStatsViewModel = viewModel()
+    viewModel: PreviewVocabularyStatsViewModel = viewModel()
 ) {
     // Collect state from ViewModel
     val stats by viewModel.stats.collectAsState()

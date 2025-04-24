@@ -260,7 +260,7 @@ fun SettingsScreen(navController: NavController) {
                     visible = isSettingVisable2, // You would need to add this state variable
                     enter = fadeIn(animationSpec = tween(500)) +
                             slideInVertically(
-                                initialOffsetY = { it/3 },
+                                initialOffsetY = { it/2 },
                                 animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
                             )
                 ) {
