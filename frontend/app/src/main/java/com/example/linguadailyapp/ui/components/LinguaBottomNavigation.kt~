@@ -215,7 +215,7 @@ fun LinguaBottomNavigation(
                     unselectedIconColor = Color.Gray.copy(alpha = 0.6f),
                     unselectedTextColor = Color.Gray.copy(alpha = 0.6f)
                 ),
-                enabled = true
+                enabled = !isRandomDisabled || showCooldownModal
             )
         }
     }
