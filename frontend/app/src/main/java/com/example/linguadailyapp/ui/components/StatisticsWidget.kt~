@@ -121,15 +121,10 @@ fun VocabularyStatsWidget(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    val day = if (stats.streakDays == 1) "day" else "days"
+                    
                     StatItem(title = "Goal", value = "${stats.totalGoal} words")
-                    if (stats.streakDays == 1) {
-                        StatItem(title = "Streak", value = "${stats.streakDays} day")
-
-                    } else {
-                    StatItem(title = "Streak", value = "${stats.streakDays} days")
-
-                    }
-
+                    StatItem(title = "Streak", value = "${stats.streakDays} $day")
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
