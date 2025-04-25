@@ -122,7 +122,13 @@ fun VocabularyStatsWidget(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     StatItem(title = "Goal", value = "${stats.totalGoal} words")
+                    if (stats.streakDays == 1) {
+                        StatItem(title = "Streak", value = "${stats.streakDays} day")
+
+                    } else {
                     StatItem(title = "Streak", value = "${stats.streakDays} days")
+                    }
+
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
