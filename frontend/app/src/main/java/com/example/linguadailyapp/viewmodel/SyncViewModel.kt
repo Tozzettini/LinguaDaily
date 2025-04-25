@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 class SyncViewModel(private val availableWordRepository: AvailableWordRepository) : ViewModel() {
 
-    private val DATABASE_SIZE_LIMIT = 10
+    private val DATABASE_SIZE_LIMIT = 50
 
     suspend fun syncBlocking(preferencesManager: PreferencesManager) {
         for(language in Language.entries) {
