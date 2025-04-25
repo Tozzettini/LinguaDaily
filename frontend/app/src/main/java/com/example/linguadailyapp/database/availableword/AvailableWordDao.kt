@@ -1,6 +1,8 @@
 package com.example.linguadailyapp.database.availableword
 
 import androidx.room.*
+import com.example.linguadailyapp.datamodels.AvailableWord
+import com.example.linguadailyapp.datamodels.Language
 import kotlinx.coroutines.flow.Flow
 import retrofit2.http.GET
 import java.time.LocalDate
@@ -13,8 +15,8 @@ interface AvailableWordDao {
     @Delete
     suspend fun delete(learnedWord: AvailableWord)
 
-    @Query("SELECT count(*) FROM availableWords")
-    suspend fun getWordCount(): Int
+    @Query("SELECT count(*) FROM availableWords WHERE language = :language")
+    suspend fun getWordCountForLanguage(language: Language): Int
 
     @Update
     suspend fun updateWord(learnedWord: AvailableWord)

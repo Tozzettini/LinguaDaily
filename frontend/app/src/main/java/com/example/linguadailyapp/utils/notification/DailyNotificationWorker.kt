@@ -4,8 +4,11 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.linguadailyapp.database.availableword.AvailableWordRepository
-import com.example.linguadailyapp.database.learnedWord.LearnedWord
+import com.example.linguadailyapp.datamodels.LearnedWord
 import com.example.linguadailyapp.database.learnedWord.LearnedWordRepository
+import com.example.linguadailyapp.utils.preferences.LanguagePreferencesManager
+import com.example.linguadailyapp.utils.preferences.PreferencesManager
+import com.example.linguadailyapp.viewmodel.LanguageViewModel
 import com.example.linguadailyapp.viewmodel.WordViewModel
 
 class DailyNotificationWorker(
@@ -15,11 +18,14 @@ class DailyNotificationWorker(
 
     override suspend fun doWork(): Result {
 
-        val wordViewModel = WordViewModel(learnedWordRepository = LearnedWordRepository(applicationContext), availableWordRepository = AvailableWordRepository(applicationContext))
-        val todaysWord = wordViewModel.getTodaysLearnedWord()
+        val wordViewModel = WordViewModel(
+            learnedWordRepository = LearnedWordRepository(applicationContext),
+            availableWordRepository = AvailableWordRepository(applicationContext),
+            languageViewModel = LanguageViewModel(LanguagePreferencesManager(applicationContext)))
+        val todaysWords = wordViewModel.todaysLearnedWords.value
 
-        if(todaysWord != null) {
-            sendDailyNotification(todaysWord, applicationContext)
+        if(!todaysWords.isEmpty()) {
+            sendDailyNotification(todaysWords.first(), applicationContext)
         }
 
         return Result.success()

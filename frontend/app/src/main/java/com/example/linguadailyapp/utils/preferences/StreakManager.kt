@@ -1,4 +1,4 @@
-package com.example.linguadailyapp.database.streakmanager
+package com.example.linguadailyapp.utils.preferences
 
 import android.content.Context
 import java.time.LocalDate

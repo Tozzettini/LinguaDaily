@@ -1,7 +1,6 @@
 package com.example.linguadailyapp.viewmodel
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -59,27 +58,16 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.R
 import com.example.linguadailyapp.navigation.NavigationDestinations
-import com.example.linguadailyapp.ui.screens.Languagetype
+import com.example.linguadailyapp.datamodels.Language
+import com.example.linguadailyapp.utils.preferences.LanguagePreferencesManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 // ViewModel using SharedPreferences for language preferences
-class LanguageViewModel(private val sharedPreferences: SharedPreferences) : ViewModel() {
-    // SharedPreferences key
-    private val SELECTED_LANGUAGES_KEY = "selected_languages"
-
+class LanguageViewModel(private val languagePreferencesManager: LanguagePreferencesManager) : ViewModel() {
     // MutableStateFlow to hold the current selections
-    private val _selectedLanguages = MutableStateFlow<Set<Languagetype>>(setOf())
-    val selectedLanguages: StateFlow<Set<Languagetype>> = _selectedLanguages
-
-    // Available languages
-    val availableLanguages = listOf(
-        Languagetype("English", "en"),
-        Languagetype("Italian", "it"),
-        Languagetype("Dutch", "nl"),
-//        Languagetype("Spanish", "es"),
-//        Languagetype("Portuguese", "pt")
-    )
+    private val _selectedLanguages = MutableStateFlow<Set<Language>>(setOf())
+    val selectedLanguages: StateFlow<Set<Language>> = _selectedLanguages
 
     init {
         // Load saved languages on initialization
@@ -87,56 +75,32 @@ class LanguageViewModel(private val sharedPreferences: SharedPreferences) : View
     }
 
     private fun loadSelectedLanguages() {
-        // Get saved language codes from SharedPreferences
-        val savedLanguageCodes = sharedPreferences.getStringSet(
-            SELECTED_LANGUAGES_KEY,
-            setOf("en") // Default to English if nothing is saved
-        ) ?: setOf("en")
+        var languages = languagePreferencesManager.getLanguages()
 
-        // Convert codes to Languagetype objects
-        val languageSet = savedLanguageCodes.mapNotNull { code ->
-            availableLanguages.find { it.code == code }
-        }.toSet()
+        if(languages.isEmpty()) languages = setOf(Language.ENGLISH)
 
-        // Use default if empty
-        val result = if (languageSet.isEmpty()) {
-            setOf(availableLanguages.first())
-        } else {
-            languageSet
-        }
-
-        _selectedLanguages.value = result
+        _selectedLanguages.value = languages
     }
 
     // Function to update selected languages
-    fun updateSelectedLanguages(languages: Set<Languagetype>) {
-        // Ensure we have at least one language selected
-        val languagesToSave = if (languages.isEmpty()) {
-            setOf(availableLanguages.first()) // Default to first language
-        } else {
-            languages
-        }
+    fun updateSelectedLanguages(languages: Set<Language>) {
+        var languagesToSave = languages
 
-        // Save to SharedPreferences
-        sharedPreferences.edit().apply {
-            putStringSet(
-                SELECTED_LANGUAGES_KEY,
-                languagesToSave.map { it.code }.toSet()
-            )
-            apply() // Apply changes asynchronously
-        }
+        if(languagesToSave.isEmpty()) return
 
-        // Update state
+        languagePreferencesManager.setLanguages(languagesToSave)
+
         _selectedLanguages.value = languagesToSave
     }
 }
 
 // Factory for ViewModel instantiation
-class LanguageViewModelFactory(private val sharedPreferences: SharedPreferences) : ViewModelProvider.Factory {
+class LanguageViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(LanguageViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return LanguageViewModel(sharedPreferences) as T
+            val languagePreferencesManager = LanguagePreferencesManager(context)
+            return LanguageViewModel(languagePreferencesManager) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
@@ -148,15 +112,7 @@ fun ImprovedStyledTopBar2(
     navController: NavController,
     viewModel: LanguageViewModel
 ) {
-    val languages = viewModel.availableLanguages
-
-    val languageToFlag = mapOf(
-        "en" to "🇺🇸",  // English - United States
-//        "es" to "🇪🇸",  // Spanish - Spain
-        "it" to "🇮🇹",  // Italian - Italy
-//        "pt" to "🇵🇹",  // Portuguese - Portugal
-        "nl" to "🇳🇱",  // Dutch - Netherlands
-    )
+    val languages = Language.entries
 
     // State to keep track of dropdown visibility
     var showLanguageDropdown by remember { mutableStateOf(false) }
@@ -214,7 +170,7 @@ fun ImprovedStyledTopBar2(
                         // Show first selected language flag or a default icon
                         if (selectedLanguages.isNotEmpty()) {
                             Text(
-                                text = selectedLanguages.firstOrNull()?.let { languageToFlag[it.code] } ?: "🌐",
+                                text = selectedLanguages.firstOrNull()?.flag ?: "🌐",
                                 fontSize = 16.sp,
                                 modifier = Modifier.padding(end = 2.dp)
                             )
@@ -287,13 +243,13 @@ fun ImprovedStyledTopBar2(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = languageToFlag[language.code] ?: "🌐",
+                                text = language.displayName,
                                 fontSize = 16.sp,
                                 modifier = Modifier.padding(end = 8.dp)
                             )
 
                             Text(
-                                text = language.name,
+                                text = language.flag,
                                 color = Color.Black,
                                 fontSize = 14.sp,
                                 modifier = Modifier.weight(1f)
@@ -348,6 +304,11 @@ fun ImprovedStyledTopBar2(
                             showLanguageDropdown = false
                             // Save to ViewModel which persists to SharedPreferences
                             viewModel.updateSelectedLanguages(tempSelectedLanguages)
+
+                            // TODO: Force reload because of bug where if the selected
+                            //  languages are updated is it not seen in the wordViewModel.
+                            //  Maybe try to actually fix the bug later
+                            navController.navigate(NavigationDestinations.Home.route)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -411,14 +372,9 @@ fun YourAppScreen() {
     // Get the application context
     val context = LocalContext.current
 
-    // Get SharedPreferences instance
-    val sharedPreferences = remember {
-        context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
-    }
-
     // Create the ViewModel using the factory
     val viewModel: LanguageViewModel = viewModel(
-        factory = LanguageViewModelFactory(sharedPreferences)
+        factory = LanguageViewModelFactory(context)
     )
 
     val navController = rememberNavController()

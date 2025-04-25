@@ -6,15 +6,16 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.example.linguadailyapp.database.availableword.AvailableWord
+import com.example.linguadailyapp.datamodels.AvailableWord
 import com.example.linguadailyapp.database.availableword.AvailableWordDao
-import com.example.linguadailyapp.database.learnedWord.LearnedWord
+import com.example.linguadailyapp.datamodels.LearnedWord
 import com.example.linguadailyapp.database.learnedWord.LearnedWordDao
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import com.example.linguadailyapp.datamodels.Language
 
 class Converters {
     private val localDateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
@@ -61,6 +62,15 @@ class Converters {
         }
     }
 
+    @TypeConverter
+    fun fromLanguage(value: Language): String = value.name
+
+    @TypeConverter
+    fun toLanguage(value: String): Language {
+        return Language.entries.firstOrNull {
+            it.displayName.equals(value, ignoreCase = true) || it.name.equals(value, ignoreCase = true)
+        } ?: Language.ENGLISH
+    }
 
 }
 

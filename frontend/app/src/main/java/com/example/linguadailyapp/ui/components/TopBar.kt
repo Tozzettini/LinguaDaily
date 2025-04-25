@@ -46,22 +46,16 @@ import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.R
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
+import com.example.linguadailyapp.datamodels.Language
 import com.example.linguadailyapp.viewmodel.LanguageViewModel
 
 // Define the Languagetype class if it's not already defined elsewhere
-data class Languagetype(val name: String, val code: String)
 @Composable
 fun ImprovedStyledTopBar3(
     navController: NavController,
     viewModel: LanguageViewModel
 ) {
-    val languages = viewModel.availableLanguages
-
-    val languageToFlag = mapOf(
-        "en" to "🇺🇸",  // English - United States
-        "it" to "🇮🇹",  // Italian - Italy
-        "nl" to "🇳🇱",  // Dutch - Netherlands
-    )
+    val languages = Language.entries
 
     // State to keep track of dropdown visibility
     var showLanguageDropdown by remember { mutableStateOf(false) }
@@ -145,8 +139,7 @@ fun ImprovedStyledTopBar3(
                         // Show first selected language flag or a default icon
                         if (selectedLanguages.isNotEmpty()) {
                             Text(
-                                text = selectedLanguages.firstOrNull()?.let {
-                                    languageToFlag[it.code] } ?: "🌐",
+                                text = selectedLanguages.firstOrNull()?.flag ?: "🌐",
                                 fontSize = 18.sp
                             )
                         } else {
@@ -210,7 +203,7 @@ fun ImprovedStyledTopBar3(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = languageToFlag[language.code] ?: "🌐",
+                                text = language.flag,
                                 fontSize = 18.sp,
                                 modifier = Modifier.padding(end = 12.dp)
                             )

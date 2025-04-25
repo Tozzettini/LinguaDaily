@@ -1,8 +1,8 @@
-package com.example.linguadailyapp.database.learnedWord
+package com.example.linguadailyapp.datamodels
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.linguadailyapp.database.availableword.AvailableWord
+import com.example.linguadailyapp.datamodels.Language
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -11,7 +11,7 @@ data class LearnedWord(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val word: String,
     val description: String,
-    val language: String,
+    val language: Language,
     val learnedAt: LocalDate = LocalDate.now(),
     val etymology: String,
     val exampleSentence: String,
@@ -49,7 +49,7 @@ data class LearnedWord(
                 id = -1,
                 word = "Default",
                 description = "No description available.",
-                language = "en",
+                language = Language.ENGLISH,
                 exampleSentence = "This is a default word.",
                 phoneticSpelling = "[ˈdɪˌfɔlt]",
                 partOfSpeech = "noun",
@@ -59,5 +59,3 @@ data class LearnedWord(
 
     }
 }
-
-

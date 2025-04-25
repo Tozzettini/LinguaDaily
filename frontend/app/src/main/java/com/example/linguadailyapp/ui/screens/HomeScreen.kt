@@ -1,6 +1,5 @@
 package com.example.linguadailyapp.ui.screens
 
-import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -24,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.linguadailyapp.database.learnedWord.LearnedWord
+import com.example.linguadailyapp.datamodels.LearnedWord
 import com.example.linguadailyapp.ui.components.*
 import com.example.linguadailyapp.ui.components.DailyChallengeCard
 import com.example.linguadailyapp.ui.components.VocabularyStatsWidget
@@ -42,24 +41,18 @@ import java.time.LocalTime
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: WordViewModel = viewModel(factory = WordViewModelFactory(LocalContext.current)),
-    statsViewModel: VocabularyStatsViewModel = viewModel()
+    wordViewModel: WordViewModel = viewModel(factory = WordViewModelFactory(LocalContext.current)),
+    statsViewModel: VocabularyStatsViewModel = viewModel(),
+    languageViewModel: LanguageViewModel = viewModel(factory = LanguageViewModelFactory(LocalContext.current))
 ) {
-    val todaysWord by viewModel.todaysLearnedWord.collectAsState()
-    var currentLanguage by remember { mutableStateOf(Languagetype("English", "en")) }
+    val todaysWords by wordViewModel.todaysLearnedWords.collectAsState()
+
 
     // Get the application context
     val context = LocalContext.current
 
-    // Get SharedPreferences instance
-    val sharedPreferences = remember {
-        context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
-    }
-    val words by viewModel.words.collectAsState()
+    val words by wordViewModel.words.collectAsState()
     // Create the ViewModel using the factory
-    val viewModel: LanguageViewModel = viewModel(
-        factory = LanguageViewModelFactory(sharedPreferences)
-    )
     LaunchedEffect(words.size) {
         statsViewModel.updateWordsLearned(words.size)
     }
@@ -113,7 +106,7 @@ fun HomeScreen(
 
             ImprovedStyledTopBar2(
                 navController = navController,
-                viewModel = viewModel
+                viewModel = languageViewModel
             )
         },
         bottomBar = {
@@ -144,7 +137,7 @@ fun HomeScreen(
                                     animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
                                 )
                     ) {
-                        DailyInspirationBanner(todaysWord?: LearnedWord.default())
+                        DailyInspirationBanner(todaysWords.firstOrNull()?: LearnedWord.default())
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -177,47 +170,22 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Animated main word card
-                    AnimatedVisibility(
-                        visible = isWordCardVisible,
-                        enter = fadeIn(animationSpec = tween(700)) +
-                                slideInVertically(
-                                    initialOffsetY = { it / 3 },
-                                    animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing)
-                                )
-                    ) {
-                        MainWordCard2(learnedWord = todaysWord?: LearnedWord.default(), navController = navController)
+                    todaysWords.forEach {
+                        word ->
+                        AnimatedVisibility(
+                            visible = isWordCardVisible,
+                            enter = fadeIn(animationSpec = tween(700)) +
+                                    slideInVertically(
+                                        initialOffsetY = { it / 3 },
+                                        animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing)
+                                    )
+                        ) {
+                            MainWordCard2(learnedWord = word, navController = navController)
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
                     }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // Animated main word card2
-                    AnimatedVisibility(
-                        visible = isWordCardVisible2,
-                        enter = fadeIn(animationSpec = tween(900)) +
-                                slideInVertically(
-                                    initialOffsetY = { it / 5 },
-                                    animationSpec = tween(durationMillis = 900, easing = FastOutSlowInEasing)
-                                )
-                    ) {
-                        MainWordCard2(navController = navController)
-                    }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // Animated main word card3
-                    AnimatedVisibility(
-                        visible = isWordCardVisible3,
-                        enter = fadeIn(animationSpec = tween(1100)) +
-                                slideInVertically(
-                                    initialOffsetY = { it / 5 },
-                                    animationSpec = tween(durationMillis = 1100, easing = FastOutSlowInEasing)
-                                )
-                    ) {
-                        MainWordCard2(navController = navController)
-                    }
-                    Spacer(modifier = Modifier.height(24.dp))
-
                 }
             }
         }

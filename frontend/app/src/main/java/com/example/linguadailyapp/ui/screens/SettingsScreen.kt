@@ -69,7 +69,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.components.FeedbackBox
 import com.example.linguadailyapp.ui.theme.Playfair
-import com.example.linguadailyapp.utils.PreferencesManager
+import com.example.linguadailyapp.utils.preferences.PreferencesManager
 import com.example.linguadailyapp.utils.notification.NotificationPermission
 import kotlinx.coroutines.delay
 

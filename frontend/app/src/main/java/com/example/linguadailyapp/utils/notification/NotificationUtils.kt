@@ -7,8 +7,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.linguadailyapp.R
-import com.example.linguadailyapp.database.learnedWord.LearnedWord
-import com.example.linguadailyapp.utils.PreferencesManager
+import com.example.linguadailyapp.datamodels.LearnedWord
+import com.example.linguadailyapp.utils.preferences.PreferencesManager
 
 fun sendNotification(title: String, message: String, context: Context) {
     if(!PreferencesManager(context).isNotificationsEnabled()) return

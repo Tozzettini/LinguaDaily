@@ -2,8 +2,9 @@ package com.example.linguadailyapp.database.learnedWord
 
 import android.content.Context
 import com.example.linguadailyapp.database.LocalDatabase
+import com.example.linguadailyapp.datamodels.Language
+import com.example.linguadailyapp.datamodels.LearnedWord
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
 class LearnedWordRepository(val context : Context) {
@@ -24,9 +25,9 @@ class LearnedWordRepository(val context : Context) {
         wordDao.updateWord(learnedWord)
     }
 
-    suspend fun getTodaysWord(): LearnedWord? {
+    suspend fun getTodaysWordForLanguage(language: Language): LearnedWord? {
         return wordDao.getWordsForDay(LocalDate.now()).firstOrNull { word ->
-           word.isWordOfTheDay
+           word.isWordOfTheDay && word.language == language
         }
     }
 

@@ -17,6 +17,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,9 +33,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.linguadailyapp.database.learnedWord.LearnedWord
+import com.example.linguadailyapp.datamodels.LearnedWord
 import com.example.linguadailyapp.navigation.NavigationDestinations
-import com.example.linguadailyapp.utils.RandomWordCooldownManager
+import com.example.linguadailyapp.utils.preferences.LanguagePreferencesManager
+import com.example.linguadailyapp.utils.preferences.RandomWordCooldownManager
+import com.example.linguadailyapp.viewmodel.LanguageViewModel
+import com.example.linguadailyapp.viewmodel.LanguageViewModelFactory
 import com.example.linguadailyapp.viewmodel.WordViewModel
 import com.example.linguadailyapp.viewmodel.WordViewModelFactory
 import kotlinx.coroutines.delay
@@ -49,12 +53,16 @@ fun LinguaBottomNavigationPreview() {
 @Composable
 fun LinguaBottomNavigation(
     navController: NavController,
-    wordViewModel: WordViewModel = viewModel(factory = WordViewModelFactory(LocalContext.current))
+    wordViewModel: WordViewModel = viewModel(factory = WordViewModelFactory(LocalContext.current)),
+    languageViewModel: LanguageViewModel = viewModel(factory = LanguageViewModelFactory(LocalContext.current))
 ) {
     val context = LocalContext.current
     val cooldownManager = remember { RandomWordCooldownManager(context) }
 
     var showCooldownModal by remember { mutableStateOf(false) }
+
+    val languagesSelected by languageViewModel.selectedLanguages.collectAsState()
+
 
     // Update cooldown status every second if modal is showing
     LaunchedEffect(showCooldownModal) {
@@ -180,7 +188,7 @@ fun LinguaBottomNavigation(
                                 // Handle first click - get random word
                                 var randomWord: LearnedWord? = null
                                 runBlocking {
-                                    randomWord = wordViewModel.getRandomWordBlocking()
+                                    randomWord = wordViewModel.getRandomWordBlocking(languages = languagesSelected)
                                 }
 
                                 if (randomWord != null) {

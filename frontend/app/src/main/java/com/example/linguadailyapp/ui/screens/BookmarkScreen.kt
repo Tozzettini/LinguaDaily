@@ -50,10 +50,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.linguadailyapp.database.learnedWord.LearnedWord
+import com.example.linguadailyapp.datamodels.LearnedWord
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.components.LinguaBottomNavigation
 import com.example.linguadailyapp.ui.theme.Playfair
+import com.example.linguadailyapp.datamodels.Language
 import com.example.linguadailyapp.viewmodel.WordViewModel
 import com.example.linguadailyapp.viewmodel.WordViewModelFactory
 import java.time.LocalDate
@@ -297,7 +298,7 @@ fun PreviewBookmarkCard() {
             LearnedWord(
                 word = "Serendipity",
                 description = "The occurrence and development of events by chance in a happy or beneficial way",
-                language = "English",
+                language = Language.ENGLISH,
                 exampleSentence = "",
                 phoneticSpelling = "",
                 etymology = "",

@@ -2,12 +2,11 @@ package com.example.linguadailyapp
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import com.example.linguadailyapp.database.streakmanager.StreakCounter
+import com.example.linguadailyapp.utils.preferences.StreakCounter
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import java.time.LocalDate
 
 class StreakCounterTest {

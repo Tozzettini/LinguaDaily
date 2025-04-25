@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,8 +22,7 @@ import com.example.linguadailyapp.utils.ConnectionManager
 import com.example.linguadailyapp.utils.notification.DailyNotificationWorker
 import com.example.linguadailyapp.utils.NetworkType
 import com.example.linguadailyapp.utils.notification.NotificationPermission
-import com.example.linguadailyapp.utils.PreferencesManager
-import com.example.linguadailyapp.utils.notification.sendNotification
+import com.example.linguadailyapp.utils.preferences.PreferencesManager
 import com.example.linguadailyapp.viewmodel.SyncViewModel
 import kotlinx.coroutines.runBlocking
 import java.time.Duration
@@ -59,7 +57,6 @@ class MainActivity : ComponentActivity() {
 
 
         val syncViewModel = SyncViewModel(AvailableWordRepository(this))
-        val availableWordRepository = AvailableWordRepository(this)
         val context = this
 
         setContent {
@@ -67,7 +64,7 @@ class MainActivity : ComponentActivity() {
                 var appReady by remember { mutableStateOf(false) }
 
                 LaunchedEffect(Unit) {
-                    if(availableWordRepository.getWordCount() != 0) {
+                    if(syncViewModel.canSyncInBackground()) {
                         syncViewModel.syncInBackground(preferencesManager)
                         appReady = true
                         return@LaunchedEffect
@@ -183,10 +180,9 @@ private fun showNoInternetDialog(
 
 private fun handlePermissionResult(context: Context, isGranted: Boolean) {
     if ( !isGranted ) {
-        Toast.makeText(context, "Notification Permission Denied", Toast.LENGTH_SHORT).show()
+        // Do nothing
     } else {
         PreferencesManager(context).setNotificationsEnabled(true)
-        sendNotification("You're Daily words are:", "List of daily words in diffrent languages;)", context)
     }
 }
 

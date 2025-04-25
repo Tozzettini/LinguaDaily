@@ -1,11 +1,11 @@
-package com.example.linguadailyapp.utils
+package com.example.linguadailyapp.utils.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import androidx.core.content.edit
+import com.example.linguadailyapp.datamodels.Language
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class PreferencesManager(context: Context) {
     private val sharedPreferences: SharedPreferences =
@@ -23,9 +23,6 @@ class PreferencesManager(context: Context) {
     private  val KEY_TOTAL_GOAL = "total_goal"
     private  val KEY_STREAK_DAYS = "streak_days"
     private  val KEY_LAST_OPENED_DATE = "last_opened_date"
-
-
-
 
     // New methods for vocabulary statistics
 
@@ -74,16 +71,6 @@ class PreferencesManager(context: Context) {
 
     // ---- Methods to access settings ----
 
-    fun setSkip(skip: Int) {
-        sharedPreferences.edit()
-            .putInt("skip", skip)
-            .apply()
-    }
-
-    fun getSkip(): Int {
-        return sharedPreferences.getInt("skip", DEFAULT_SKIP)
-    }
-
     fun setNotificationsEnabled(enabled: Boolean) {
         sharedPreferences.edit()
             .putBoolean("notifications_enabled", enabled)
@@ -123,5 +110,16 @@ class PreferencesManager(context: Context) {
     fun getOutOfWordsMode() : Boolean {
         return sharedPreferences.getBoolean("is_out_of_words", DEFAULT_OUT_OF_WORDS)
     }
+
+    fun setSkipForLanguage(skip: Int, language: Language) {
+        sharedPreferences.edit()
+            .putInt("skip_${language.ordinal}", skip)
+            .apply()
+    }
+
+    fun getSkipForLanguage(language: Language): Int {
+        return sharedPreferences.getInt("skip_${language.ordinal}", DEFAULT_SKIP)
+    }
+
 
 }

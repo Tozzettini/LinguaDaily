@@ -2,6 +2,8 @@ package com.example.linguadailyapp.database.availableword
 
 import android.content.Context
 import com.example.linguadailyapp.database.LocalDatabase
+import com.example.linguadailyapp.datamodels.AvailableWord
+import com.example.linguadailyapp.datamodels.Language
 import kotlin.random.Random
 import kotlin.random.nextInt
 
@@ -19,19 +21,18 @@ class AvailableWordRepository(val context : Context) {
         }
     }
 
-    suspend fun getWordCount() : Int {
-        return wordDao.getWordCount()
+    suspend fun getWordCountForLanguage(language: Language) : Int {
+        return wordDao.getWordCountForLanguage(language)
     }
 
     suspend fun removeWord(availableWord: AvailableWord) {
         wordDao.delete(availableWord)
     }
 
-    suspend fun getRandomWord() : AvailableWord? {
-        if(this.getWordCount() == 0) return null
+    suspend fun getRandomWordForLanguage(language: Language) : AvailableWord? {
+        if(this.getWordCountForLanguage(language) == 0) return null
 
-        var availableWords = wordDao.getAllWords()
-        return availableWords.get(Random.nextInt(0 until  availableWords.size))
+        return wordDao.getAllWords().filter { it -> it.language == language }.random()
     }
 
 }

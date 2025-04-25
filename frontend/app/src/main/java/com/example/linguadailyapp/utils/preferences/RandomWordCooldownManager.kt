@@ -1,11 +1,11 @@
-package com.example.linguadailyapp.utils
+package com.example.linguadailyapp.utils.preferences
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.edit
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import androidx.core.content.edit
 
 class RandomWordCooldownManager(private val context: Context) {
     companion object {

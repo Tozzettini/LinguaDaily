@@ -1,6 +1,7 @@
 package com.example.linguadailyapp.database.learnedWord
 
 import androidx.room.*
+import com.example.linguadailyapp.datamodels.LearnedWord
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
