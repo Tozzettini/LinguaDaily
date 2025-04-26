@@ -64,18 +64,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.linguadailyapp.datamodels.Feedback
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.components.FeedbackBox
 import com.example.linguadailyapp.ui.theme.Playfair
 import com.example.linguadailyapp.utils.preferences.PreferencesManager
 import com.example.linguadailyapp.utils.notification.NotificationPermission
+import com.example.linguadailyapp.viewmodel.FeedbackViewModel
+import com.example.linguadailyapp.viewmodel.VocabularyStatsViewModel
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(
+    navController: NavController,
+    feedbackViewModel: FeedbackViewModel = viewModel(),
+    ) {
     val context = LocalContext.current
     val preferencesManager = PreferencesManager(context)
 
@@ -266,8 +273,7 @@ fun SettingsScreen(navController: NavController) {
                 ) {
                     FeedbackBox(
                         onSubmitFeedback = { feedback ->
-                            // Handle the feedback submission here
-                            // e.g., send to server, save locally, etc.
+                            feedbackViewModel.saveFeedback(feedback)
                         }
                     )
                 }
