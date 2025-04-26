@@ -1,7 +1,5 @@
-package com.example.word_demo;
+package com.example.word_demo.word;
 
-import com.example.word_demo.Word;
-import com.example.word_demo.WordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

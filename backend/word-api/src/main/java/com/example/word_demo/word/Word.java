@@ -1,4 +1,4 @@
-package com.example.word_demo;
+package com.example.word_demo.word;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
