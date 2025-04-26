@@ -195,7 +195,7 @@ fun getTimeBasedGreeting(): String {
     val currentHour = LocalTime.now().hour
 
     return when (currentHour) {
-        in 5..11 -> "Good Morning!"
+        in 5..11 -> "Good Morning princess!"
         in 12..16 -> "Good Afternoon!"
         in 17..21 -> "Good Evening!"
         else -> "Wow you're up late!"

@@ -1,5 +1,14 @@
 package com.example.linguadailyapp.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,8 +31,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -35,12 +44,19 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -52,14 +68,15 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.linguadailyapp.datamodels.Language
 import com.example.linguadailyapp.datamodels.LearnedWord
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.components.LinguaBottomNavigation
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 import com.example.linguadailyapp.ui.theme.Playfair
-import com.example.linguadailyapp.datamodels.Language
 import com.example.linguadailyapp.viewmodel.WordViewModel
 import com.example.linguadailyapp.viewmodel.WordViewModelFactory
+import kotlinx.coroutines.delay
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,6 +89,14 @@ fun WordsScreen(
 
     val backgroundColor = Color(0xFFF7F7F7)
     val accentColor = Color(0xFF1F565E)
+    val primaryBackground = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFFF7F5F0),  // Light cream color
+            Color(0xFFF1E4D2),  // Slightly darker cream
+        ),
+        start = Offset(0f, 0f),
+        end = Offset(0f, Float.POSITIVE_INFINITY)
+    )
 
     Scaffold(
         containerColor = backgroundColor,
@@ -103,7 +128,17 @@ fun WordsScreen(
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = backgroundColor
-                )
+                ),
+                modifier = Modifier
+                    .drawBehind {
+                        // Draw a thin top border
+                        drawLine(
+                            color = Color(0xFFE0E0E0),
+                            start = Offset(0f, size.height),  // Start at bottom-left
+                            end = Offset(size.width, size.height),  // End at bottom-right
+                            strokeWidth = 2.dp.toPx()
+                        )
+                    }
             )
         },
         bottomBar = {
@@ -161,10 +196,29 @@ fun EmptyWordsView(modifier: Modifier = Modifier) {
 
 @Composable
 fun WordsList(modifier: Modifier, learnedWords: List<LearnedWord>, viewModel: WordViewModel, navController: NavController) {
+    val primaryBackground = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFFF7F5F0),  // Light cream color
+            Color(0xFFF1E4D2),  // Slightly darker cream
+        ),
+        start = Offset(0f, 0f),
+        end = Offset(0f, Float.POSITIVE_INFINITY)
+    )
+
+    // Remember if initial animation has played
+    val initialLoadAnimationPlayed = remember { mutableStateOf(false) }
+
+    // Run this effect only once when the composable is first displayed
+    LaunchedEffect(Unit) {
+        // Set to true after a short delay to ensure the animation runs
+        delay(100)
+        initialLoadAnimationPlayed.value = true
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFFF7F7F7))
+            .background(primaryBackground)
     ) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -172,7 +226,30 @@ fun WordsList(modifier: Modifier, learnedWords: List<LearnedWord>, viewModel: Wo
             modifier = Modifier.fillMaxSize()
         ) {
             items(learnedWords) { word ->
-                WordCard(word, navController) { viewModel.toggleBookmark(it) }
+                // Create a remembered AnimatedVisibility state for each item
+                val visible = remember { MutableTransitionState(false) }
+
+                // Only trigger animation once on initial load
+                LaunchedEffect(initialLoadAnimationPlayed.value) {
+                    if (initialLoadAnimationPlayed.value) {
+                        delay(learnedWords.indexOf(word) * 100L) // Staggered delay
+                        visible.targetState = true
+                    }
+                }
+
+                // Wrap the card in AnimatedVisibility
+                AnimatedVisibility(
+                    visibleState = visible,
+                    enter = slideInVertically(
+                        initialOffsetY = { 100 },
+                        animationSpec = tween(durationMillis = 300)
+                    ) + fadeIn(
+                        animationSpec = tween(durationMillis = 300)
+                    ),
+                    exit = fadeOut() + slideOutVertically()
+                ) {
+                    WordCard(word, navController) { viewModel.toggleBookmark(it) }
+                }
             }
         }
     }
@@ -213,23 +290,52 @@ fun WordCard(learnedWord: LearnedWord, navController: NavController, onBookmarkC
             )
             Spacer(modifier = Modifier.width(16.dp))
 
-            IconButton(
-                onClick = { onBookmarkClick(learnedWord) },
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(
-                        color = if (learnedWord.bookmarked) accentColor else Color.Transparent,
-                        shape = CircleShape
-                    )
-                    .padding(horizontal = 0.dp)
-            ) {
-                Icon(
-                    imageVector = if (learnedWord.bookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                    contentDescription = if (learnedWord.bookmarked) "Remove bookmark" else "Add bookmark",
-                    tint = if (learnedWord.bookmarked) Color.White else accentColor,
-                    modifier = Modifier.size(20.dp)
+            //Testing UI shit
+
+            Box(modifier = Modifier.padding(horizontal = 10.dp)) {
+                // Animate background color
+                val backgroundColor by animateColorAsState(
+                    targetValue = if (learnedWord.bookmarked) Color(0xFF1F565E) else Color(0xFF1F565E).copy(alpha = 0.1f),
+                    label = "BackgroundColorAnimation"
                 )
+
+                // Animate icon tint
+                val iconTint by animateColorAsState(
+                    targetValue = if (learnedWord.bookmarked) Color.White else Color(0xFF1F565E),
+                    label = "IconTintAnimation"
+                )
+
+                // Pop animation on toggle
+                val scale by animateFloatAsState(
+                    targetValue = if (learnedWord.bookmarked) 1.1f else 1f, // Scale up a bit when bookmarked
+                    animationSpec = tween(durationMillis = 150),
+                    label = "IconScaleAnimation"
+                )
+
+                IconButton(
+                    onClick = {
+                        onBookmarkClick(learnedWord)
+                    },
+                    modifier = Modifier
+                        .graphicsLayer(scaleX = scale, scaleY = scale) // Bouncy effect
+                        .background(
+                            color = backgroundColor,
+                            shape = CircleShape
+                        )
+                        .size(38.dp) // Slightly larger button for better touch
+                ) {
+                    Icon(
+                        imageVector = if (learnedWord.bookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                        contentDescription = if (learnedWord.bookmarked) "Remove from bookmarks" else "Add to bookmarks",
+                        tint = iconTint,
+                        modifier = Modifier.size(18.dp) // Larger, consistent icon
+                    )
+                }
             }
+
+
+
+
         }
     }
 }
@@ -259,13 +365,16 @@ fun WordInformation(word: String, definition: String, modifier: Modifier = Modif
     }
 }
 
+// IDK about word color
 @Composable
 fun DateCircle(date: LocalDate, modifier: Modifier = Modifier) {
     val accentColor = Color(0xFF1F565E) // Dark teal
     val lightBeige = Color(0xFFF7E5BE) // Light beige
+    val lightGreen = Color(0xFF1F565E).copy(alpha = 0.1f) // Light beige
+
 
     Surface(
-        color = lightBeige,
+        color = lightGreen,
         shape = CircleShape,
         border = BorderStroke(2.dp, accentColor),
         modifier = modifier.size(54.dp),
@@ -279,7 +388,7 @@ fun DateCircle(date: LocalDate, modifier: Modifier = Modifier) {
                 text = date.month.name.take(3),
                 color = accentColor,
                 fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
 

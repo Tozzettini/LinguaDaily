@@ -418,7 +418,7 @@ fun MainWordCard2(
     )
 
     Card(
-//        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
