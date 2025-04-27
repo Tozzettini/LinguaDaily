@@ -1,4 +1,4 @@
-package com.example.word_demo;
+package com.example.word_demo.word;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

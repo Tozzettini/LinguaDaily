@@ -1,4 +1,4 @@
-package com.example.word_demo;
+package com.example.word_demo.word;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
