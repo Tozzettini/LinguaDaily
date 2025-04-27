@@ -204,72 +204,6 @@ fun EmptyWordsView(modifier: Modifier = Modifier) {
 
 
 
-//@Composable
-//fun WordsList(
-//    modifier: Modifier,
-//    learnedWords: List<LearnedWord>,
-//    viewModel: WordViewModel,
-//    navController: NavController
-//) {
-//    val primaryBackground = Brush.linearGradient(
-//        colors = listOf(
-//            Color(0xFFF7F5F0),
-//            Color(0xFFF1E4D2),
-//        ),
-//        start = Offset(0f, 0f),
-//        end = Offset(0f, Float.POSITIVE_INFINITY)
-//    )
-//
-//    val animatedItems = remember { mutableStateListOf<Int>() }
-//    val animationPlayed = remember { mutableStateOf(false) }
-//
-//    Box(
-//        modifier = modifier
-//            .fillMaxSize()
-//            .background(primaryBackground)
-//    ) {
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .verticalScroll(rememberScrollState()) // <- make Column scrollable
-//                .padding(16.dp),
-//            verticalArrangement = Arrangement.spacedBy(12.dp)
-//        ) {
-//            learnedWords.forEachIndexed { index, word ->
-//
-//                val isVisible = remember { mutableStateOf(false) }
-//
-//                LaunchedEffect(Unit) {
-//                    if (!animationPlayed.value) {
-//                        delay(index * 70L)
-//                        isVisible.value = true
-//                        animatedItems.add(index)
-//
-//                        if (index == learnedWords.lastIndex) {
-//                            animationPlayed.value = true
-//                        }
-//                    } else {
-//                        isVisible.value = true
-//                    }
-//                }
-//
-//                AnimatedVisibility(
-//                    visible = isVisible.value,
-//                    enter = slideInVertically(
-//                        initialOffsetY = { it / 2 },
-//                        animationSpec = tween(durationMillis = 300)
-//                    ) + fadeIn(
-//                        animationSpec = tween(durationMillis = 300)
-//                    ),
-//                    exit = ExitTransition.None
-//                ) {
-//                    WordCard(word, navController) { viewModel.toggleBookmark(it) }
-//                }
-//            }
-//        }
-//    }
-//}
-
 @Composable
 fun WordsList(
     modifier: Modifier,
@@ -286,22 +220,56 @@ fun WordsList(
         end = Offset(0f, Float.POSITIVE_INFINITY)
     )
 
+    val animatedItems = remember { mutableStateListOf<Int>() }
+    val animationPlayed = remember { mutableStateOf(false) }
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(primaryBackground)
     ) {
-        LazyColumn(
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()) // <- make Column scrollable
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(learnedWords) { word ->
-                WordCard(word, navController) { viewModel.toggleBookmark(it) }
+            learnedWords.forEachIndexed { index, word ->
+
+                val isVisible = remember { mutableStateOf(false) }
+
+                LaunchedEffect(Unit) {
+                    if (!animationPlayed.value) {
+                        delay(index * 70L)
+                        isVisible.value = true
+                        animatedItems.add(index)
+
+                        if (index == learnedWords.lastIndex) {
+                            animationPlayed.value = true
+                        }
+                    } else {
+                        isVisible.value = true
+                    }
+                }
+
+                AnimatedVisibility(
+                    visible = isVisible.value,
+                    enter = slideInVertically(
+                        initialOffsetY = { it / 2 },
+                        animationSpec = tween(durationMillis = 300)
+                    ) + fadeIn(
+                        animationSpec = tween(durationMillis = 300)
+                    ),
+                    exit = ExitTransition.None
+                ) {
+                    WordCard(word, navController) { viewModel.toggleBookmark(it) }
+                }
             }
         }
     }
 }
+
 
 
 

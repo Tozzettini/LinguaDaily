@@ -1,5 +1,6 @@
 package com.example.linguadailyapp.ui.screens
 
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -57,7 +58,7 @@ fun WordDetailScreen(
 ) {
     val scrollState = rememberScrollState()
     var contentVisible by remember { mutableStateOf(false) }
-
+    val context = LocalContext.current
     var learnedWord : LearnedWord
     runBlocking {
         learnedWord = wordViewModel.getLearnedWordById(wordId!!)!!
@@ -92,9 +93,21 @@ fun WordDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* share logic */ }) {
+                    IconButton(
+                        onClick = {
+
+                            val sendIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, "Bomboclaat I can share words!? here's the word I learned: ${learnedWord.word}")
+                                type = "text/plain"
+                            }
+                            val shareIntent = Intent.createChooser(sendIntent, null)
+                            context.startActivity(shareIntent)
+                        }
+                    ) {
                         Icon(Icons.Default.Share, contentDescription = "Share")
                     }
+
                     IconButton(onClick = {
                         wordViewModel.toggleBookmark(learnedWord)
                         isBookmarked = !isBookmarked
