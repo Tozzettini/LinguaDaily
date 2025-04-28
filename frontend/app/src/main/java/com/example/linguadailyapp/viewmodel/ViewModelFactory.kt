@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.linguadailyapp.database.availableword.AvailableWordRepository
 import com.example.linguadailyapp.database.learnedWord.LearnedWordRepository
+import com.example.linguadailyapp.utils.WordSyncLogic
 import com.example.linguadailyapp.utils.preferences.LanguagePreferencesManager
+import com.example.linguadailyapp.utils.preferences.RandomWordCooldownManager
 
 class WordViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -13,7 +15,9 @@ class WordViewModelFactory(private val context: Context) : ViewModelProvider.Fac
             val learnedWordRepository = LearnedWordRepository(context)
             val availableWordRepository = AvailableWordRepository(context)
             val languageViewModel = LanguageViewModel(LanguagePreferencesManager(context))
-            return WordViewModel(learnedWordRepository, availableWordRepository, languageViewModel) as T
+            val wordSyncLogic = WordSyncLogic(availableWordRepository)
+            val cooldownManager = RandomWordCooldownManager(context)
+            return WordViewModel(learnedWordRepository, availableWordRepository, languageViewModel, wordSyncLogic, cooldownManager) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
@@ -23,7 +27,8 @@ class SyncViewModelFactory(private val context: Context) : ViewModelProvider.Fac
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SyncViewModel::class.java)) {
             val availableWordRepository = AvailableWordRepository(context)
-            return SyncViewModel(availableWordRepository) as T
+            val wordSyncLogic = WordSyncLogic(availableWordRepository)
+            return SyncViewModel(wordSyncLogic) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

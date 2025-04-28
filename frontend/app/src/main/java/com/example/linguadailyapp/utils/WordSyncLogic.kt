@@ -1,0 +1,67 @@
+package com.example.linguadailyapp.utils
+
+import com.example.linguadailyapp.database.availableword.AvailableWordRepository
+import com.example.linguadailyapp.datamodels.AvailableWord
+import com.example.linguadailyapp.datamodels.Language
+import com.example.linguadailyapp.retrofit.RetrofitClient
+import com.example.linguadailyapp.utils.preferences.PreferencesManager
+
+class WordSyncLogic(private val availableWordRepository: AvailableWordRepository) {
+
+    private val DATABASE_SIZE_LIMIT = 5
+    private val SYNC_THRESHOLD = 0.5
+
+    suspend fun canSyncInBackground() : Boolean {
+        for(language in Language.entries) {
+            if(availableWordRepository.getWordCountForLanguage(language) == 0) return false
+        }
+
+        return true
+    }
+
+    suspend fun shouldSync() : Boolean {
+        for(language in Language.entries) {
+            if(availableWordRepository.getWordCountForLanguage(language) < (DATABASE_SIZE_LIMIT * SYNC_THRESHOLD)) return true
+        }
+
+        return false
+    }
+
+    suspend fun shouldSyncForLanguages() : Set<Language> =
+        Language.entries.filterTo(mutableSetOf<Language>()) {
+            availableWordRepository.getWordCountForLanguage(it) < (DATABASE_SIZE_LIMIT * SYNC_THRESHOLD)
+        }
+
+    suspend fun syncBlockingForLanguages(preferencesManager: PreferencesManager, languages: Set<Language> = Language.entries.toSet()) {
+        for(language in languages) {
+            syncBlockingForLanguage(preferencesManager, language)
+        }
+    }
+
+    suspend fun syncBlockingForLanguage(preferencesManager: PreferencesManager, language: Language) {
+        var successfullyAdded = mutableListOf<AvailableWord>()
+
+        var countWords = availableWordRepository.getWordCountForLanguage(language = language)
+
+        if(countWords == DATABASE_SIZE_LIMIT) return
+
+        var skip = preferencesManager.getSkipForLanguage(language)
+        var limit = DATABASE_SIZE_LIMIT - countWords
+
+
+        try {
+            var words = RetrofitClient.apiService.getWordsWithSkipAndLimit(skip, limit, language.name)
+
+            for(word in words) {
+                availableWordRepository.insert(word)
+                successfullyAdded.add(word)
+            }
+
+            preferencesManager.setSkipForLanguage(skip + limit, language)
+        } catch (e: Exception) {
+            for(word in successfullyAdded) {
+                availableWordRepository.removeWord(word)
+            }
+        }
+    }
+}

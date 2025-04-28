@@ -7,12 +7,21 @@ import com.example.linguadailyapp.database.availableword.AvailableWordRepository
 import com.example.linguadailyapp.datamodels.LearnedWord
 import com.example.linguadailyapp.database.learnedWord.LearnedWordRepository
 import com.example.linguadailyapp.datamodels.Language
+import com.example.linguadailyapp.utils.WordSyncLogic
+import com.example.linguadailyapp.utils.preferences.RandomWordCooldownManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
-class WordViewModel(private val learnedWordRepository: LearnedWordRepository, private val availableWordRepository: AvailableWordRepository, private val languageViewModel: LanguageViewModel) : ViewModel() {
+enum class RandomWordState {
+    IDLE,
+    COOLDOWN,
+    SYNC_NEEDED
+}
+
+class WordViewModel(private val learnedWordRepository: LearnedWordRepository, private val availableWordRepository: AvailableWordRepository, private val languageViewModel: LanguageViewModel, private val wordSyncLogic: WordSyncLogic, private val cooldownManager: RandomWordCooldownManager) : ViewModel() {
 
     private val _words = MutableStateFlow<List<LearnedWord>>(emptyList())
     val words: StateFlow<List<LearnedWord>> = _words
@@ -23,11 +32,15 @@ class WordViewModel(private val learnedWordRepository: LearnedWordRepository, pr
     private val _bookmarkedWords = MutableStateFlow<List<LearnedWord>>(emptyList())
     val bookmarkedWords: StateFlow<List<LearnedWord>> = _bookmarkedWords
 
+    private val _randomWordState = MutableStateFlow<RandomWordState>(RandomWordState.IDLE)
+    val randomWordState = _randomWordState.asStateFlow()
+
     init {
         viewModelScope.launch {
             languageViewModel.selectedLanguages.collect { selectedLanguages ->
                 // When selectedLanguages changes, reload the today's learned words
                 _todaysLearnedWords.value = getTodaysLearnedWords(selectedLanguages)
+                _randomWordState.value = getRandomWordState()
 
                 // You might want to fetch or filter the words based on the new selected languages
                 learnedWordRepository.getAllWordsFlow().collect { allWords ->
@@ -36,6 +49,21 @@ class WordViewModel(private val learnedWordRepository: LearnedWordRepository, pr
                 }
             }
         }
+    }
+
+    fun updateState() {
+        viewModelScope.launch {
+            _randomWordState.value = getRandomWordState()
+        }
+    }
+
+    suspend fun getRandomWordState() : RandomWordState {
+        if(cooldownManager.isInCooldown.value) return RandomWordState.COOLDOWN
+
+        if(!wordSyncLogic.canSyncInBackground()) return RandomWordState.SYNC_NEEDED
+
+        return RandomWordState.IDLE
+
     }
 
     suspend fun getLearnedWordById(id : Int): LearnedWord? {
@@ -90,4 +118,6 @@ class WordViewModel(private val learnedWordRepository: LearnedWordRepository, pr
 
         return list
     }
+
+
 }

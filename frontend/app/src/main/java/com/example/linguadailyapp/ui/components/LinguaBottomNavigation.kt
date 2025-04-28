@@ -1,5 +1,8 @@
 package com.example.linguadailyapp.ui.components
 
+import android.app.AlertDialog
+import android.content.Context
+import android.content.Intent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
@@ -35,10 +38,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.linguadailyapp.datamodels.LearnedWord
 import com.example.linguadailyapp.navigation.NavigationDestinations
-import com.example.linguadailyapp.utils.preferences.LanguagePreferencesManager
+import com.example.linguadailyapp.utils.ConnectionManager
+import com.example.linguadailyapp.utils.NetworkType
+import com.example.linguadailyapp.utils.preferences.PreferencesManager
 import com.example.linguadailyapp.utils.preferences.RandomWordCooldownManager
 import com.example.linguadailyapp.viewmodel.LanguageViewModel
 import com.example.linguadailyapp.viewmodel.LanguageViewModelFactory
+import com.example.linguadailyapp.viewmodel.RandomWordState
+import com.example.linguadailyapp.viewmodel.SyncViewModel
+import com.example.linguadailyapp.viewmodel.SyncViewModelFactory
 import com.example.linguadailyapp.viewmodel.WordViewModel
 import com.example.linguadailyapp.viewmodel.WordViewModelFactory
 import kotlinx.coroutines.delay
@@ -54,15 +62,19 @@ fun LinguaBottomNavigationPreview() {
 fun LinguaBottomNavigation(
     navController: NavController,
     wordViewModel: WordViewModel = viewModel(factory = WordViewModelFactory(LocalContext.current)),
-    languageViewModel: LanguageViewModel = viewModel(factory = LanguageViewModelFactory(LocalContext.current))
+    languageViewModel: LanguageViewModel = viewModel(factory = LanguageViewModelFactory(LocalContext.current)),
+    syncViewModel: SyncViewModel = viewModel(factory = SyncViewModelFactory(LocalContext.current))
 ) {
     val context = LocalContext.current
     val cooldownManager = remember { RandomWordCooldownManager(context) }
 
     var showCooldownModal by remember { mutableStateOf(false) }
+    var showSyncDialog by remember { mutableStateOf(false) }
 
+    val randomWordState by wordViewModel.randomWordState.collectAsState()
     val languagesSelected by languageViewModel.selectedLanguages.collectAsState()
 
+    val preferencesManager = PreferencesManager(context)
 
     // Update cooldown status every second if modal is showing
     LaunchedEffect(showCooldownModal) {
@@ -73,6 +85,7 @@ fun LinguaBottomNavigation(
 
                 // If cooldown is over, hide the modal
                 if (!cooldownManager.isInCooldown.value) {
+                    wordViewModel.updateState()
                     showCooldownModal = false
                     break
                 }
@@ -122,11 +135,33 @@ fun LinguaBottomNavigation(
             onWatchAdClick = {
                 // Reset cooldown after ad is watched
                 cooldownManager.resetCooldown()
+                wordViewModel.updateState()
                 showCooldownModal = false
             },
             onDismiss = {
                 showCooldownModal = false
             }
+        )
+    }
+
+    if(showSyncDialog) {
+        outOfRandomWordsDialog(
+            context = context,
+            allowSyncOnData = preferencesManager.getSyncAllowedOnData(),
+            onCancelled = {
+                wordViewModel.updateState()
+                showSyncDialog = false
+            },
+            onSyncTriggered = {
+                runBlocking {
+                    syncViewModel.syncBlocking(preferencesManager)
+                }
+
+                wordViewModel.updateState()
+
+                showSyncDialog = false
+            },
+            preferencesManager = preferencesManager
         )
     }
 
@@ -181,27 +216,38 @@ fun LinguaBottomNavigation(
                 onClick = {
                     if (item.route == "random_word") {
                         // Check if random word button is in cooldown
-                        if (!cooldownManager.isInCooldown.value) {
-                            val canClick = cooldownManager.incrementClickCount()
-
-                            if (canClick) {
-                                // Handle first click - get random word
-                                var randomWord: LearnedWord? = null
-                                runBlocking {
-                                    randomWord = wordViewModel.getRandomWordBlocking(languages = languagesSelected)
-                                }
-
-                                if (randomWord != null) {
-                                    navController.navigate(NavigationDestinations.Word.createRoute(randomWord!!.id))
-                                }
-                            } else {
-                                // Handle second click - show cooldown modal
-                                showCooldownModal = true
-                            }
-                        } else {
-                            // Already in cooldown, show modal
-                            showCooldownModal = true
+                        if(randomWordState == RandomWordState.SYNC_NEEDED) {
+                            showSyncDialog = true
+                            return@NavigationBarItem
                         }
+
+                        if (randomWordState == RandomWordState.COOLDOWN) {
+                            showCooldownModal = true
+                            return@NavigationBarItem
+                        }
+
+//                        val canClick = cooldownManager.incrementClickCount()
+//
+//                        if (canClick) {
+                            // Handle first click - get random word
+                            var randomWord: LearnedWord? = null
+
+                            runBlocking {
+                                randomWord = wordViewModel.getRandomWordBlocking(languages = languagesSelected)
+
+                                if(syncViewModel.shouldSync()) syncViewModel.syncInBackground(PreferencesManager(context))
+                            }
+
+                            if (randomWord != null) {
+                                wordViewModel.updateState()
+                                navController.navigate(NavigationDestinations.Word.createRoute(randomWord.id))
+                            }
+
+//
+//                        } else {
+//                            // Handle second click - show cooldown modal
+//                            showCooldownModal = true
+//                        }
                     } else {
                         navController.navigate(item.route) {
                             // Pop up to the start destination of the graph to avoid
@@ -227,6 +273,55 @@ fun LinguaBottomNavigation(
             )
         }
     }
+}
+
+private fun outOfRandomWordsDialog(
+    context: Context,
+    allowSyncOnData: Boolean,
+    preferencesManager: PreferencesManager,
+    onCancelled: () -> Unit,
+    onSyncTriggered: () -> Unit
+) {
+    val message =
+        if(allowSyncOnData) "To get new words, please connect to either Wi-Fi or mobile data."
+        else "To get new words, please connect to Wi-Fi or allow syncing over mobile data."
+
+    val builder = AlertDialog.Builder(context)
+        .setTitle("We have run out of words")
+        .setMessage(message)
+        .setCancelable(false)
+
+        .setNegativeButton("Cancel") { _, _ ->
+            preferencesManager.setOutOfWordsMode(true)
+            onCancelled()
+        }
+
+        .setPositiveButton("Retry") { _, _ ->
+            onSyncTriggered()
+        }
+
+    if (!allowSyncOnData) {
+        builder.setNeutralButton("Allow Mobile Data") { _, _ ->
+            preferencesManager.setAllowSyncOnData(true)
+
+            val networkType = ConnectionManager.getNetworkType(context)
+            if (networkType == NetworkType.MOBILE_DATA || networkType == NetworkType.WIFI) {
+                onSyncTriggered()
+            } else {
+                android.os.Handler(context.mainLooper).postDelayed({
+                    outOfRandomWordsDialog(
+                        context,
+                        allowSyncOnData = true,
+                        preferencesManager,
+                        onCancelled,
+                        onSyncTriggered
+                    )
+                }, 300)
+            }
+        }
+    }
+
+    builder.show()
 }
 
 // Data class for navigation items

@@ -12,24 +12,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import com.example.linguadailyapp.database.availableword.AvailableWordRepository
 import com.example.linguadailyapp.navigation.AppNavigation
 import com.example.linguadailyapp.ui.screens.LoadingScreen
 import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 import com.example.linguadailyapp.utils.ConnectionManager
-import com.example.linguadailyapp.utils.notification.DailyNotificationWorker
 import com.example.linguadailyapp.utils.NetworkType
+import com.example.linguadailyapp.utils.WordSyncLogic
 import com.example.linguadailyapp.utils.notification.NotificationPermission
 import com.example.linguadailyapp.utils.notification.queueNotification
 import com.example.linguadailyapp.utils.preferences.PreferencesManager
 import com.example.linguadailyapp.viewmodel.SyncViewModel
 import kotlinx.coroutines.runBlocking
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
 
@@ -52,16 +46,16 @@ class MainActivity : ComponentActivity() {
 
         queueNotification(this)
 
-
-        val syncViewModel = SyncViewModel(AvailableWordRepository(this))
+        val syncViewModel = SyncViewModel(WordSyncLogic(AvailableWordRepository(this)))
         val context = this
+        val wordSyncLogic = WordSyncLogic(AvailableWordRepository(this))
 
         setContent {
             LinguaDailyAppTheme {
                 var appReady by remember { mutableStateOf(false) }
 
                 LaunchedEffect(Unit) {
-                    if(syncViewModel.canSyncInBackground()) {
+                    if(wordSyncLogic.canSyncInBackground()) {
                         syncViewModel.syncInBackground(preferencesManager)
                         appReady = true
                         return@LaunchedEffect
@@ -71,7 +65,7 @@ class MainActivity : ComponentActivity() {
 
                     if ( networkType == NetworkType.WIFI || (networkType == NetworkType.MOBILE_DATA && preferencesManager.getSyncAllowedOnData()) )  {
                         runBlocking {
-                            syncViewModel.syncBlocking(preferencesManager)
+                            wordSyncLogic.syncBlockingForLanguages(preferencesManager)
                         }
                         preferencesManager.setOutOfWordsMode(false)
                         appReady = true
@@ -91,7 +85,7 @@ class MainActivity : ComponentActivity() {
 
                             if (preferencesManager.getSyncAllowedOnData() || updatedNetworkType == NetworkType.WIFI) {
                                 runBlocking {
-                                    syncViewModel.syncBlocking(preferencesManager)
+                                    wordSyncLogic.syncBlockingForLanguages(preferencesManager)
                                 }
                                 preferencesManager.setOutOfWordsMode(false)
 
@@ -107,7 +101,7 @@ class MainActivity : ComponentActivity() {
                                     },
                                     onSyncTriggered = {
                                         runBlocking {
-                                            syncViewModel.syncBlocking(preferencesManager)
+                                            wordSyncLogic.syncBlockingForLanguages(preferencesManager)
                                         }
                                     }
                                 )
@@ -180,16 +174,5 @@ private fun handlePermissionResult(context: Context, isGranted: Boolean) {
         // Do nothing
     } else {
         PreferencesManager(context).setNotificationsEnabled(true)
-    }
-}
-
-private fun getInitialDelay(): Long {
-    val now = LocalDateTime.now()
-    val targetTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(12, 0))
-    val delay = Duration.between(now, targetTime)
-    return if (delay.isNegative) {
-        Duration.between(now, targetTime.plusDays(1)).toMillis()
-    } else {
-        delay.toMillis()
     }
 }
