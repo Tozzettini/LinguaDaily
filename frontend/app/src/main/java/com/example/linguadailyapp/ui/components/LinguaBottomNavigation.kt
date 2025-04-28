@@ -226,9 +226,9 @@ fun LinguaBottomNavigation(
                             return@NavigationBarItem
                         }
 
-//                        val canClick = cooldownManager.incrementClickCount()
-//
-//                        if (canClick) {
+                        val canClick = cooldownManager.incrementClickCount()
+
+                        if (canClick) {
                             // Handle first click - get random word
                             var randomWord: LearnedWord? = null
 
@@ -243,11 +243,11 @@ fun LinguaBottomNavigation(
                                 navController.navigate(NavigationDestinations.Word.createRoute(randomWord.id))
                             }
 
-//
-//                        } else {
-//                            // Handle second click - show cooldown modal
-//                            showCooldownModal = true
-//                        }
+
+                        } else {
+                            // Handle second click - show cooldown modal
+                            showCooldownModal = true
+                        }
                     } else {
                         navController.navigate(item.route) {
                             // Pop up to the start destination of the graph to avoid
