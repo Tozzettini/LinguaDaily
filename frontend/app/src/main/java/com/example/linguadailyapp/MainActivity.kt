@@ -22,6 +22,7 @@ import com.example.linguadailyapp.utils.ConnectionManager
 import com.example.linguadailyapp.utils.notification.DailyNotificationWorker
 import com.example.linguadailyapp.utils.NetworkType
 import com.example.linguadailyapp.utils.notification.NotificationPermission
+import com.example.linguadailyapp.utils.notification.queueNotification
 import com.example.linguadailyapp.utils.preferences.PreferencesManager
 import com.example.linguadailyapp.viewmodel.SyncViewModel
 import kotlinx.coroutines.runBlocking
@@ -47,13 +48,9 @@ class MainActivity : ComponentActivity() {
                 }
             ).init()
 
-            val workRequest = PeriodicWorkRequestBuilder<DailyNotificationWorker>(1, TimeUnit.DAYS)
-                .setInitialDelay(getInitialDelay(), TimeUnit.MILLISECONDS)
-                .build()
-
-            WorkManager.getInstance(applicationContext).enqueue(workRequest)
         }
 
+        queueNotification(this)
 
 
         val syncViewModel = SyncViewModel(AvailableWordRepository(this))

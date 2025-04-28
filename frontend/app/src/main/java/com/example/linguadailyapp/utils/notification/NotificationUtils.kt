@@ -6,9 +6,15 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.linguadailyapp.R
 import com.example.linguadailyapp.datamodels.LearnedWord
 import com.example.linguadailyapp.utils.preferences.PreferencesManager
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.util.concurrent.TimeUnit
 
 fun sendNotification(title: String, message: String, context: Context) {
     if(!PreferencesManager(context).isNotificationsEnabled()) return
@@ -64,4 +70,32 @@ fun sendDailyNotification(learnedWord: LearnedWord, context: Context) {
         return
     }
     notificationManager.notify(2, notificationBuilder.build()) // 1 is the notification ID
+}
+
+fun queueNotification(context: Context) {
+    val workRequest = PeriodicWorkRequestBuilder<DailyNotificationWorker>(1, TimeUnit.DAYS)
+        .setInitialDelay(getInitialDelay(), TimeUnit.MILLISECONDS)
+        .addTag("daily_notification")
+        .build()
+
+    val workManager = WorkManager.getInstance(context)
+
+    val workInfos = workManager.getWorkInfosByTag("daily_notification").get()
+
+    if (workInfos.isNullOrEmpty()) {
+        workManager.enqueue(workRequest)
+    }
+}
+
+
+
+private fun getInitialDelay(): Long {
+    val now = LocalDateTime.now()
+    val targetTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(12, 0))
+    val delay = Duration.between(now, targetTime)
+    return if (delay.isNegative) {
+        Duration.between(now, targetTime.plusDays(1)).toMillis()
+    } else {
+        delay.toMillis()
+    }
 }
