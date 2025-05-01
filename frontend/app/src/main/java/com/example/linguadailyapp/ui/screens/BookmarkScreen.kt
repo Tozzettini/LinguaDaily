@@ -1,5 +1,8 @@
 package com.example.linguadailyapp.ui.screens
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,9 +16,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -28,7 +33,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -38,8 +42,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -50,16 +57,17 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.linguadailyapp.datamodels.Language
 import com.example.linguadailyapp.datamodels.LearnedWord
 import com.example.linguadailyapp.navigation.NavigationDestinations
 import com.example.linguadailyapp.ui.components.LinguaBottomNavigation
+import com.example.linguadailyapp.ui.theme.LinguaDailyAppTheme
 import com.example.linguadailyapp.ui.theme.Playfair
-import com.example.linguadailyapp.datamodels.Language
 import com.example.linguadailyapp.viewmodel.WordViewModel
 import com.example.linguadailyapp.viewmodel.WordViewModelFactory
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+
 
 
 
@@ -73,6 +81,14 @@ fun BookmarkScreen(
 
     val backgroundColor = Color(0xFFF7F7F7)
     val accentColor = Color(0xFF1F565E)
+    val primaryBackground = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFFF7F5F0),  // Light cream color
+            Color(0xFFF1E4D2),  // Slightly darker cream
+        ),
+        start = Offset(0f, 0f),
+        end = Offset(0f, Float.POSITIVE_INFINITY)
+    )
 
     Scaffold(
         containerColor = backgroundColor,
@@ -87,7 +103,6 @@ fun BookmarkScreen(
                         color = Color.Black
                     )
                 },
-
                 navigationIcon = {
                     IconButton(onClick = {
                         if (navController.previousBackStackEntry != null) {
@@ -113,7 +128,7 @@ fun BookmarkScreen(
                             color = Color(0xFFE0E0E0),
                             start = Offset(0f, size.height),  // Start at bottom-left
                             end = Offset(size.width, size.height),  // End at bottom-right
-                            strokeWidth = 5.dp.toPx()
+                            strokeWidth = 2.dp.toPx()
                         )
                     }
             )
@@ -125,12 +140,18 @@ fun BookmarkScreen(
             if (bookmarkedWords.isEmpty()) {
                 EmptyBookmarksView(Modifier.padding(paddingValues))
             } else {
-                BookmarkGrid(
-                    modifier = Modifier.padding(paddingValues),
-                    learnedWords = bookmarkedWords,
-                    navController = navController,
-                    onTrashClicked = { word -> viewModel.toggleBookmark(word) }
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(primaryBackground)
+                        .padding(paddingValues)
+                ) {
+                    BookmarkGrid(
+                        learnedWords = bookmarkedWords,
+                        navController = navController,
+                        onTrashClicked = { word -> viewModel.toggleBookmark(word) }
+                    )
+                }
             }
         }
     )
@@ -173,18 +194,18 @@ fun EmptyBookmarksView(modifier: Modifier = Modifier) {
 
 @Composable
 fun BookmarkGrid(
-    modifier: Modifier = Modifier,
-    navController: NavController,
     learnedWords: List<LearnedWord>,
+    navController: NavController,
     onTrashClicked: (LearnedWord) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(horizontal = 10.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         items(learnedWords) { word ->
             BookmarkCard(word, navController, onTrashClicked)
@@ -194,25 +215,27 @@ fun BookmarkGrid(
 
 @Composable
 fun BookmarkCard(learnedWord: LearnedWord, navController: NavController, onTrashClicked: (LearnedWord) -> Unit) {
-    val primaryColor = Color(0xFFF7E5BE) // Light beige like in MainWordCard
-    val accentColor = Color(0xFF1F565E) // Dark teal like in MainWordCard
-    val accentColor2 = Color(0xFF1F565E).copy(alpha = 0.1f) // Dark teal like in MainWordCard
+    val accentColor = Color(0xFF1F565E) // Dark teal
 
     Card(
-        border = BorderStroke(1.dp, Color.Black.copy(alpha = 0.1f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = primaryColor
-        ),
         modifier = Modifier
             .fillMaxWidth()
+            .padding(2.dp)
+            .shadow(
+                elevation = 2.dp,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .clickable { navController.navigate(NavigationDestinations.Word.createRoute(learnedWord.id)) },
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        border = BorderStroke(1.dp, Color.Black.copy(alpha = 0.05f))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .clickable {navController.navigate(NavigationDestinations.Word.createRoute(learnedWord.id))}
         ) {
             // Header with date and delete icon
             Row(
@@ -230,42 +253,49 @@ fun BookmarkCard(learnedWord: LearnedWord, navController: NavController, onTrash
                     fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                 )
 
-                IconButton(
-                    onClick = { onTrashClicked(learnedWord) },
-                    modifier = Modifier
-                        .size(28.dp)
-                        .background(
-                            color = accentColor,
-                            shape = CircleShape
-                        )
-                        .padding(horizontal = 0.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Delete,
-                        contentDescription = "Remove bookmark",
-                        tint = Color.White,
-                        modifier = Modifier.size(16.dp)
+                // Delete/Unbookmark button with animation similar to WordCard bookmark button
+                Box {
+                    // Animate background color
+                    val backgroundColor by animateColorAsState(
+                        targetValue = Color(0xFF1F565E),
+                        label = "BackgroundColorAnimation"
                     )
+
+                    // Animate icon tint
+                    val iconTint by animateColorAsState(
+                        targetValue = Color.White,
+                        label = "IconTintAnimation"
+                    )
+
+                    // Pop animation on toggle
+                    val scale by animateFloatAsState(
+                        targetValue = 1f,
+                        animationSpec = tween(durationMillis = 150),
+                        label = "IconScaleAnimation"
+                    )
+
+                    IconButton(
+                        onClick = { onTrashClicked(learnedWord) },
+                        modifier = Modifier
+                            .graphicsLayer(scaleX = scale, scaleY = scale)
+                            .size(32.dp)
+                            .background(
+                                color = backgroundColor,
+                                shape = CircleShape
+                            )
+                            .padding(horizontal = 0.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = "Remove bookmark",
+                            tint = iconTint,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
                 }
             }
 
-            // Divider with the same style as in MainWordCard
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .height(1.dp)
-                    .drawBehind {
-                        val strokeWidth = 1.dp.toPx()
-                        drawLine(
-                            color = Color(0xFFF7E5BE).copy(alpha = 0.5f),
-                            start = Offset(0f, 0f),
-                            end = Offset(size.width, 0f),
-                            strokeWidth = strokeWidth
-                        )
-                    }
-                    .background(Color.Black.copy(alpha = 0.1f))
-            )
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Word
             Text(
@@ -294,7 +324,7 @@ fun BookmarkCard(learnedWord: LearnedWord, navController: NavController, onTrash
 @Composable
 fun PreviewBookmarkScreen() {
     val navController = rememberNavController()
-    MaterialTheme {
+    LinguaDailyAppTheme {
         BookmarkScreen(navController = navController)
     }
 }
@@ -304,7 +334,7 @@ fun PreviewBookmarkScreen() {
 fun PreviewBookmarkCard() {
     val navController = rememberNavController()
 
-    MaterialTheme {
+    LinguaDailyAppTheme {
         BookmarkCard(
             LearnedWord(
                 word = "Serendipity",
@@ -325,7 +355,7 @@ fun PreviewBookmarkCard() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewEmptyBookmarksView() {
-    MaterialTheme {
+    LinguaDailyAppTheme {
         EmptyBookmarksView()
     }
 }

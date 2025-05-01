@@ -170,13 +170,15 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    todaysWords.forEach {
-                        word ->
+                    //TODO: Make it animate progressively
+                    val i = 3
+
+                    todaysWords.forEachIndexed { index, word ->
                         AnimatedVisibility(
                             visible = isWordCardVisible,
                             enter = fadeIn(animationSpec = tween(700)) +
                                     slideInVertically(
-                                        initialOffsetY = { it / 3 },
+                                        initialOffsetY = { it / (i + index) },
                                         animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing)
                                     )
                         ) {
@@ -184,8 +186,8 @@ fun HomeScreen(
                         }
 
                         Spacer(modifier = Modifier.height(24.dp))
-
                     }
+
                 }
             }
         }

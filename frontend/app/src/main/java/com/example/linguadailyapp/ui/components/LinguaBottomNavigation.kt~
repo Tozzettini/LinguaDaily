@@ -240,8 +240,7 @@ fun LinguaBottomNavigation(
 
                             if (randomWord != null) {
                                 wordViewModel.updateState()
-                                navController.navigate(NavigationDestinations.Word.createRoute(
-                                    randomWord!!.id))
+                                navController.navigate(NavigationDestinations.Word.createRoute(randomWord.id))
                             }
 
 
