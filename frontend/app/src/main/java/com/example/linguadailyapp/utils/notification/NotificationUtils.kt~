@@ -84,11 +84,11 @@ fun queueNotification(context: Context) {
 
 ////    commented this out
 //
-//    val workInfos = workManager.getWorkInfosByTag("daily_notification").get()
-////
-//  if (workInfos.isNullOrEmpty()) {
-//        workManager.enqueue(workRequest)
-//    }
+    val workInfos = workManager.getWorkInfosByTag("daily_notification").get()
+//
+  if (workInfos.isNullOrEmpty()) {
+        workManager.enqueue(workRequest)
+    }
 }
 
 

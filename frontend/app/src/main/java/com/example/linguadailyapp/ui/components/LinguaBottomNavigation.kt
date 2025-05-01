@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -125,6 +127,7 @@ fun LinguaBottomNavigation(
 
     // Primary brand color for active items
     val brandColor = Color(0xFF1F565E)
+    val hasConnection = ConnectionManager.getNetworkType(context) != NetworkType.NONE
 
     // Current route state
     val currentRoute = navController.currentBackStackEntry?.destination?.route
@@ -135,6 +138,15 @@ fun LinguaBottomNavigation(
     LaunchedEffect(true) {
         RewardedAdManager.loadAd(context)
     }
+    val showNoWifiPopup = remember { mutableStateOf(false) }
+
+    // Your existing UI
+
+    // Add this to your Composable
+    NoWifiPopupForAds(
+        showDialog = showNoWifiPopup,
+        context = LocalContext.current
+    )
 
     // Show cooldown modal if needed and display ad
     if (showCooldownModal) {
@@ -142,25 +154,50 @@ fun LinguaBottomNavigation(
             isVisible = true,
             remainingTime = cooldownManager.remainingTime.value,
             onWatchAdClick = {
-//                if(hasConnectiontoWifi){}
-                activity?.let {
-                    RewardedAdManager.showAd(it){
-//              Reset cooldown after ad is watched
-                cooldownManager.resetCooldown()
-                wordViewModel.updateState()
-                showCooldownModal = false
+
+                if(hasConnection) {
+                    activity?.let {
+                        RewardedAdManager.showAd(it) {
+                            // Reset cooldown after ad is watched
+//                            cooldownManager.resetCooldown()
+                            wordViewModel.updateState()
+                            showCooldownModal = false
+                            //---F
+
+                            if (randomWordState == RandomWordState.COOLDOWN) {
+                                showCooldownModal = true
+                            }
+
+                            var randomWord: LearnedWord? = null
+
+                            runBlocking {
+                                randomWord = wordViewModel.getRandomWordBlocking(languages = languagesSelected)
+
+                                if(syncViewModel.shouldSync()) syncViewModel.syncInBackground(PreferencesManager(context))
+                            }
+
+                            if (randomWord != null) {
+                                wordViewModel.updateState()
+                                navController.navigate(NavigationDestinations.Word.createRoute(
+                                    randomWord!!.id))
+                            }
+                        }
                     }
+                } else {
+                    showNoWifiPopup.value = true
                 }
-//                // Reset cooldown after ad is watched
-//                cooldownManager.resetCooldown()
-//                wordViewModel.updateState()
-//                showCooldownModal = false
             },
             onDismiss = {
                 showCooldownModal = false
             }
         )
     }
+
+    //                // Reset cooldown after ad is watched
+//                cooldownManager.resetCooldown()
+//                wordViewModel.updateState()
+//                showCooldownModal = false
+
 
     if(showSyncDialog) {
         outOfRandomWordsDialog(
@@ -232,6 +269,7 @@ fun LinguaBottomNavigation(
                 },
                 selected = selected,
                 onClick = {
+
                     if (item.route == "random_word") {
                         // Check if random word button is in cooldown
                         if(randomWordState == RandomWordState.SYNC_NEEDED) {
@@ -327,7 +365,7 @@ private fun outOfRandomWordsDialog(
             if (networkType == NetworkType.MOBILE_DATA || networkType == NetworkType.WIFI) {
                 onSyncTriggered()
             } else {
-                android.os.Handler(context.mainLooper).postDelayed({
+                Handler(context.mainLooper).postDelayed({
                     outOfRandomWordsDialog(
                         context,
                         allowSyncOnData = true,
@@ -347,6 +385,6 @@ private fun outOfRandomWordsDialog(
 data class NavigationItem(
     val name: String,
     val route: String,
-    val icon: androidx.compose.ui.graphics.vector.ImageVector,
+    val icon: ImageVector,
     val contentDescription: String
 )
