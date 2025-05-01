@@ -71,15 +71,13 @@ class LanguageViewModel(private val languagePreferencesManager: LanguagePreferen
 
     init {
         // Load saved languages on initialization
-        loadSelectedLanguages()
+        _selectedLanguages.value = getSelectedLanguages()
     }
 
-    private fun loadSelectedLanguages() {
+    fun getSelectedLanguages() : Set<Language> {
         var languages = languagePreferencesManager.getLanguages()
 
-        if(languages.isEmpty()) languages = setOf(Language.ENGLISH)
-
-        _selectedLanguages.value = languages
+        return if(languages.isNotEmpty()) languages else setOf(Language.ENGLISH)
     }
 
     // Function to update selected languages

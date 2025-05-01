@@ -1,11 +1,11 @@
 package com.example.linguadailyapp.utils.notification
 
-import android.app.Notification
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.linguadailyapp.database.availableword.AvailableWordRepository
 import com.example.linguadailyapp.database.learnedWord.LearnedWordRepository
+import com.example.linguadailyapp.datamodels.LearnedWord
 import com.example.linguadailyapp.utils.WordSyncLogic
 import com.example.linguadailyapp.utils.preferences.LanguagePreferencesManager
 import com.example.linguadailyapp.utils.preferences.RandomWordCooldownManager
@@ -25,14 +25,14 @@ class DailyNotificationWorker(
             wordSyncLogic = WordSyncLogic(AvailableWordRepository(applicationContext)),
             languageViewModel = LanguageViewModel(LanguagePreferencesManager(applicationContext)),
             cooldownManager = RandomWordCooldownManager(applicationContext))
+        val languageViewModel = LanguageViewModel(LanguagePreferencesManager(applicationContext))
 
-        val todaysWords = wordViewModel.todaysLearnedWords.value
+        sendDailyNotification(LearnedWord.default(), applicationContext)
 
-        if(!todaysWords.isEmpty()) {
-            sendDailyNotification(todaysWords.first(), applicationContext)
-        }
+        val languages = languageViewModel.getSelectedLanguages()
+        val todayWord = wordViewModel.getTodaysLearnedWordForLanguage(languages.first())
 
-
+        if(todayWord != null) sendDailyNotification(todayWord, applicationContext)
 
         return Result.success()
     }
