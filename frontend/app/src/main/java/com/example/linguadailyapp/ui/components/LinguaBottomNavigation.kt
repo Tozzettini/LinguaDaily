@@ -1,5 +1,6 @@
 package com.example.linguadailyapp.ui.components
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -45,6 +46,7 @@ import com.example.linguadailyapp.utils.preferences.RandomWordCooldownManager
 import com.example.linguadailyapp.viewmodel.LanguageViewModel
 import com.example.linguadailyapp.viewmodel.LanguageViewModelFactory
 import com.example.linguadailyapp.viewmodel.RandomWordState
+import com.example.linguadailyapp.viewmodel.RewardedAdManager
 import com.example.linguadailyapp.viewmodel.SyncViewModel
 import com.example.linguadailyapp.viewmodel.SyncViewModelFactory
 import com.example.linguadailyapp.viewmodel.WordViewModel
@@ -127,16 +129,32 @@ fun LinguaBottomNavigation(
     // Current route state
     val currentRoute = navController.currentBackStackEntry?.destination?.route
 
-    // Show cooldown modal if needed
+    val activity = context as? Activity
+
+// Load ad once on entry
+    LaunchedEffect(true) {
+        RewardedAdManager.loadAd(context)
+    }
+
+    // Show cooldown modal if needed and display ad
     if (showCooldownModal) {
         RandomWordCooldownModal(
             isVisible = true,
             remainingTime = cooldownManager.remainingTime.value,
             onWatchAdClick = {
-                // Reset cooldown after ad is watched
+//                if(hasConnectiontoWifi){}
+                activity?.let {
+                    RewardedAdManager.showAd(it){
+//              Reset cooldown after ad is watched
                 cooldownManager.resetCooldown()
                 wordViewModel.updateState()
                 showCooldownModal = false
+                    }
+                }
+//                // Reset cooldown after ad is watched
+//                cooldownManager.resetCooldown()
+//                wordViewModel.updateState()
+//                showCooldownModal = false
             },
             onDismiss = {
                 showCooldownModal = false

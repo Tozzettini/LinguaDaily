@@ -16,6 +16,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 
+
 fun sendNotification(title: String, message: String, context: Context) {
     if(!PreferencesManager(context).isNotificationsEnabled()) return
 
@@ -80,9 +81,11 @@ fun queueNotification(context: Context) {
 
     val workManager = WorkManager.getInstance(context)
 
+////    commented this out
+//
     val workInfos = workManager.getWorkInfosByTag("daily_notification").get()
-
-    if (workInfos.isNullOrEmpty()) {
+//
+  if (workInfos.isNullOrEmpty()) {
         workManager.enqueue(workRequest)
     }
 }
