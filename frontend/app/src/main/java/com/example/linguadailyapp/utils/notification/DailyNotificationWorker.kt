@@ -26,9 +26,7 @@ class DailyNotificationWorker(
             languageViewModel = LanguageViewModel(LanguagePreferencesManager(applicationContext)),
             cooldownManager = RandomWordCooldownManager(applicationContext))
         val languageViewModel = LanguageViewModel(LanguagePreferencesManager(applicationContext))
-
-        sendDailyNotification(LearnedWord.default(), applicationContext)
-
+        
         val languages = languageViewModel.getSelectedLanguages()
         val todayWord = wordViewModel.getTodaysLearnedWordForLanguage(languages.first())
 
