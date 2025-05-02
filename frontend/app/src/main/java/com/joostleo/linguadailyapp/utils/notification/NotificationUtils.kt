@@ -1,13 +1,16 @@
 package com.joostleo.linguadailyapp.utils.notification
 
 import android.Manifest
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.joostleo.linguadailyapp.MainActivity
 import com.joostleo.linguadailyapp.R
 import com.joostleo.linguadailyapp.datamodels.LearnedWord
 import com.joostleo.linguadailyapp.utils.preferences.PreferencesManager
@@ -48,11 +51,24 @@ fun sendNotification(title: String, message: String, context: Context) {
 fun sendDailyNotification(learnedWord: LearnedWord, context: Context) {
     if(!PreferencesManager(context).isNotificationsEnabled()) return
 
+    val intent = Intent(context, MainActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    }
+
+    val pendingIntent = PendingIntent.getActivity(
+        context,
+        0,
+        intent,
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+    )
+
     val notificationBuilder = NotificationCompat.Builder(context, "LinguaDailyChannel")
         .setSmallIcon(R.drawable.ic_icon_v1)
         .setContentTitle("Today's Word: ${learnedWord.word}")
         .setContentText(learnedWord.description)
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        .setAutoCancel(true)
+        .setContentIntent(pendingIntent)
 
     val notificationManager = NotificationManagerCompat.from(context)
 
@@ -87,8 +103,6 @@ fun queueNotification(context: Context) {
         workManager.enqueue(workRequest)
     }
 }
-
-
 
 private fun getInitialDelay(): Long {
     val now = LocalDateTime.now()
