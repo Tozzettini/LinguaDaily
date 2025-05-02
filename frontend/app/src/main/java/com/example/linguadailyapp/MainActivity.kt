@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
         // Initialize AdMob SDK
         MobileAds.initialize(this) {}
 
-// Set your actual test device ID
+        // Set your actual test device ID
         val testDeviceIds = listOf("E00275ABA00DA3CA26368F6303D8347B") // Ziches phone ID
         val configuration = RequestConfiguration.Builder()
             .setTestDeviceIds(testDeviceIds)
