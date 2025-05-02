@@ -1,4 +1,0 @@
-package com.example.linguadailyapp.viewmodel
-
-class RandomWordCooldownManager {
-}

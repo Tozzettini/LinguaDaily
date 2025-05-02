@@ -1,0 +1,3 @@
+package com.joostleo.linguadailyapp.database.streakmanager
+
+class StreakCounterTestTest
