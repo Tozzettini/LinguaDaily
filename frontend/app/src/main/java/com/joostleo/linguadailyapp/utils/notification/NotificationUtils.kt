@@ -48,7 +48,7 @@ fun sendNotification(title: String, message: String, context: Context) {
     notificationManager.notify(1, notificationBuilder.build()) // 1 is the notification ID
 }
 
-fun sendDailyNotification(learnedWord: LearnedWord, context: Context) {
+fun sendDailyNotification(learnedWords: List<LearnedWord>, context: Context) {
     if(!PreferencesManager(context).isNotificationsEnabled()) return
 
     val intent = Intent(context, MainActivity::class.java).apply {
@@ -64,11 +64,34 @@ fun sendDailyNotification(learnedWord: LearnedWord, context: Context) {
 
     val notificationBuilder = NotificationCompat.Builder(context, "LinguaDailyChannel")
         .setSmallIcon(R.drawable.ic_icon_v1)
-        .setContentTitle("Today's Word: ${learnedWord.word}")
-        .setContentText(learnedWord.description)
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .setAutoCancel(true)
         .setContentIntent(pendingIntent)
+
+    when (learnedWords.size) {
+        0 -> return
+
+        1 -> {
+            val word = learnedWords.first()
+            notificationBuilder
+                .setContentTitle("Today's Word: ${word.word}")
+                .setContentText(word.description)
+        }
+
+        in 2..3 -> {
+            val words = learnedWords.joinToString(", ") { it.word }
+            notificationBuilder
+                .setContentTitle("Today's Words: $words")
+                .setContentText("Tap here to check them out!")
+        }
+
+        else -> {
+            val words = learnedWords.take(3).joinToString(", ") { it.word }
+            notificationBuilder
+                .setContentTitle("Today's Words: $words...")
+                .setContentText("Tap here to check them out!")
+        }
+    }
 
     val notificationManager = NotificationManagerCompat.from(context)
 
