@@ -76,19 +76,17 @@ fun sendDailyNotification(learnedWord: LearnedWord, context: Context) {
 
 fun queueNotification(context: Context) {
     val workRequest = PeriodicWorkRequestBuilder<DailyNotificationWorker>(1, TimeUnit.DAYS)
-        .setInitialDelay(getInitialDelay(), TimeUnit.MILLISECONDS)
+        .setInitialDelay(getInitialDelay(), TimeUnit.MINUTES)
         .addTag("daily_notification")
         .build()
 
     val workManager = WorkManager.getInstance(context)
 
-////    commented this out
-//
-//    val workInfos = workManager.getWorkInfosByTag("daily_notification").get()
-////
-//  if (workInfos.isNullOrEmpty()) {
-//        workManager.enqueue(workRequest)
-//    }
+    val workInfos = workManager.getWorkInfosByTag("daily_notification").get()
+
+    if (workInfos.isNullOrEmpty()) {
+        workManager.enqueue(workRequest)
+    }
 }
 
 
@@ -98,8 +96,8 @@ private fun getInitialDelay(): Long {
     val targetTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(12, 0))
     val delay = Duration.between(now, targetTime)
     return if (delay.isNegative) {
-        Duration.between(now, targetTime.plusDays(1)).toMillis()
+        Duration.between(now, targetTime.plusDays(1)).toMinutes()
     } else {
-        delay.toMillis()
+        delay.toMinutes()
     }
 }
