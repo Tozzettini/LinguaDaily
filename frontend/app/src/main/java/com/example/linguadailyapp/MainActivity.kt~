@@ -24,6 +24,7 @@ import com.example.linguadailyapp.utils.notification.queueNotification
 import com.example.linguadailyapp.utils.preferences.PreferencesManager
 import com.example.linguadailyapp.viewmodel.SyncViewModel
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
@@ -50,8 +51,23 @@ class MainActivity : ComponentActivity() {
         val syncViewModel = SyncViewModel(WordSyncLogic(AvailableWordRepository(this)))
         val context = this
         val wordSyncLogic = WordSyncLogic(AvailableWordRepository(this))
-        //ads
+
+
+
+        //ads - test device id: ABC123
+        // Initialize AdMob SDK
         MobileAds.initialize(this) {}
+
+// Set your actual test device ID
+        val testDeviceIds = listOf("ABC123") // Replace with your real device ID from Logcat
+        val configuration = RequestConfiguration.Builder()
+            .setTestDeviceIds(testDeviceIds)
+            .build()
+
+        MobileAds.setRequestConfiguration(configuration)
+
+
+        //---
 
 
         setContent {

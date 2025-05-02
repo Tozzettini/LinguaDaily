@@ -51,13 +51,23 @@ class MainActivity : ComponentActivity() {
         val syncViewModel = SyncViewModel(WordSyncLogic(AvailableWordRepository(this)))
         val context = this
         val wordSyncLogic = WordSyncLogic(AvailableWordRepository(this))
+
+
+
         //ads - test device id: ABC123
+        // Initialize AdMob SDK
         MobileAds.initialize(this) {}
-        MobileAds.setRequestConfiguration(
-            RequestConfiguration.Builder()
-                .setTestDeviceIds(listOf("ABC123"))
-                .build()
-        )
+
+// Set your actual test device ID
+        val testDeviceIds = listOf("E00275ABA00DA3CA26368F6303D8347B") // Ziches phone ID
+        val configuration = RequestConfiguration.Builder()
+            .setTestDeviceIds(testDeviceIds)
+            .build()
+
+        MobileAds.setRequestConfiguration(configuration)
+
+
+        //---
 
 
         setContent {
