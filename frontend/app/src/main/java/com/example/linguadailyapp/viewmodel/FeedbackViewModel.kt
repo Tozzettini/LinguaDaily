@@ -17,9 +17,8 @@ class FeedbackViewModel(private val application: Application) : AndroidViewModel
                     feedback = feedbackMessage,
                     appVersion = getAppVersion(),
                     platform = "Android",
-                    deviceModel = "${Build.MANUFACTURER} ${Build.MODEL}",
+//                    deviceModel = "${Build.MANUFACTURER} ${Build.MODEL}",
                     osVersion = Build.VERSION.RELEASE,
-                    userId = null,
                     feedbackType = feedbackType
                 )
                 RetrofitClient.apiService.saveFeedback(feedback)
