@@ -33,7 +33,7 @@ object RewardedAdManager {
 
         RewardedAd.load(
             context,
-            "ca-app-pub-5606958515134668/3416222558", // Test Rewarded Ad Unit ID
+            "ca-app-pub-5606958515134668/3416222558", //  Rewarded Ad Unit ID
             adRequest,
             object : RewardedAdLoadCallback() {
                 override fun onAdLoaded(ad: RewardedAd) {

@@ -13,8 +13,8 @@ android {
         applicationId = "com.joostleo.linguadailyapp"
         minSdk = 29
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.0.2"
+        versionCode = 5
+        versionName = "1.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

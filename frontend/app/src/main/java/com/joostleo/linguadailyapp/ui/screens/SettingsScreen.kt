@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DataUsage
@@ -54,7 +55,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -112,9 +115,6 @@ fun SettingsScreen(
     var isSettingVisable2 by remember { mutableStateOf(false) }
 
 
-
-
-
     // Staggered animation
     LaunchedEffect(Unit) {
         delay(100)
@@ -123,7 +123,6 @@ fun SettingsScreen(
         isSettingVisable1 = true
         delay(250)
         isSettingVisable2 = true
-
     }
 
     Scaffold(
@@ -156,128 +155,147 @@ fun SettingsScreen(
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = backgroundColor
-                )
+                ),
+                        modifier = Modifier
+                        .drawBehind {
+                    // Draw a thin top border
+                    drawLine(
+                        color = Color(0xFFE0E0E0),
+                        start = Offset(0f, size.height),  // Start at bottom-left
+                        end = Offset(size.width, size.height),  // End at bottom-right
+                        strokeWidth = 2.dp.toPx()
+                    )
+                }
             )
         },
         content = { paddingValues ->
-            Column(
+            // Replace your Column in the content section of the Scaffold with this:
+            Box(
                 modifier = Modifier
+
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Header
-                Box(
+                val scrollState = androidx.compose.foundation.rememberScrollState()
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
-                    contentAlignment = Alignment.Center
+                        .fillMaxSize()
+                        .padding(horizontal = 10.dp, vertical = 0.dp)
+                        .verticalScroll(scrollState),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Box(
-                            modifier = Modifier
-                                .size(80.dp)
-                                .background(lightBeige, CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = null,
-                                tint = accentColor,
-                                modifier = Modifier.size(48.dp)
+                    // Header
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Box(
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .background(lightBeige, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Settings,
+                                    contentDescription = null,
+                                    tint = accentColor,
+                                    modifier = Modifier.size(48.dp)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Text(
+                                text = "App Preferences",
+                                fontFamily = Playfair,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 18.sp,
+                                color = Color.Black
+                            )
+
+                            Text(
+                                text = "Customize your language learning experience",
+                                fontFamily = FontFamily.Default,
+                                fontSize = 14.sp,
+                                color = Color.Gray
                             )
                         }
+                    }
 
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Text(
-                            text = "App Preferences",
-                            fontFamily = Playfair,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 18.sp,
-                            color = Color.Black
-                        )
-
-                        Text(
-                            text = "Customize your language learning experience",
-                            fontFamily = FontFamily.Default,
-                            fontSize = 14.sp,
-                            color = Color.Gray
+                    // Settings Items - keep these the same as your original code
+                    AnimatedVisibility(
+                        visible = isSettingVisable0,
+                        enter = fadeIn(animationSpec = tween(500)) +
+                                slideInVertically(
+                                    initialOffsetY = { it },
+                                    animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                                )
+                    ) {
+                        SettingItem(
+                            icon = if (isNotificationsEnabled) Icons.Default.NotificationsActive else Icons.Default.Notifications,
+                            title = "Daily Word Notifications",
+                            description = "Receive notifications for your daily word",
+                            isChecked = isNotificationsEnabled,
+                            onCheckedChange = { isChecked ->
+                                if (isChecked) {
+                                    if (notificationPermission.hasNotificationPermission()) {
+                                        preferencesManager.setNotificationsEnabled(true)
+                                        isNotificationsEnabled = true
+                                    } else {
+                                        notificationPermission.relaunch()
+                                    }
+                                } else {
+                                    preferencesManager.setNotificationsEnabled(false)
+                                    isNotificationsEnabled = false
+                                }
+                            }
                         )
                     }
-                }
 
-                // Settings Items
-                AnimatedVisibility(
-                    visible = isSettingVisable0,
-                    enter = fadeIn(animationSpec = tween(500)) +
-                            slideInVertically(
-                                initialOffsetY = { it },
-                                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
-                            )
-                ) {
-
-                    SettingItem(
-                        icon = if (isNotificationsEnabled) Icons.Default.NotificationsActive else Icons.Default.Notifications,
-                        title = "Daily Word Notifications",
-                        description = "Receive notifications for your daily word",
-                        isChecked = isNotificationsEnabled,
-                        onCheckedChange = { isChecked ->
-                            if (isChecked) {
-                                if (notificationPermission.hasNotificationPermission()) {
-                                    preferencesManager.setNotificationsEnabled(true)
-                                    isNotificationsEnabled = true
-                                } else {
-                                    notificationPermission.relaunch()
-                                }
-                            } else {
-                                preferencesManager.setNotificationsEnabled(false)
-                                isNotificationsEnabled = false
+                    AnimatedVisibility(
+                        visible = isSettingVisable1,
+                        enter = fadeIn(animationSpec = tween(500)) +
+                                slideInVertically(
+                                    initialOffsetY = { it/2 },
+                                    animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                                )
+                    ) {
+                        SettingItem(
+                            icon = Icons.Default.DataUsage,
+                            title = "Allow Mobile Data Usage",
+                            description = "Download new words using mobile data",
+                            isChecked = allowSyncOnData,
+                            onCheckedChange = {
+                                preferencesManager.setAllowSyncOnData(it)
+                                allowSyncOnData = it
                             }
-                        }
-                    )
+                        )
+                    }
+
+                    AnimatedVisibility(
+                        visible = isSettingVisable2,
+                        enter = fadeIn(animationSpec = tween(500)) +
+                                slideInVertically(
+                                    initialOffsetY = { it/3 },
+                                    animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                                )
+                    ) {
+                        FeedbackBox(
+                            onSubmitFeedback = { feedback ->
+                                feedbackViewModel.saveFeedback(feedback)
+                            }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                 }
-
-                AnimatedVisibility(
-                    visible = isSettingVisable1,
-                    enter = fadeIn(animationSpec = tween(500)) +
-                            slideInVertically(
-                                initialOffsetY = { it/2 },
-                                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
-                            )
-                ) {
-
-                    SettingItem(
-                        icon = Icons.Default.DataUsage,
-                        title = "Allow Mobile Data Usage",
-                        description = "Download new words using mobile data",
-                        isChecked = allowSyncOnData,
-                        onCheckedChange = {
-                            preferencesManager.setAllowSyncOnData(it)
-                            allowSyncOnData = it
-                        }
-                    )
-                }
-
-                AnimatedVisibility(
-                    visible = isSettingVisable2, // You would need to add this state variable
-                    enter = fadeIn(animationSpec = tween(500)) +
-                            slideInVertically(
-                                initialOffsetY = { it/3 },
-                                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
-                            )
-                ) {
-                    FeedbackBox(
-                        onSubmitFeedback = { feedback ->
-                            feedbackViewModel.saveFeedback(feedback)
-                        }
-                    )
-                }
-
-
-
             }
+
+
         }
     )
 

@@ -23,7 +23,7 @@
         >
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-5606958515134668~7595381967" /> <!-- Test App ID -->
+            android:value="ca-app-pub-5606958515134668~7595381967" /> <!-- Actual Ad App ID -->
 
         <activity
             android:name="com.joostleo.linguadailyapp.MainActivity"

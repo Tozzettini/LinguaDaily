@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.EmojiEvents
@@ -125,11 +126,23 @@ fun ComingSoonContent(
         start = Offset(0f, 0f),
         end = Offset(0f, Float.POSITIVE_INFINITY)
     )
+     val scrollState = androidx.compose.foundation.rememberScrollState()
 
+    /*
+    *
+    * val scrollState = androidx.compose.foundation.rememberScrollState()
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 10.dp, vertical = 0.dp)
+                            .verticalScroll(scrollState),
+                            *
+                            * */
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
