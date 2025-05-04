@@ -5,8 +5,11 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Handler
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmarks
@@ -25,11 +28,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -77,6 +82,15 @@ fun LinguaBottomNavigation(
     val languagesSelected by languageViewModel.selectedLanguages.collectAsState()
 
     val preferencesManager = PreferencesManager(context)
+
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp
+    val screenWidth = configuration.screenWidthDp
+
+    val navigationBarHeight = if (screenHeight <= 640) 84.dp else 64.dp
+    val navigationIconSize = if (screenHeight <= 640) 20.dp else 24.dp
+    val navigationTextSize = if (screenHeight <= 640) 10.sp else 12.sp
+
 
     // Update cooldown status every second if modal is showing
     LaunchedEffect(showCooldownModal) {
@@ -223,7 +237,8 @@ fun LinguaBottomNavigation(
         contentColor = brandColor,
         tonalElevation = 8.dp,
         modifier = Modifier
-            .height(64.dp)
+            .height(navigationBarHeight)
+            .heightIn(min = 64.dp)
             .drawBehind {
                 // Draw a thin top border
                 drawLine(
@@ -248,23 +263,27 @@ fun LinguaBottomNavigation(
 
             NavigationBarItem(
                 icon = {
-                    Column {
+                    Column (horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(0.dp),
+                        modifier = Modifier.padding(top = 2.dp)// adjust this for spacing
+                    ) {
                         Icon(
                             imageVector = item.icon,
                             contentDescription = item.contentDescription,
                             tint = if (isRandomDisabled) Color.Gray.copy(alpha = 0.3f) else iconColor,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(navigationIconSize)
+                        )
+                        Text(
+                            text = item.name,
+                            fontSize = navigationTextSize,
+                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                            color = if (isRandomDisabled) Color.Gray.copy(alpha = 0.3f) else Color.Unspecified
                         )
                     }
                 },
-                label = {
-                    Text(
-                        text = item.name,
-                        fontSize = 12.sp,
-                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                        color = if (isRandomDisabled) Color.Gray.copy(alpha = 0.3f) else Color.Unspecified
-                    )
-                },
+//                label = {
+//                  used to use labels here but there was too much spacing
+//                },
                 selected = selected,
                 onClick = {
 
