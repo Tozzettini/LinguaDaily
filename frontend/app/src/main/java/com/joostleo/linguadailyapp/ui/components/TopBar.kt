@@ -25,25 +25,51 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.joostleo.linguadailyapp.R
 import com.joostleo.linguadailyapp.navigation.NavigationDestinations
 import com.joostleo.linguadailyapp.datamodels.Language
+import com.joostleo.linguadailyapp.ui.theme.LinguaDailyAppTheme
+import com.joostleo.linguadailyapp.ui.theme.Playfair
+import com.joostleo.linguadailyapp.utils.preferences.LanguagePreferencesManager
 import com.joostleo.linguadailyapp.viewmodel.LanguageViewModel
 
-// Define the Languagetype class if it's not already defined elsewhere
+@Preview(showBackground = true)
 @Composable
-fun ImprovedStyledTopBar3(
+fun TopBarPreview() {
+    LinguaDailyAppTheme {
+
+        ImprovedStyledTopBar(
+            navController = rememberNavController(),
+            viewModel = LanguageViewModel(
+                languagePreferencesManager = LanguagePreferencesManager(
+                    context = LocalContext.current
+                )
+            )
+        )
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ImprovedStyledTopBar(
     navController: NavController,
     viewModel: LanguageViewModel
 ) {
@@ -60,73 +86,63 @@ fun ImprovedStyledTopBar3(
         mutableStateOf(selectedLanguages.toMutableSet())
     }
 
-    // Animated colors with smoother transition
-    val containerColor = animateColorAsState(
-        targetValue = Color.White,
-        animationSpec = tween(400, easing = FastOutSlowInEasing)
-    )
+    // Brand color consistent with the rest of the app
+    val brandColor = Color(0xFF1F565E)
+    val backgroundColor = Color(0xFFF7F7F7)
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .shadow(
-                    elevation = 3.dp,
-                    shape = RoundedCornerShape(16.dp),
-                    spotColor = Color(0xFF1F565E).copy(alpha = 0.08f),
-                    ambientColor = Color(0xFF1F565E).copy(alpha = 0.04f)
-                )
-                .clip(RoundedCornerShape(16.dp))
-                .background(containerColor.value),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+    CenterAlignedTopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = backgroundColor
+        ),
+        title = {
+            // Logo in the center with elegant typography
+            Text(
+                text = "LinguaDaily",
+                fontFamily = Playfair,
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+                color = brandColor,
+                textAlign = TextAlign.Center
+            )
+        },
+        navigationIcon = {
             // Language selector with improved visual design
-            Box(modifier = Modifier.padding(start = 14.dp)) {
-
-                this@Row.AnimatedVisibility(
+            Box {
+                // Badge showing additional languages when multiple are selected
+                AnimatedVisibility(
                     visible = selectedLanguages.size > 1,
                     enter = fadeIn() + scaleIn(),
-                    exit = fadeOut() + scaleOut()
                 ) {
                     Text(
                         text = "+${selectedLanguages.size - 1}",
-                        fontSize = 11.sp,
+                        fontSize = 10.sp,
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
-                            .offset(x = 22.dp, y = (-4).dp)
+                            .offset(x = 32.dp, y = (-4).dp)
                             .size(16.dp)
-                            .background(Color(0xFF1F565E), CircleShape)
+                            .background(brandColor, CircleShape)
                             .wrapContentSize(Alignment.Center)
                     )
                 }
 
-                IconButton(
-                    onClick = {
-                        showLanguageDropdown = true
-                        tempSelectedLanguages = selectedLanguages.toMutableSet()
-                    },
+                Card(
+                    shape = CircleShape,
+                    colors = CardDefaults.cardColors(
+                        containerColor = brandColor.copy(alpha = 0.08f)
+                    ),
                     modifier = Modifier
+                        .padding(start = 8.dp)
                         .size(40.dp)
-                        .clip(CircleShape)
-                        .background(
-                            brush = Brush.radialGradient(
-                                colors = listOf(
-                                    Color(0xFF1F565E).copy(alpha = 0.12f),
-                                    Color(0xFF1F565E).copy(alpha = 0.06f)
-                                )
-                            )
-                        )
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 4.dp)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable {
+                                showLanguageDropdown = true
+                                tempSelectedLanguages = selectedLanguages.toMutableSet()
+                            },
+                        contentAlignment = Alignment.Center
                     ) {
                         // Show first selected language flag or a default icon
                         if (selectedLanguages.isNotEmpty()) {
@@ -138,36 +154,33 @@ fun ImprovedStyledTopBar3(
                             Icon(
                                 imageVector = Icons.Default.Language,
                                 contentDescription = "Language",
-                                tint = Color(0xFF1F565E),
+                                tint = brandColor,
                                 modifier = Modifier.size(22.dp)
                             )
                         }
                     }
                 }
 
+                // Language selection dropdown
                 DropdownMenu(
                     expanded = showLanguageDropdown,
                     offset = DpOffset(x = 28.dp, y = (-8).dp),
                     onDismissRequest = {
                         showLanguageDropdown = false
+                        // Cancel changes if dismissed without clicking Done
                         tempSelectedLanguages = selectedLanguages.toMutableSet()
                     },
                     modifier = Modifier
                         .background(Color.White)
-                        .clip(RoundedCornerShape(16.dp))
-                        .shadow(
-                            elevation = 6.dp,
-                            shape = RoundedCornerShape(16.dp),
-                            spotColor = Color(0xFF1F565E).copy(alpha = 0.1f)
-                        )
-                        .width(200.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .shadow(elevation = 0.dp)
+                        .width(180.dp)
                 ) {
                     Text(
                         text = "Select Languages",
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF1F565E),
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                     )
 
                     HorizontalDivider(
@@ -183,6 +196,7 @@ fun ImprovedStyledTopBar3(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
+                                    // Toggle selection in temp state only
                                     val updatedSelection = tempSelectedLanguages.toMutableSet()
                                     if (updatedSelection.contains(language)) {
                                         updatedSelection.remove(language)
@@ -191,56 +205,41 @@ fun ImprovedStyledTopBar3(
                                     }
                                     tempSelectedLanguages = updatedSelection
                                 }
-                                .padding(horizontal = 18.dp, vertical = 14.dp),
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = language.flag,
-                                fontSize = 18.sp,
-                                modifier = Modifier.padding(end = 12.dp)
+                                text = language.displayName,
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(end = 8.dp)
                             )
 
                             Text(
-                                text = language.name,
+                                text = language.flag,
                                 color = Color.Black,
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
                                 modifier = Modifier.weight(1f)
                             )
 
-                            // Show checkmark if selected with animation
-                            AnimatedVisibility(
-                                visible = tempSelectedLanguages.contains(language),
-                                enter = fadeIn() + scaleIn(),
-                                exit = fadeOut() + scaleOut()
-                            ) {
+                            // Show checkmark if selected
+                            if (tempSelectedLanguages.contains(language)) {
                                 Box(
                                     modifier = Modifier
-                                        .size(20.dp)
-                                        .background(
-                                            brush = Brush.radialGradient(
-                                                colors = listOf(
-                                                    Color(0xFF1F565E),
-                                                    Color(0xFF1F565E).copy(alpha = 0.9f)
-                                                )
-                                            ),
-                                            CircleShape
-                                        ),
+                                        .size(18.dp)
+                                        .background(Color(0xFF1F565E), CircleShape),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Check,
                                         contentDescription = "Selected",
                                         tint = Color.White,
-                                        modifier = Modifier.size(14.dp)
+                                        modifier = Modifier.size(12.dp)
                                     )
                                 }
-                            }
-
-                            if (!tempSelectedLanguages.contains(language)) {
+                            } else {
                                 Box(
                                     modifier = Modifier
-                                        .size(20.dp)
+                                        .size(18.dp)
                                         .border(1.dp, Color(0xFF1F565E), CircleShape)
                                 )
                             }
@@ -250,13 +249,14 @@ fun ImprovedStyledTopBar3(
                             HorizontalDivider(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 18.dp),
+                                    .padding(horizontal = 16.dp),
                                 thickness = 0.5.dp,
                                 color = Color(0xFFE0E0E0)
                             )
                         }
                     }
 
+                    // Add a done button to close the dropdown and confirm selections
                     HorizontalDivider(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -268,88 +268,69 @@ fun ImprovedStyledTopBar3(
                     Button(
                         onClick = {
                             showLanguageDropdown = false
+                            // Save to ViewModel which persists to SharedPreferences
                             viewModel.updateSelectedLanguages(tempSelectedLanguages)
+
+                            // TODO: Force reload because of bug where if the selected
+                            //  languages are updated is it not seen in the wordViewModel.
+                            //  Maybe try to actually fix the bug later
+                            navController.navigate(NavigationDestinations.Home.route)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 18.dp, vertical = 12.dp)
-                            .height(44.dp),
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF1F565E)
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                        )
                     ) {
                         Text(
                             text = "Done (${tempSelectedLanguages.size})",
-                            color = Color.White,
-                            fontWeight = FontWeight.Medium
+                            color = Color.White
                         )
                     }
                 }
             }
-
-            // Logo in the center with improved scaling
-            Box(
-                modifier = Modifier
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.logo_no_bg),
-                    contentDescription = "Logo",
-                    modifier = Modifier
-                        .height(45.dp)
-                        .padding(top = 6.dp)
-                        .graphicsLayer(
-                            scaleX = 1.8f,
-                            scaleY = 1.8f
-                        ),
-                    colorFilter = ColorFilter.tint(Color(0xFF1F565E))
-                )
-            }
-
+        },
+        actions = {
             // Settings button with improved visual design
-            Box(modifier = Modifier.padding(end = 14.dp)) {
-                IconButton(
-                    onClick = { navController.navigate(NavigationDestinations.Settings.route) },
+            Card(
+                shape = CircleShape,
+                colors = CardDefaults.cardColors(
+                    containerColor = brandColor.copy(alpha = 0.08f)
+                ),
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .size(40.dp)
+            ) {
+                Box(
                     modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(
-                            brush = Brush.radialGradient(
-                                colors = listOf(
-                                    Color(0xFF1F565E).copy(alpha = 0.12f),
-                                    Color(0xFF1F565E).copy(alpha = 0.06f)
-                                )
-                            )
-                        )
+                        .fillMaxSize()
+                        .clickable { navController.navigate(NavigationDestinations.Settings.route) },
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
                         contentDescription = "Settings",
-                        tint = Color(0xFF1F565E),
+                        tint = brandColor,
                         modifier = Modifier.size(22.dp)
                     )
                 }
             }
-        }
-    }
-}
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(backgroundColor)
+            .drawBehind {
+                // Draw a thin top border
+                drawLine(
+                    color = Color(0xFFE0E0E0),
+                    start = Offset(0f, size.height),  // Start at bottom-left
+                    end = Offset(size.width, size.height),  // End at bottom-right
+                    strokeWidth = 2.dp.toPx()
+                )
+            },
+        scrollBehavior = null
+    )
 
-//@Preview(showBackground = true)
-//@Composable
-//fun ImprovedStyledTopBarPreview() {
-//    LinguaDailyAppTheme {
-//        Box(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(480.dp)
-//                .background(Color.White)
-//        ) {
-//            ImprovedStyledTopBar3(
-//                navController = rememberNavController(),
-//                viewModel = LanguageViewModel(preferredLanguage = "it")
-//            )
-//        }
-//    }
-//}
+
+}

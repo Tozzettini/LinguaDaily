@@ -65,6 +65,45 @@ fun LinguaBottomNavigationPreview() {
     LinguaBottomNavigation(navController = NavController(LocalContext.current))
 }
 
+@Preview(
+    name = "Phone - Normal",
+    device = "spec:width=411dp,height=891dp,orientation=portrait"
+)
+@Composable
+fun BottomNav_Preview_Phone() {
+    LinguaBottomNavigation(navController = NavController(LocalContext.current))
+}
+
+
+@Preview(
+    name = "Tablet - Landscape",
+    device = "spec:width=1280dp,height=800dp,orientation=landscape"
+)
+@Composable
+fun BottomNav_Preview_Tablet() {
+    LinguaBottomNavigation(navController = NavController(LocalContext.current))
+}
+@Preview(
+    name = "Small Phone",
+    device = "spec:width=320dp,height=640dp,orientation=portrait"
+)
+@Composable
+fun BottomNav_Preview_SmallPhone() {
+    LinguaBottomNavigation(navController = NavController(LocalContext.current))
+}
+
+@Preview(
+    name = "Tall Phone (Gesture Nav)",
+    device = "spec:width=411dp,height=1000dp,orientation=portrait"
+)
+@Composable
+fun BottomNav_Preview_TallPhone() {
+    LinguaBottomNavigation(navController = NavController(LocalContext.current))
+}
+
+
+
+
 @Composable
 fun LinguaBottomNavigation(
     navController: NavController,
@@ -87,7 +126,7 @@ fun LinguaBottomNavigation(
     val screenHeight = configuration.screenHeightDp
     val screenWidth = configuration.screenWidthDp
 
-    val navigationBarHeight = if (screenHeight <= 640) 84.dp else 64.dp
+    val navigationBarHeight = if (screenHeight <= 640) 64.dp else 64.dp
     val navigationIconSize = if (screenHeight <= 640) 20.dp else 24.dp
     val navigationTextSize = if (screenHeight <= 640) 10.sp else 12.sp
 

@@ -95,16 +95,9 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             // Use our new improved top bar
-//            ImprovedStyledTopBar(
-//                navController = navController,
-//                onLanguagesSelected = { selectedLangs ->
-//                    // Store your selected languages here
-//                    // For example, update a ViewModel or save to preferences
-////                    viewModel.updateSelectedLanguages(selectedLangs)
-//                }
-//            )
 
-            ImprovedStyledTopBar2(
+            //was 2
+            ImprovedStyledTopBar(
                 navController = navController,
                 viewModel = languageViewModel
             )
