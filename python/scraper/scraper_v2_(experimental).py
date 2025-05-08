@@ -133,18 +133,29 @@ def main():
         start_time_i = time.time()
         try:
             json_str = get_data(info.word, info.language, api_keys[key])
-            parsed = parse_json(info.word, info.language, json_str)
-            parsed_list.append(parsed)
-            print("Parsed: " + parsed.word + "\nTime: " + str(time.time() - start_time_i))
         except Exception as e:
-            print(f"Caught an exception: {e}\nWord skipped: {info.word}")
+            try:
+                if "wait" in str(e):
+                    print("Sleeping")
+                    time.sleep(6)
+
+                print("Retrying with exception {}".format(e))
+                json_str = get_data(info.word, info.language, api_keys[key])
+            except Exception as e:
+                print(f"Caught an exception: {e}\nWord skipped: {info.word}")
+                continue
         finally:
             key += 1
             key %= keys_len
-            delay = 6 - (time.time() - start_time_i)
-            if delay > 0:
-                print(delay)
-                time.sleep(delay)
+
+        try:
+            parsed = parse_json(info.word, info.language, json_str)
+        except Exception as e:
+            print(f"Caught an exception: {e}\nWord skipped: {info.word}")
+            continue
+
+        parsed_list.append(parsed)
+        print("Parsed: " + parsed.word + "\nTime: " + str(time.time() - start_time_i))
 
     write_word_info_to_csv(parsed_list)
     print("Finished in {} seconds".format(time.time() - start_time))
