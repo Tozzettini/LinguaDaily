@@ -1,4 +1,5 @@
 import json
+import random
 import re
 from datetime import datetime
 from cohere import ClientV2
@@ -118,12 +119,15 @@ def write_word_info_to_csv(word_infos: List[WordInfo]):
 def main():
     start_time = time.time()
 
-    to_convert = read_word_requests_from_csv()
-
     load_dotenv()
 
     api_keys_raw = os.getenv("API_KEYS")
+    random_order = os.getenv("RANDOM_ORDER", "False").lower() == "true"
+    input_file_name = os.getenv("INPUT_FILE_NAME", "input.csv")
+
     api_keys = [key.strip() for key in api_keys_raw.split(",") if key]
+
+    to_convert = read_word_requests_from_csv(input_file_name)
 
     parsed_list = []
     keys_len = len(api_keys)
@@ -156,6 +160,9 @@ def main():
 
         parsed_list.append(parsed)
         print("Parsed: " + parsed.word + "\nTime: " + str(time.time() - start_time_i))
+
+    if random_order:
+        random.shuffle(parsed_list)
 
     write_word_info_to_csv(parsed_list)
     print("Finished in {} seconds".format(time.time() - start_time))

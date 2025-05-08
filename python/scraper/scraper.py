@@ -1,4 +1,5 @@
 import json
+import random
 import re
 from datetime import datetime
 from cohere import ClientV2
@@ -115,42 +116,62 @@ def write_word_info_to_csv(word_infos: List[WordInfo]):
             })
 
 
+def do_work(info: WordRequest, api_key: str, parsed_list, start_time):
+    json_str = get_data(info.word, info.language, api_key)
+    parsed = parse_json(info.word, info.language, json_str)
+    parsed_list.append(parsed)
+    print("Parsed: " + parsed.word + "\nTime: " + str(time.time() - start_time))
+
+
 def main():
     start_time = time.time()
-
-    to_convert = read_word_requests_from_csv()
 
     load_dotenv()
 
     api_keys_raw = os.getenv("API_KEYS")
+    random_order = os.getenv("RANDOM_ORDER", "False").lower() == "true"
+    input_file_name = os.getenv("INPUT_FILE_NAME", "input.csv")
     api_keys = [key.strip() for key in api_keys_raw.split(",") if key]
 
+    to_convert = read_word_requests_from_csv(input_file_name)
+
+    deleted_keys = []
     parsed_list = []
-    keys_len = len(api_keys)
     key = 0
 
     for info in to_convert:
         start_time_i = time.time()
         try:
-            json_str = get_data(info.word, info.language, api_keys[key])
-            parsed = parse_json(info.word, info.language, json_str)
-            parsed_list.append(parsed)
-            print("Parsed: " + parsed.word + "\nTime: " + str(time.time() - start_time_i))
+            do_work(info, api_keys[key], parsed_list, start_time_i)
         except Exception as e:
-            print(f"Caught an exception: {e}\nWord skipped: {info.word}")
+            if "You are using a Trial key, which is limited to 1000 API calls / month" in str(e):
+                removed = api_keys.pop(key)
+                key -= 1
+                deleted_keys.append(removed)
+                try:
+                    do_work(info, api_keys[key], parsed_list, start_time_i)
+                except Exception as e:
+                    print(f"Caught an exception: {e}\nWord skipped: {info.word}")
+            else:
+                print(f"Caught an exception: {e}\nWord skipped: {info.word}")
+
         finally:
             key += 1
-            key %= keys_len
+            key %= len(api_keys)
             delay = 6 - (time.time() - start_time_i)
             if delay > 0:
                 print(delay)
                 time.sleep(delay)
+
+    if random_order:
+        random.shuffle(parsed_list)
 
     write_word_info_to_csv(parsed_list)
     print("Finished in {} seconds".format(time.time() - start_time))
     print("Total words: {}".format(len(to_convert)))
     print("Total words parsed: {}".format(len(parsed_list)))
     print("Percentage lost: {}".format((len(to_convert) - len(parsed_list)) / len(to_convert) * 100))
+    print("Keys deleted: " + str(deleted_keys))
 
 
 if __name__ == "__main__":
