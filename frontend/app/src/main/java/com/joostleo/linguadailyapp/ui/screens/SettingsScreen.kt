@@ -86,7 +86,7 @@ fun SettingsScreen(
     val context = LocalContext.current
     val preferencesManager = PreferencesManager(context)
 
-    var isNotificationsEnabled by rememberSaveable { mutableStateOf(preferencesManager.isNotificationsEnabled()) }
+    var isNotificationsEnabled by rememberSaveable { mutableStateOf(preferencesManager.isNotificationsEnabled() && NotificationPermission.hasNotificationPermission(context)) }
     var allowSyncOnData by rememberSaveable { mutableStateOf(preferencesManager.getSyncAllowedOnData()) }
     var showSettingsRedirect by rememberSaveable { mutableStateOf(false) }
 
