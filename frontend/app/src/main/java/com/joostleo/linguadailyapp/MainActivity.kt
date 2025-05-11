@@ -20,11 +20,11 @@ import com.joostleo.linguadailyapp.utils.ConnectionManager
 import com.joostleo.linguadailyapp.utils.NetworkType
 import com.joostleo.linguadailyapp.utils.WordSyncLogic
 import com.joostleo.linguadailyapp.utils.notification.NotificationPermission
-import com.joostleo.linguadailyapp.utils.notification.queueNotification
 import com.joostleo.linguadailyapp.utils.preferences.PreferencesManager
 import com.joostleo.linguadailyapp.viewmodel.SyncViewModel
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
+import com.joostleo.linguadailyapp.utils.notification.scheduleDailyNotification
 import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
@@ -36,6 +36,8 @@ class MainActivity : ComponentActivity() {
         val preferencesManager = PreferencesManager(this)
 
         if(preferencesManager.isFirstLaunch()) {
+            scheduleDailyNotification(this)
+
             NotificationPermission(
                 this,
                 registerForActivityResult(ActivityResultContracts.RequestPermission())
@@ -45,8 +47,6 @@ class MainActivity : ComponentActivity() {
             ).init()
 
         }
-
-        queueNotification(this)
 
         val syncViewModel = SyncViewModel(WordSyncLogic(AvailableWordRepository(this)))
         val context = this

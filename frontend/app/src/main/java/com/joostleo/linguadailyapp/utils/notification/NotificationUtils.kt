@@ -8,16 +8,12 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import com.joostleo.linguadailyapp.MainActivity
 import com.joostleo.linguadailyapp.R
 import com.joostleo.linguadailyapp.datamodels.LearnedWord
 import com.joostleo.linguadailyapp.utils.preferences.PreferencesManager
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.util.concurrent.TimeUnit
+import android.app.AlarmManager
+import java.util.Calendar
 
 
 fun sendNotification(title: String, message: String, context: Context) {
@@ -112,28 +108,32 @@ fun sendDailyNotification(learnedWords: List<LearnedWord>, context: Context) {
     notificationManager.notify(2, notificationBuilder.build()) // 1 is the notification ID
 }
 
-fun queueNotification(context: Context) {
-    val workRequest = PeriodicWorkRequestBuilder<DailyNotificationWorker>(1, TimeUnit.DAYS)
-        .setInitialDelay(getInitialDelay(), TimeUnit.MINUTES)
-        .addTag("daily_notification")
-        .build()
+fun scheduleDailyNotification(context: Context) {
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    val intent = Intent(context, DailyNotificationReceiver::class.java)
+    val pendingIntent = PendingIntent.getBroadcast(
+        context,
+        0,
+        intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
 
-    val workManager = WorkManager.getInstance(context)
+    val calendar = Calendar.getInstance().apply {
+        timeInMillis = System.currentTimeMillis()
+        set(Calendar.HOUR_OF_DAY, 12)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
 
-    val workInfos = workManager.getWorkInfosByTag("daily_notification").get()
-
-    if (workInfos.isNullOrEmpty()) {
-        workManager.enqueue(workRequest)
+        if (before(Calendar.getInstance())) {
+            add(Calendar.DAY_OF_MONTH, 1)
+        }
     }
+
+    alarmManager.setAndAllowWhileIdle(
+        AlarmManager.RTC_WAKEUP,
+        calendar.timeInMillis,
+        pendingIntent
+    )
 }
 
-private fun getInitialDelay(): Long {
-    val now = LocalDateTime.now()
-    val targetTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(12, 0))
-    val delay = Duration.between(now, targetTime)
-    return if (delay.isNegative) {
-        Duration.between(now, targetTime.plusDays(1)).toMinutes()
-    } else {
-        delay.toMinutes()
-    }
-}
