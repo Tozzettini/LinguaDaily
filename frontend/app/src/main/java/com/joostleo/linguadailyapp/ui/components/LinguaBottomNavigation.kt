@@ -42,10 +42,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.joostleo.linguadailyapp.database.availableword.AvailableWordRepository
+import com.joostleo.linguadailyapp.database.learnedWord.LearnedWordRepository
 import com.joostleo.linguadailyapp.datamodels.LearnedWord
 import com.joostleo.linguadailyapp.navigation.NavigationDestinations
 import com.joostleo.linguadailyapp.utils.ConnectionManager
 import com.joostleo.linguadailyapp.utils.NetworkType
+import com.joostleo.linguadailyapp.utils.RandomWordLogic
+import com.joostleo.linguadailyapp.utils.WordSyncLogic
 import com.joostleo.linguadailyapp.utils.preferences.PreferencesManager
 import com.joostleo.linguadailyapp.utils.preferences.RandomWordCooldownManager
 import com.joostleo.linguadailyapp.viewmodel.LanguageViewModel
@@ -113,6 +117,12 @@ fun LinguaBottomNavigation(
 ) {
     val context = LocalContext.current
     val cooldownManager = remember { RandomWordCooldownManager(context) }
+    val randomWordLogic = RandomWordLogic(
+        availableWordRepository = AvailableWordRepository(context),
+        learnedWordRepository = LearnedWordRepository(context),
+        cooldownManager = cooldownManager,
+        wordSyncLogic = WordSyncLogic(AvailableWordRepository(context)),
+        )
 
     var showCooldownModal by remember { mutableStateOf(false) }
     var showSyncDialog by remember { mutableStateOf(false) }
@@ -222,7 +232,7 @@ fun LinguaBottomNavigation(
                             var randomWord: LearnedWord? = null
 
                             runBlocking {
-                                randomWord = wordViewModel.getRandomWordBlocking(languages = languagesSelected)
+                                randomWord = randomWordLogic.getRandomWordBlocking(languages = languagesSelected)
 
                                 if(syncViewModel.shouldSync()) syncViewModel.syncInBackground(PreferencesManager(context))
                             }
@@ -345,7 +355,7 @@ fun LinguaBottomNavigation(
                             var randomWord: LearnedWord? = null
 
                             runBlocking {
-                                randomWord = wordViewModel.getRandomWordBlocking(languages = languagesSelected)
+                                randomWord = randomWordLogic.getRandomWordBlocking(languages = languagesSelected)
 
                                 if(syncViewModel.shouldSync()) syncViewModel.syncInBackground(PreferencesManager(context))
                             }

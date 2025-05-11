@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.joostleo.linguadailyapp.database.availableword.AvailableWordRepository
 import com.joostleo.linguadailyapp.datamodels.LearnedWord
 import com.joostleo.linguadailyapp.database.learnedWord.LearnedWordRepository
-import com.joostleo.linguadailyapp.datamodels.Language
+import com.joostleo.linguadailyapp.utils.RandomWordLogic
 import com.joostleo.linguadailyapp.utils.WordSyncLogic
 import com.joostleo.linguadailyapp.utils.preferences.RandomWordCooldownManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,12 +34,14 @@ class WordViewModel(private val learnedWordRepository: LearnedWordRepository, pr
     private val _randomWordState = MutableStateFlow<RandomWordState>(RandomWordState.IDLE)
     val randomWordState = _randomWordState.asStateFlow()
 
+    private val randomWordLogic = RandomWordLogic(availableWordRepository, learnedWordRepository, cooldownManager, wordSyncLogic)
+
     init {
         viewModelScope.launch {
             languageViewModel.selectedLanguages.collect { selectedLanguages ->
                 // When selectedLanguages changes, reload the today's learned words
-                _todaysLearnedWords.value = getTodaysLearnedWords(selectedLanguages)
-                _randomWordState.value = getRandomWordState()
+                _todaysLearnedWords.value = randomWordLogic.getTodaysLearnedWords(selectedLanguages)
+                _randomWordState.value = randomWordLogic.getRandomWordState()
 
                 // You might want to fetch or filter the words based on the new selected languages
                 learnedWordRepository.getAllWordsFlow().collect { allWords ->
@@ -52,21 +54,8 @@ class WordViewModel(private val learnedWordRepository: LearnedWordRepository, pr
 
     fun updateState() {
         viewModelScope.launch {
-            _randomWordState.value = getRandomWordState()
+            _randomWordState.value = randomWordLogic.getRandomWordState()
         }
-    }
-
-    suspend fun getRandomWordState() : RandomWordState {
-        if(cooldownManager.isInCooldown.value) return RandomWordState.COOLDOWN
-
-        if(!wordSyncLogic.canSyncInBackground()) return RandomWordState.SYNC_NEEDED
-
-        return RandomWordState.IDLE
-
-    }
-
-    suspend fun getLearnedWordById(id : Int): LearnedWord? {
-        return learnedWordRepository.getWordById(id)
     }
 
     fun toggleBookmark(learnedWord: LearnedWord) {
@@ -76,46 +65,8 @@ class WordViewModel(private val learnedWordRepository: LearnedWordRepository, pr
         }
     }
 
-    private suspend fun filterLanguagesByAvailableWords(languages: Set<Language>) : List<Language> =
-        languages.filter { availableWordRepository.getWordCountForLanguage(it) != 0 }
-
-    suspend fun getRandomWordBlocking(isWordOfDay: Boolean = false, languages: Set<Language>) : LearnedWord? {
-        val filteredLanguages = filterLanguagesByAvailableWords(languages)
-
-        if(filteredLanguages.isEmpty()) return null
-
-        val randomWord = availableWordRepository.getRandomWordForLanguage(filteredLanguages.random())
-
-        if(randomWord == null) return randomWord
-
-        val learnedWord = LearnedWord.of(availableWord = randomWord, isWordOfTheDay = isWordOfDay)
-
-        learnedWordRepository.insert(learnedWord)
-        availableWordRepository.removeWord(randomWord)
-
-        return learnedWord
-    }
-
-    suspend fun getTodaysLearnedWordForLanguage(language: Language) : LearnedWord? {
-        var todaysWord = learnedWordRepository.getTodaysWordForLanguage(language)
-
-        if(todaysWord == null) {
-            todaysWord = getRandomWordBlocking(isWordOfDay = true, setOf(language))
-        }
-
-        return todaysWord
-    }
-
-    suspend fun getTodaysLearnedWords(languages: Set<Language>) : List<LearnedWord> {
-        val list = mutableListOf<LearnedWord>()
-
-        for(language in languages) {
-            val word = getTodaysLearnedWordForLanguage(language)
-
-            if(word != null) list.add(word)
-        }
-
-        return list
+    suspend fun getLearnedWordById(id : Int): LearnedWord? {
+        return learnedWordRepository.getWordById(id)
     }
 
 
