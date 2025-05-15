@@ -13,6 +13,7 @@ import com.joostleo.linguadailyapp.R
 import com.joostleo.linguadailyapp.datamodels.LearnedWord
 import com.joostleo.linguadailyapp.utils.preferences.PreferencesManager
 import android.app.AlarmManager
+import android.util.Log
 import java.util.Calendar
 
 
@@ -118,16 +119,10 @@ fun scheduleDailyNotification(context: Context) {
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 
-    val calendar = Calendar.getInstance().apply {
-        timeInMillis = System.currentTimeMillis()
-        set(Calendar.HOUR_OF_DAY, 12)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 0)
+    val calendar = Calendar.getInstance()
 
-        if (before(Calendar.getInstance())) {
-            add(Calendar.DAY_OF_MONTH, 1)
-        }
+    calendar.apply {
+        add(Calendar.HOUR, 24)
     }
 
     alarmManager.setAndAllowWhileIdle(
@@ -135,5 +130,8 @@ fun scheduleDailyNotification(context: Context) {
         calendar.timeInMillis,
         pendingIntent
     )
+
+    Log.d("NotificationUtils", "Scheduled Alarm")
+
 }
 
