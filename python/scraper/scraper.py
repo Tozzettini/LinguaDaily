@@ -115,6 +115,25 @@ def write_word_info_to_csv(word_infos: List[WordInfo]):
                 'phoneticSpelling': info.phoneticSpelling
             })
 
+def write_lost_word_info_to_csv(word_requests: List[WordRequest]):
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    filename = f"missed_{timestamp}.csv"
+
+    with open(filename, mode='w', newline='', encoding='utf-8') as csvfile:
+        fieldnames = [
+            'word',
+            'language'
+        ]
+
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for info in word_requests:
+            writer.writerow({
+                'word': info.word,
+                'language': info.language
+            })
+
 
 def do_work(info: WordRequest, api_key: str, parsed_list, start_time):
     json_str = get_data(info.word, info.language, api_key)
@@ -137,6 +156,7 @@ def main():
 
     deleted_keys = []
     parsed_list = []
+    missed_list = []
     key = 0
 
     for info in to_convert:
@@ -151,27 +171,30 @@ def main():
                 try:
                     do_work(info, api_keys[key], parsed_list, start_time_i)
                 except Exception as e:
+                    missed_list.append(info)
                     print(f"Caught an exception: {e}\nWord skipped: {info.word}")
             else:
+                missed_list.append(info)
                 print(f"Caught an exception: {e}\nWord skipped: {info.word}")
-
         finally:
             key += 1
             key %= len(api_keys)
-            delay = 6 - (time.time() - start_time_i)
+            delay = 6.1 - (time.time() - start_time_i)
             if delay > 0:
-                print(delay)
+                print("delay: " + str(delay))
                 time.sleep(delay)
 
     if random_order:
         random.shuffle(parsed_list)
 
     write_word_info_to_csv(parsed_list)
+    write_lost_word_info_to_csv(missed_list)
     print("Finished in {} seconds".format(time.time() - start_time))
     print("Total words: {}".format(len(to_convert)))
     print("Total words parsed: {}".format(len(parsed_list)))
     print("Percentage lost: {}".format((len(to_convert) - len(parsed_list)) / len(to_convert) * 100))
     print("Keys deleted: " + str(deleted_keys))
+    print("Lost words: " + str(missed_list))
 
 
 if __name__ == "__main__":
