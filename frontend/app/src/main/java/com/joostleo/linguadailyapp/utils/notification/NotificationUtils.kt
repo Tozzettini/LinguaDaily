@@ -14,6 +14,7 @@ import com.joostleo.linguadailyapp.datamodels.LearnedWord
 import com.joostleo.linguadailyapp.utils.preferences.PreferencesManager
 import android.app.AlarmManager
 import android.util.Log
+import java.time.LocalTime
 import java.util.Calendar
 
 
@@ -121,8 +122,15 @@ fun scheduleDailyNotification(context: Context) {
 
     val calendar = Calendar.getInstance()
 
+    // 60 minutes - (difference in minutes from 12:00)
+    val minutes = 60 - LocalTime.now().minute
+
+    // 24 hours - (difference in hours from 12:00) - (1 hour to compensate for the minutes)
+    val hours = 35 - LocalTime.now().hour
+
     calendar.apply {
-        add(Calendar.HOUR, 24)
+        add(Calendar.HOUR, hours)
+        add(Calendar.MINUTE, minutes)
     }
 
     alarmManager.setAndAllowWhileIdle(
