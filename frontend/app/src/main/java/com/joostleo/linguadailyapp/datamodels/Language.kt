@@ -1,9 +1,11 @@
 package com.joostleo.linguadailyapp.datamodels
 
 enum class Language(val displayName: String, val code: String, val flag: String) {
-    DUTCH("Nederlands", "nl", "🇳🇱"),
-    ENGLISH("English", "en", "🇺🇸");
-//    ITALIAN("Italiano", "it", "🇮🇹");
+    SPANISH("Español", "es", "🇪🇸"),
+    ENGLISH("English", "en", "🇺🇸"),
+    GERMAN("Deutsch", "de", "🇩🇪"),
+    ITALIAN("Italiano", "it", "🇮🇹"),
+    DUTCH("Nederlands", "nl", "🇳🇱");
 
     override fun toString(): String = displayName
 
