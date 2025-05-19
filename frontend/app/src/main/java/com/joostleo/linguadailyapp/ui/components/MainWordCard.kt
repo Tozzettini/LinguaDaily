@@ -233,7 +233,7 @@ fun MainWordCard2(
                                             .verticalScroll(rememberScrollState())
                                     ) {
                                         Text(
-                                            text = learnedWord.description,
+                                            text = "${learnedWord.translation}, ${learnedWord.description}",
                                             fontSize = 16.sp,
                                             color = Color.Black,
                                             lineHeight = 24.sp

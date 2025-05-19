@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class AvailableWord(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val word: String,
+    val translation: String,
     val description: String,
     val language: Language,
     val etymology: String,

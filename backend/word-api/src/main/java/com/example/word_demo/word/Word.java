@@ -1,12 +1,6 @@
 package com.example.word_demo.word;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 
 // Represents the Word Table in the database
 
@@ -18,6 +12,9 @@ public class Word {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String word;
+    private String translation;
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
     private String language;
     private String exampleSentence;
@@ -58,6 +55,14 @@ public class Word {
 
     public void setWord(String word) {
         this.word = word;
+    }
+
+    public String getTranslation() {
+        return translation;
+    }
+
+    public void setTranslation(String translation) {
+        this.translation = translation;
     }
 
     public String getDescription() {

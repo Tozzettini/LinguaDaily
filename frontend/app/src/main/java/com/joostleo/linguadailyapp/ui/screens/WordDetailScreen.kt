@@ -176,7 +176,7 @@ fun WordDetailScreen(
 
                     // Sections
                     DetailSection("How to use", learnedWord.exampleSentence)
-                    DetailSection("Definition", learnedWord.description)
+                    DetailSection("Definition", "${learnedWord.translation}, ${learnedWord.description}")
                     DetailSection("Etymology", learnedWord.etymology)
 //                    DetailSection("Example Sentences", wordDetails.examples.joinToString("\n\n") { "- $it" })
 

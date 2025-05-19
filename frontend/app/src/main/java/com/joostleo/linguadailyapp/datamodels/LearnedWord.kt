@@ -9,6 +9,7 @@ import java.time.LocalDateTime
 data class LearnedWord(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val word: String,
+    val translation: String,
     val description: String,
     val language: Language,
     val learnedAt: LocalDate = LocalDate.now(),
@@ -40,7 +41,8 @@ data class LearnedWord(
                 learnedAt = learnedAt,
                 bookmarked = bookmarked,
                 bookmarkedAt = bookmarkedAt,
-                isWordOfTheDay = isWordOfTheDay
+                isWordOfTheDay = isWordOfTheDay,
+                translation = availableWord.translation
             )
         }
         fun default(): LearnedWord {
@@ -52,7 +54,8 @@ data class LearnedWord(
                 exampleSentence = "This is a default word.",
                 phoneticSpelling = "[ˈdɪˌfɔlt]",
                 partOfSpeech = "noun",
-                etymology = "From Latin 'defallere'"
+                etymology = "From Latin 'defallere'",
+                translation = "Default"
             )
         }
 
