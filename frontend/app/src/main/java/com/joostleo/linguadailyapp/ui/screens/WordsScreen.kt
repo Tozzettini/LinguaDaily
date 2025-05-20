@@ -478,7 +478,8 @@ fun PreviewWordCard() {
                 phoneticSpelling = "",
                 exampleSentence = "",
                 partOfSpeech = "",
-                etymology = ""
+                etymology = "",
+                translation = ""
             ),
             navController,
             onBookmarkClick = {},

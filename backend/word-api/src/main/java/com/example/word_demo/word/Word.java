@@ -13,8 +13,6 @@ public class Word {
     private Long id;
     private String word;
     private String translation;
-    @Lob
-    @Column(columnDefinition = "TEXT")
     private String description;
     private String language;
     private String exampleSentence;

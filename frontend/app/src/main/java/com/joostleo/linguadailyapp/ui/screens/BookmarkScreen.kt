@@ -345,7 +345,8 @@ fun PreviewBookmarkCard() {
                 exampleSentence = "",
                 phoneticSpelling = "",
                 etymology = "",
-                partOfSpeech = ""
+                partOfSpeech = "",
+                translation = ""
 
             ),
             navController = navController,
