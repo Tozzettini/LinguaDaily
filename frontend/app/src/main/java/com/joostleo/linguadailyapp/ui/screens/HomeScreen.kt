@@ -164,14 +164,67 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     //TODO: Make it animate progressively
-                    val i = 3
+                    // Keep your existing animation states
+                    var isWordCardVisible by remember { mutableStateOf(false) }
+                    var isWordCardVisible2 by remember { mutableStateOf(false) }
+                    var isWordCardVisible3 by remember { mutableStateOf(false) }
+                    var isWordCardVisible4 by remember { mutableStateOf(false) }
+                    var isWordCardVisible5 by remember { mutableStateOf(false) }
+                    var isWordCardVisible6 by remember { mutableStateOf(false) }
 
+// In your LaunchedEffect, trigger them sequentially:
+                    LaunchedEffect(Unit) {
+                        delay(100)
+                        isHeaderVisible = true
+                        delay(200)
+                        isStatsVisible = true
+                        delay(200)
+                        isChallengeVisible = true
+                        delay(200)
+
+                        // Cards animate sequentially
+                        if (todaysWords.size > 0) {
+                            isWordCardVisible = true
+                        }
+                        delay(150)
+                        if (todaysWords.size > 1) {
+                            isWordCardVisible2 = true
+                        }
+                        delay(150)
+                        if (todaysWords.size > 2) {
+                            isWordCardVisible3 = true
+                        }
+                        delay(150)
+                        if (todaysWords.size > 3) {
+                            isWordCardVisible4 = true
+                        }
+                        delay(150)
+                        if (todaysWords.size > 4) {
+                            isWordCardVisible5 = true
+                        }
+                        delay(150)
+                        if (todaysWords.size > 5) {
+                            isWordCardVisible6 = true
+                        }
+                    }
+
+// Now display each card with its corresponding visibility state
                     todaysWords.forEachIndexed { index, word ->
+                        val isVisible = when (index) {
+                            0 -> isWordCardVisible
+                            1 -> isWordCardVisible2
+                            2 -> isWordCardVisible3
+                            3 -> isWordCardVisible4
+                            4 -> isWordCardVisible5
+                            5 -> isWordCardVisible6
+                            else -> true // Show any additional cards without animation
+                        }
+
                         AnimatedVisibility(
-                            visible = isWordCardVisible,
+                            visible = isVisible,
                             enter = fadeIn(animationSpec = tween(700)) +
                                     slideInVertically(
-                                        initialOffsetY = { it / (i + index) },
+                                        initialOffsetY = { it / 3 },
                                         animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing)
                                     )
                         ) {

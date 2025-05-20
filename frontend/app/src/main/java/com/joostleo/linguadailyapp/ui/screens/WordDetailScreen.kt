@@ -1,6 +1,7 @@
 package com.joostleo.linguadailyapp.ui.screens
 
 import android.content.Intent
+import android.graphics.fonts.FontStyle
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -29,14 +30,19 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.google.common.io.Files.append
 import com.joostleo.linguadailyapp.datamodels.LearnedWord
 import com.joostleo.linguadailyapp.navigation.NavigationDestinations
 import com.joostleo.linguadailyapp.ui.theme.LinguaDailyAppTheme
@@ -176,7 +182,36 @@ fun WordDetailScreen(
 
                     // Sections
                     DetailSection("How to use", learnedWord.exampleSentence)
-                    DetailSection("Definition", "${learnedWord.translation}, ${learnedWord.description}")
+//                    DetailSection("Definition", "${learnedWord.translation}, ${learnedWord.description}")
+                    /*Testin stupid shit out*/
+
+                    // Enhanced definition styling
+                    DetailSection("Definition", buildAnnotatedString {
+                        // Translation in bold and slightly larger
+                        withStyle(style = SpanStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 17.sp,  // Slightly larger than the rest
+                            color = Color.Black  // A deeper tone matching your app's color scheme
+                        )) {
+                            append("${learnedWord.translation}")  // Apostrophes inside the bold formatting
+                        }
+
+                        // Subtle separator
+                        withStyle(style = SpanStyle(
+                            color = Color.Gray,
+                            fontWeight = FontWeight.Normal
+                        )) {
+                            append("  —  ")  // Em dash with spacing for visual separation
+                        }
+
+                        // Description with improved readability
+                        withStyle(style = SpanStyle(
+                            fontWeight = FontWeight.Normal,
+                        )) {
+                            append(learnedWord.description)
+                        }
+                    })
+                    /**/
                     DetailSection("Etymology", learnedWord.etymology)
 //                    DetailSection("Example Sentences", wordDetails.examples.joinToString("\n\n") { "- $it" })
 
@@ -190,6 +225,27 @@ fun WordDetailScreen(
 
 @Composable
 fun DetailSection(title: String, content: String) {
+    SectionDivider()
+    Text(
+        text = title,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
+        fontFamily = FontFamily.Default,
+        color = Color.Black,
+        modifier = Modifier.padding(vertical = 12.dp)
+    )
+    Text(
+        text = content,
+        fontSize = 16.sp,
+        color = Color.Black,
+        lineHeight = 24.sp
+    )
+    Spacer(modifier = Modifier.height(24.dp))
+}
+
+// Overloaded DetailSection for annotated strings
+@Composable
+fun DetailSection(title: String, content: AnnotatedString) {
     SectionDivider()
     Text(
         text = title,
