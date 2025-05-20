@@ -8,7 +8,7 @@ import com.joostleo.linguadailyapp.utils.preferences.PreferencesManager
 
 class WordSyncLogic(private val availableWordRepository: AvailableWordRepository) {
 
-    private val DATABASE_SIZE_LIMIT = 50
+    private val DATABASE_SIZE_LIMIT = 365
     private val SYNC_THRESHOLD = 0.8
 
     suspend fun canSyncInBackground() : Boolean {
