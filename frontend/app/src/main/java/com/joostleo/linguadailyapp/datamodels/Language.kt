@@ -3,6 +3,7 @@ package com.joostleo.linguadailyapp.datamodels
 enum class Language(val displayName: String, val code: String, val flag: String) {
     SPANISH("Español", "es", "🇪🇸"),
     ENGLISH("English", "en", "🇺🇸"),
+    ENGLISH_PLUS("English+", "en+", "🇺🇸"),
     GERMAN("Deutsch", "de", "🇩🇪"),
     ITALIAN("Italiano", "it", "🇮🇹"),
     DUTCH("Nederlands", "nl", "🇳🇱");
