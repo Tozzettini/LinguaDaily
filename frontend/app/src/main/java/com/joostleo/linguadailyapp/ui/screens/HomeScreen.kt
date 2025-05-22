@@ -130,7 +130,7 @@ fun HomeScreen(
                                     animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
                                 )
                     ) {
-                        DailyInspirationBanner(todaysWords.firstOrNull()?: LearnedWord.default())
+                        DailyInspirationBanner(todaysWords)
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -250,7 +250,7 @@ fun getTimeBasedGreeting(): String {
     }
 }
 @Composable
-fun DailyInspirationBanner(todaysWord: LearnedWord) {
+fun DailyInspirationBanner(todaysWords: List<LearnedWord>) {
     val bannerColor = Color(0xFF1F565E).copy(alpha = 0.08f)
     val greeting = getTimeBasedGreeting()
     Card(
@@ -283,7 +283,7 @@ fun DailyInspirationBanner(todaysWord: LearnedWord) {
                     color = Color(0xFF1F565E)
                 )
                 Text(
-                    text = "Word of the Day: ${todaysWord.word}",
+                    text = "Word of the Day:" /* insert here some stuff */ ,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFF1F565E).copy(alpha = 0.7f)
                 )
