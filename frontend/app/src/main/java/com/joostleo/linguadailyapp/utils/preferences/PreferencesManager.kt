@@ -26,6 +26,16 @@ class PreferencesManager(context: Context) {
 
     // New methods for vocabulary statistics
 
+    fun isOnboardingCompleted(): Boolean {
+        return sharedPreferences.getBoolean("onboarding_completed", false)
+    }
+
+    fun setOnboardingCompleted(completed: Boolean) {
+        sharedPreferences.edit()
+            .putBoolean("onboarding_completed", completed)
+            .apply()
+    }
+
     fun getWordsLearned(): Int {
         return sharedPreferences.getInt(KEY_WORDS_LEARNED, 0)
     }
