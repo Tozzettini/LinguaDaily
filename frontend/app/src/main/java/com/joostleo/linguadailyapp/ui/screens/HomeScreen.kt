@@ -253,6 +253,9 @@ fun getTimeBasedGreeting(): String {
 fun DailyInspirationBanner(todaysWords: List<LearnedWord>) {
     val bannerColor = Color(0xFF1F565E).copy(alpha = 0.08f)
     val greeting = getTimeBasedGreeting()
+
+    val wordString = if(todaysWords.size < 2) "Word of the Day: ${todaysWords.firstOrNull()?.word}" else "Words of the Day: ${todaysWords.joinToString(", ") { it.word }}"
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -283,7 +286,7 @@ fun DailyInspirationBanner(todaysWords: List<LearnedWord>) {
                     color = Color(0xFF1F565E)
                 )
                 Text(
-                    text = "Word of the Day:" /* insert here some stuff */ ,
+                    text = wordString,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFF1F565E).copy(alpha = 0.7f)
                 )
