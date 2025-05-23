@@ -92,7 +92,7 @@ fun MainWordCard2(
     var isBookmarked by rememberSaveable {mutableStateOf(learnedWord.bookmarked)}
 
     val animatedHeight by animateDpAsState(
-        targetValue = if (expanded) 300.dp else 105.dp,
+        targetValue = if (expanded) 300.dp else 115.dp,
         animationSpec = tween(durationMillis = 400)
     )
 
@@ -127,8 +127,9 @@ fun MainWordCard2(
                         fontFamily = Playfair,
                         color = Color.Black
                     )
+                    //.code.replaceFirstChar { it.uppercase() }
                     Text(
-                        text = "${learnedWord.partOfSpeech} - ${learnedWord.phoneticSpelling} - ${learnedWord.language.code.replaceFirstChar { it.uppercase() }}",
+                        text = "${learnedWord.partOfSpeech} - ${learnedWord.phoneticSpelling} - ${learnedWord.language}",
                         fontSize = 16.sp,
                         color = Color.Black,
                         modifier = Modifier.padding(top = 4.dp),
