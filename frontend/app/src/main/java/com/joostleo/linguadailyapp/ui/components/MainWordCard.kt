@@ -128,7 +128,7 @@ fun MainWordCard2(
                         color = Color.Black
                     )
                     Text(
-                        text = "${learnedWord.partOfSpeech} - ${learnedWord.phoneticSpelling} - ${learnedWord.language}",
+                        text = "${learnedWord.partOfSpeech} - ${learnedWord.phoneticSpelling} - ${learnedWord.language.code}",
                         fontSize = 16.sp,
                         color = Color.Black,
                         modifier = Modifier.padding(top = 4.dp),
