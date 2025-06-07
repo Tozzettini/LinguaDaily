@@ -286,8 +286,6 @@ fun LinguaBottomNavigation(
         contentColor = brandColor,
         tonalElevation = 8.dp,
         modifier = Modifier
-            .height(navigationBarHeight)
-            .heightIn(min = 64.dp)
             .drawBehind {
                 // Draw a thin top border
                 drawLine(
