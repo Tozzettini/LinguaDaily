@@ -1,109 +1,133 @@
-[10:42 PM, 4/10/2025] Joost (Fontys):  Your Current Design (Local-Only, Frontend-Tracked)
-Architecture:
+# LinguaDaily - Expand Your Vocabulary Daily
 
-🗄️ Centralized database stores all approved words, uniquely ordered by id.
+📱 **Available on Google Play Store** | 🌐 **Multilingual Learning** | 📚 **One Word at a Time**
 
-📱 The frontend (app) manages progress:
+[![Google Play](https://img.shields.io/badge/Google_Play-Download-blue?logo=google-play)](https://play.google.com/store/apps/details?id=com.linguadaily.app)
+![Android](https://img.shields.io/badge/Android-10%2B-green?logo=android)
+![Downloads](https://img.shields.io/badge/Downloads-10%2B-brightgreen)
+![Version](https://img.shields.io/badge/Version-1.0.11-orange)
 
-available_words (SQLite) → up to 300 unshown words
+## 🌟 About LinguaDaily
 
-learned_words (SQLite) → words already shown, with metadata like learned_at, bookmarked
+LinguaDaily is your perfect companion for multilingual learning and vocabulary expansion. Receive a fresh word every day across one or more languages of your choice, making language learning effortless and consistent.
 
-🔁 App fetches words in batches using a simple API:
 
-Example: GET /words?skip=300&limit=100
 
-App keeps track of skip value locally to avoid repeats.
+## ✨ Key Features
 
-Flow:
+### 📖 Daily Word Delivery
+- **One word per language daily** - Perfect for busy learners
+- **Multiple language support** - Learn Spanish, French, Japanese, and more simultaneously
+- **Consistent learning habit** - Build vocabulary gradually and effectively
 
-On install → App requests first 300 words (skip=0)
+### 🎯 Rich Word Context
+- **Clear definitions** - Understand each word thoroughly
+- **Etymology insights** - Learn about word origins and history
+- **Example sentences** - See words used in real-world contexts
+- **Bookmark system** - Save favorite words for later review
 
-Daily notification → moves a word from available to learned
+### 📱 Smart Technology
+- **Hybrid architecture** - Server-tracked progress with local caching
+- **Offline support** - Learn without internet connection
+- **Sync across devices** - Progress saved with unique user ID
+- **No duplicates** - Advanced algorithm ensures you never see repeated words
 
-When available_words < threshold → app fetches next batch (e.g., skip=300)
+## 🚀 How It Works
 
-If app is uninstalled, all progress is lost
+### Installation & Setup
+1. **Download** from Google Play Store
+2. **Select languages** - Choose one or multiple languages to learn
+3. **Receive daily words** - Get a new word every day for each selected language
 
-Pros:
+### Learning Flow
+```mermaid
+graph LR
+A[Daily Notification] --> B[View New Word]
+B --> C{Understand Word}
+C --> D[Read Definition]
+C --> E[Explore Etymology]
+C --> F[See Examples]
+D --> G[Bookmark if desired]
+E --> G
+F --> G
+G --> H[Continue Learning Tomorrow]
+```
 
-Offline support
+## 🛠 Technical Architecture
 
-Simple backend
+### Hybrid Model (Server + Local)
+- **Centralized Database** - Stores all approved words with unique ordering
+- **User Progress Tracking** - Server maintains learning history
+- **Local Cache** - Stores ~300 words for offline use
+- **Smart Sync** - Ensures seamless experience across devices
 
-Efficient, few network calls
+### Data Flow
+```
+Server (All Words + User Progress) → Local Cache (300 words) → Daily Notifications
+```
 
-Cons:
+## 📊 App Information
 
-Backend has no user context (can’t personalize or sync)
+- **Version:** 1.0.11
+- **Updated:** June 7, 2025
+- **Requires Android:** 10 and up
+- **Downloads:** 10+ (Growing daily!)
+- **Content Rating:** PEGI 3
+- **Offered by:** Google Commerce Ltd
 
-Reinstalls lose all user progress
+## 💡 Why Choose LinguaDaily?
 
-Repeats are possible if app loses skip value
+### ✅ Advantages Over Traditional Apps
+- **No lost progress** - User account system preserves learning history
+- **Personalized experience** - Backend enables future features like difficulty levels
+- **Scalable architecture** - Ready for new languages and features
+- **Efficient networking** - Minimal data usage with smart batch loading
 
-Hard to scale or add new features (difficulty levels, streaks, etc.)
+### 🎯 Perfect For
+- **Polyglots** learning multiple languages
+- **Travelers** preparing for trips abroad
+- **Students** expanding their vocabulary
+- **Language enthusiasts** exploring etymology
+- **Busy professionals** wanting consistent micro-learning
 
-✅ Hybrid Model (Server-Tracked Progress, Local Cache)
-Architecture:
+## 🔄 Version History
 
-🗄️ Centralized database:
+**v1.0.11** (June 7, 2025)
+- Improved word delivery system
+- Enhanced offline support
+- Bug fixes and performance improvements
 
-words table: all approved words
+**v1.0.0** (May 21, 2025)
+- Initial release
+- Multi-language support
+- Basic word learning features
 
-users table: user identity and progress
+## 📱 Permissions
 
-user_words table: optionally stores full word history (user_id, word_id, learned_at, etc.)
+LinguaDaily requires minimal permissions to provide the best experience:
+- Internet access (for word updates)
+- Notifications (for daily reminders)
+- Storage (for offline word caching)
 
-📱 App stores only a local cache of ~300 words
+## 🌍 Supported Languages
 
-May also store recently learned words offline until sync
+*Currently includes:* Spanish, French, Japanese, German, Italian, Portuguese, and more being added regularly!
 
-Flow:
+## 💬 Support
 
-On install or cache drop → app asks backend:
-“Give me the next 100 words for user 123”
+Having issues or suggestions? We'd love to hear from you!
+- Rate us on Google Play
+- Send feedback through the app
+- Report bugs for quick fixes
 
-Backend:
+## 📄 License
 
-Looks up user’s last_word_id or fetches from user_words
+Free to use with optional ad-supported model. Your support through ads helps us continue developing and adding new languages!
 
-Returns next batch
+---
 
-Updates progress
+**Start your language journey today!** 📚✨
 
-App stores batch in local available_words
+[![Download on Google Play](https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=com.linguadaily.app)
 
-App uses those words for notifications and requests
-
-If user logs in on a new phone → backend knows what they’ve seen
-
-Pros:
-
-Still supports offline use
-
-Backend ensures no repeats
-
-Progress survives reinstall or device switch
-
-Enables future personalization (difficulty, categories, streaks)
-
-Cleaner sync model and future scalability
-
-Cons:
-
-Slightly more complex backend
-
-Needs user account or unique ID to track progress
-
-Requires sync mechanism on app side (e.g., transaction retries, offline caching)
-
-🧠 TL;DR
-Feature	Your Design	Hybrid Model
-Offline support	✅ Yes	✅ Yes
-Backend tracks progress	❌ No	✅ Yes
-Prevents duplicates forever	❌ Only if skip is tracked well	✅ Yes
-Handles reinstalls	❌ No	✅ Yes
-Needs user login	❌ No	⚠️ Yes (or at least stable user ID)
-Simple to implement	✅ Yes	⚠️ Medium complexity
-Scales to future features	⚠️ Hard	✅ Easy
-[10:43 PM, 4/10/2025] Joost (Fontys): So afterwards we are going to a hybrid model (server-tracked progess, local cache)
+*"A word a day opens up a world of understanding."* 🌍
